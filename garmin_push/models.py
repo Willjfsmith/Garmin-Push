@@ -28,10 +28,20 @@ def parse_pace(pace_str: str) -> float:
 
     5:30 = 330 seconds per km = 1000/330 ≈ 3.03 m/s
     """
-    parts = pace_str.strip().split(":")
-    minutes = int(parts[0])
-    seconds = int(parts[1]) if len(parts) > 1 else 0
+    pace_str = pace_str.strip()
+    parts = pace_str.split(":")
+    if len(parts) not in (1, 2):
+        raise ValueError(f"Invalid pace format: {pace_str!r}. Use 'M:SS' (e.g. '5:30')")
+    try:
+        minutes = int(parts[0])
+        seconds = int(parts[1]) if len(parts) > 1 else 0
+    except ValueError:
+        raise ValueError(f"Invalid pace format: {pace_str!r}. Use 'M:SS' (e.g. '5:30')")
+    if minutes < 0 or seconds < 0 or seconds >= 60:
+        raise ValueError(f"Invalid pace: {pace_str!r}. Seconds must be 0-59")
     total_seconds = minutes * 60 + seconds
+    if total_seconds <= 0:
+        raise ValueError(f"Pace must be greater than 0:00")
     return 1000.0 / total_seconds
 
 
@@ -106,22 +116,24 @@ def resolve_pace(pace_value: Any, pace_zones: dict | None = None) -> tuple[float
 
     if isinstance(pace_value, str):
         if pace_value in zones:
-            slow_str, fast_str = zones[pace_value]
+            pace_a, pace_b = zones[pace_value]
         elif "-" in pace_value:
-            fast_str, slow_str = pace_value.split("-", 1)
+            pace_a, pace_b = pace_value.split("-", 1)
         else:
-            raise ValueError(f"Unknown pace zone: {pace_value!r}")
+            raise ValueError(
+                f"Unknown pace zone: {pace_value!r}. "
+                f"Available zones: {', '.join(zones.keys())}"
+            )
     elif isinstance(pace_value, (list, tuple)) and len(pace_value) == 2:
-        fast_str, slow_str = pace_value[0], pace_value[1]
+        pace_a, pace_b = pace_value[0], pace_value[1]
     else:
         raise ValueError(f"Invalid pace value: {pace_value!r}")
 
-    # Note: faster pace (lower min/km) = higher m/s
-    # Garmin expects targetValueOne < targetValueTwo (slower < faster in m/s)
-    slow_mps = parse_pace(slow_str)
-    fast_mps = parse_pace(fast_str)
-    if slow_mps > fast_mps:
-        slow_mps, fast_mps = fast_mps, slow_mps
+    mps_a = parse_pace(pace_a)
+    mps_b = parse_pace(pace_b)
+    # Garmin expects targetValueOne < targetValueTwo (slower pace = lower m/s first)
+    slow_mps = min(mps_a, mps_b)
+    fast_mps = max(mps_a, mps_b)
     return (slow_mps, fast_mps)
 
 
@@ -311,3 +323,73 @@ def build_workout(
         estimatedDurationInSecs=estimated_duration_minutes * 60,
         workoutSegments=[segment],
     )
+
+
+def _format_seconds(s: float) -> str:
+    """Format seconds as MM:SS or HH:MM:SS."""
+    s = int(s)
+    if s >= 3600:
+        return f"{s // 3600}:{(s % 3600) // 60:02d}:{s % 60:02d}"
+    return f"{s // 60}:{s % 60:02d}"
+
+
+def _format_meters(m: float) -> str:
+    """Format meters as human-readable distance."""
+    if m >= 1000:
+        return f"{m / 1000:.1f}km"
+    return f"{int(m)}m"
+
+
+def _mps_to_pace(mps: float) -> str:
+    """Convert m/s to min:sec per km pace string."""
+    secs_per_km = 1000.0 / mps
+    mins = int(secs_per_km) // 60
+    secs = int(secs_per_km) % 60
+    return f"{mins}:{secs:02d}"
+
+
+def format_workout_summary(workout: RunningWorkout) -> str:
+    """Return a human-readable summary of a workout for dry-run output."""
+    d = workout.to_dict()
+    lines = [f"Workout: {d['workoutName']}"]
+    lines.append(f"Duration: ~{_format_seconds(d['estimatedDurationInSecs'])}")
+    lines.append("Steps:")
+
+    for step in d["workoutSegments"][0]["workoutSteps"]:
+        step_type = step.get("stepType", {}).get("stepTypeKey", "?")
+
+        if step_type == "repeat":
+            n = step.get("numberOfIterations", "?")
+            lines.append(f"  Repeat x{n}:")
+            for inner in step.get("workoutSteps", []):
+                lines.append(f"    {_format_step_line(inner)}")
+        else:
+            lines.append(f"  {_format_step_line(step)}")
+
+    return "\n".join(lines)
+
+
+def _format_step_line(step: dict) -> str:
+    """Format a single step dict as a summary line."""
+    kind = step.get("stepType", {}).get("stepTypeKey", "?")
+    cond_key = step.get("endCondition", {}).get("conditionTypeKey", "?")
+    cond_val = step.get("endConditionValue")
+
+    if cond_key == "time" and cond_val:
+        duration_str = _format_seconds(cond_val)
+    elif cond_key == "distance" and cond_val:
+        duration_str = _format_meters(cond_val)
+    elif cond_key == "lap.button":
+        duration_str = "lap button"
+    else:
+        duration_str = "?"
+
+    target_key = step.get("targetType", {}).get("workoutTargetTypeKey", "no.target")
+    if target_key == "pace.zone":
+        tv1 = step.get("targetValueOne", 0)
+        tv2 = step.get("targetValueTwo", 0)
+        pace_str = f" @ {_mps_to_pace(tv2)}-{_mps_to_pace(tv1)}/km"
+    else:
+        pace_str = ""
+
+    return f"{kind} {duration_str}{pace_str}"
