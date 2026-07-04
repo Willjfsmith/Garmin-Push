@@ -169,6 +169,9 @@ section[hidden]{display:none}
 .overlay .obar .phase{flex:1;font-family:var(--head);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:14px}
 .ring-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;margin:8px 0}
 .ring{position:relative;width:min(74vw,300px);aspect-ratio:1}
+.ring.small{width:min(42vw,165px)}
+.ring.small .time{font-size:30px}
+.ring.small .sub{font-size:10px;margin-top:2px}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .track{fill:none;stroke:var(--hair);stroke-width:8}
 .ring .prog{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
@@ -197,15 +200,6 @@ section[hidden]{display:none}
 .modal p{color:var(--muted);margin:0 0 16px}
 
 /* quick-log sheet */
-.log-ex{display:grid;grid-template-columns:1fr;gap:5px;padding:8px 0;border-bottom:1px solid var(--hair)}
-.log-ex .lname{font-weight:700;font-size:14px}
-.log-ex .sets{display:flex;gap:6px;flex-wrap:wrap}
-.log-ex .setin{display:flex;flex-direction:column;gap:2px}
-.log-ex .setin label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
-.log-ex input{
-  width:64px;text-align:center;padding:8px 5px;border:1px solid var(--hair);border-radius:9px;
-  background:var(--paper);color:var(--ink);
-}
 .lset{margin-top:7px}
 .lset .lshead{display:flex;align-items:center;gap:8px}
 .lset .setn{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);min-width:38px}
@@ -216,15 +210,7 @@ section[hidden]{display:none}
   background:var(--paper);color:var(--ink);font-weight:800;font-size:13px;padding:0;
 }
 .reppad button.on{background:var(--accent);color:#fff;border-color:transparent}
-/* accordion in log sheets: only the active set shows its pad */
-.repchip{
-  margin-left:auto;min-width:76px;padding:7px 10px;border-radius:9px;border:1.5px dashed var(--hair);
-  background:var(--paper);color:var(--muted);font-weight:800;font-size:13px;text-align:center;
-}
-.repchip.has{border-style:solid;border-color:var(--accent);color:var(--ink)}
-.lset .reppad{display:none}
-.lset.active .reppad{display:flex}
-.lset.active .repchip{border-color:var(--accent)}
+.setw{width:82px;text-align:center;padding:8px 6px;border:1px solid var(--hair);border-radius:9px;background:var(--paper);color:var(--ink)}
 
 /* ================================================================= SNACKS */
 .snack{
@@ -632,7 +618,6 @@ function fmtWeight(w, lt){
 // you can". The column's rep-range top acts only as the ceiling that, once you
 // clear it, tells you to add load (double progression) — you're never told an
 // exact number to hit.
-const SESSION_SETS = 2; // a 15-min session = 2 circuit rounds = 2 working sets
 function computeTarget(rowIdx, colIdx){
   const col = COLUMNS[colIdx];
   const exName = currentEx(rowIdx, colIdx).n;
@@ -876,38 +861,6 @@ function wireRepPads(root, onPick){
       if(onPick) onPick(pad, +pad.dataset.val);
     });
   });
-}
-// accordion for log sheets: one rep pad open at a time; picking a value
-// collapses it into a chip and opens the next un-filled set
-function wireLogSheet(ov){
-  const lsets = [...ov.querySelectorAll(".lset")];
-  function chipOf(ls){ return ls.querySelector(".repchip"); }
-  function activate(ls){
-    lsets.forEach(x=> x.classList.toggle("active", x===ls));
-    if(ls) ls.scrollIntoView({ block:"center", behavior:"smooth" });
-  }
-  lsets.forEach(ls=>{
-    chipOf(ls).addEventListener("click", ()=> activate(ls));
-  });
-  wireRepPads(ov, (pad)=>{
-    const ls = pad.closest(".lset"); if(!ls) return;
-    const v = pad.dataset.val;
-    const chip = chipOf(ls);
-    chip.textContent = v>30 ? "30+" : (v+" reps"); chip.classList.add("has");
-    const next = lsets.find(x=> x!==ls && !x.querySelector(".reppad").dataset.val && lsets.indexOf(x)>lsets.indexOf(ls))
-              || lsets.find(x=> !x.querySelector(".reppad").dataset.val);
-    activate(next || null);
-  });
-  if(lsets.length) activate(lsets[0]);
-}
-// one set row for the log sheets (weight input if loaded + rep chip + pad)
-function lsetHTML(n, t){
-  const wv = t.lt==="bw" ? "" : (t.weight!=null?t.weight:"");
-  const wph = t.lt==="band" ? "band lvl" : S.settings.units;
-  return '<div class="lset"><div class="lshead"><span class="setn">Set '+n+'</span>'+
-    (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
-                 : '<input type="number" inputmode="decimal" class="w" placeholder="'+wph+'" value="'+wv+'" aria-label="Weight">')+
-    '<button type="button" class="repchip">'+(t.beat!=null?('beat '+t.beat):'reps')+'</button></div>'+ repPad(null) +'</div>';
 }
 
 /* ================================================================= RENDER: TODAY */
@@ -1506,6 +1459,7 @@ const Player = {
   _start(colId, steps){
     this.active=true; this.colId=colId; this.colIdx=COLUMNS.indexOf(colById(colId));
     this.steps=steps; this.idx=0;
+    this.pend={}; // sets captured as you go: pend[row][setIdx] = {w,r}
     document.documentElement.classList.toggle("reduced", matchMedia("(prefers-reduced-motion: reduce)").matches);
     requestWake(); lockScroll(true);
     try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); AC.resume&&AC.resume(); }catch(e){}
@@ -1638,7 +1592,9 @@ const Player = {
     const prog = document.getElementById("pProg");
     if(prog) prog.style.width = Math.round(this.idx/(this.steps.length-1)*100)+"%";
 
-    let html = '<div class="ring-wrap"><div class="ring"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ringProg" cx="60" cy="60" r="52" style="stroke:'+col.color+'"/></svg>';
+    const widget = this.logWidgetHTML(); // log the set you just finished
+    const ringCls = widget ? "ring small" : "ring";
+    let html = '<div class="ring-wrap"><div class="'+ringCls+'"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ringProg" cx="60" cy="60" r="52" style="stroke:'+col.color+'"/></svg>';
     html += '<div class="center"><div class="time" id="ringTime">'+mmss(step.sec)+'</div><div class="sub">'+esc(phaseLabel)+'</div></div></div></div>';
 
     if(step.type==="exercise"){
@@ -1650,18 +1606,16 @@ const Player = {
       html += '<div class="pcue">'+esc(ex.c)+'</div>';
       html += '<div class="ptarget" style="color:'+col.color+'">AMRAP · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat:'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div></div>';
     } else if(step.type==="rest"){
-      // show the NEXT move while resting so you can set up for it
+      html += widget;
+      // and preview the NEXT move so you can set up for it
       const nextStep = this.steps[this.idx+1];
       if(nextStep && nextStep.type==="exercise"){
         const nx = currentEx(nextStep.row, nextStep.colIdx);
-        html += '<div class="player-ex">'+pico(nextStep.row, nextStep.colIdx, "pbig")+
-                '<div class="pcue" style="margin-top:0">Up next</div>'+
-                '<div class="pname" style="margin-top:2px">'+esc(nx.n)+'</div>'+
+        html += '<div class="player-ex" style="margin-top:10px"><div class="pcue" style="margin-top:0">Up next: <b>'+esc(nx.n)+'</b></div>'+
                 '<div class="pcue">'+esc(nx.c)+'</div></div>';
-      } else {
-        html += '<div class="player-ex"><div class="pname">'+esc(step.label||"Rest")+'</div></div>';
       }
     } else { // warmup / cooldown
+      html += widget; // cooldown carries the final set's log widget
       html += '<div class="player-ex"><div class="pname">'+esc(step.title)+'</div><ul class="player-list">'+
         step.list.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>';
     }
@@ -1669,8 +1623,45 @@ const Player = {
     // controls
     html += '<div class="player-ctrls" id="pCtrls"></div>';
     stage.innerHTML = html;
+    this.wireLogWidget();
     this.renderControls();
     this.paint(step.sec);
+  },
+  // compact "log that set" card shown right after each exercise (during rest /
+  // cool-down) — weight prefilled, reps are one tap, saved as you go
+  logWidgetHTML(){
+    const prev = this.steps[this.idx-1];
+    if(!prev || prev.type!=="exercise") return "";
+    const row = prev.row, si = prev.round-1;
+    const t = computeTarget(row, prev.colIdx);
+    const ex = currentEx(row, prev.colIdx);
+    const cur = (this.pend[row]||[])[si] || {};
+    const set1 = (this.pend[row]||[])[0];
+    const wv = cur.w ? cur.w : (t.lt==="bw" ? "" : ((set1&&set1.w) || (t.weight!=null?t.weight:"")));
+    const wph = t.lt==="band" ? "band lvl" : S.settings.units;
+    return '<div class="card lset" id="setLog" data-row="'+row+'" data-set="'+si+'" style="margin-top:2px;padding:9px 11px">'+
+      '<div class="lshead"><span class="setn" style="min-width:0">Log · '+esc(ex.n)+' · set '+prev.round+'</span>'+
+      (t.lt==="bw" ? '' : '<input type="number" inputmode="decimal" class="w setw" placeholder="'+wph+'" value="'+wv+'" aria-label="Weight" style="margin-left:auto">')+
+      '</div>'+ repPad(cur.r||null) +
+      (t.beat!=null ? '<div class="small muted" style="margin-top:2px">Last best: '+t.beat+' reps — beat it.</div>' : '')+
+      '</div>';
+  },
+  wireLogWidget(){
+    const sl = document.getElementById("setLog");
+    if(!sl) return;
+    const row = +sl.getAttribute("data-row"), si = +sl.getAttribute("data-set");
+    const ensure = ()=>{
+      if(!this.pend[row]) this.pend[row]=[];
+      if(!this.pend[row][si]) this.pend[row][si]={w:0,r:0};
+      return this.pend[row][si];
+    };
+    const wi = sl.querySelector("input.w");
+    if(wi) wi.addEventListener("input", ()=>{ ensure().w = wi.value!=="" ? +wi.value : 0; });
+    wireRepPads(sl, (pad, v)=>{
+      const p = ensure();
+      p.r = v;
+      if(wi && wi.value!=="") p.w = +wi.value; // grab the prefilled weight too
+    });
   },
   renderControls(){
     const c = document.getElementById("pCtrls");
@@ -1699,31 +1690,33 @@ const Player = {
     const root = document.getElementById("overlayRoot"); root.innerHTML="";
     const ov = el('<div class="overlay" style="--accent:'+col.color+'"></div>');
     let html = '<div class="obar"><div class="phase" style="flex:1;color:'+col.color+'">Session complete</div></div>';
-    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">Log your AMRAP sets — weight is pre-filled, enter your reps.</p></div>';
+    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">Here\'s what you logged along the way.</p></div>';
     html += '<div class="card" style="margin-bottom:14px">';
+    let anySets = false;
     for(let r=0;r<5;r++){
       const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
-      html += '<div class="log-ex" data-row="'+r+'"><div class="lname">'+(r+1)+'. '+esc(ex.n)+'</div>';
-      for(let s=0;s<SESSION_SETS;s++) html += lsetHTML(s+1, t);
-      html += '</div>';
+      const sets = (this.pend[r]||[]).filter(s=> s && s.r>0);
+      if(sets.length) anySets = true;
+      const txt = sets.length
+        ? sets.map(s=> (s.w>0 ? fmtWeight(s.w,t.lt) : "BW")+"×"+s.r).join("  ")
+        : "—";
+      html += '<div class="lrow"><div class="lr-main"><div class="lr-name">'+(r+1)+'. '+esc(ex.n)+'</div></div>'+
+              '<div class="lr-val">'+esc(txt)+'</div></div>';
     }
     html += '</div>';
-    html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Skip logging</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save session</button></div>';
-    ov.innerHTML = html; root.appendChild(ov); wireLogSheet(ov);
+    if(!anySets) html += '<p class="small muted" style="text-align:center;margin:-6px 0 12px">No sets logged — you can still save the session, or add sets later with the ＋ Quick Log.</p>';
+    html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Don\'t save sets</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save session</button></div>';
+    ov.innerHTML = html; root.appendChild(ov);
 
     ov.querySelector("#saveLog").addEventListener("click", ()=>{
       const iso = todayISO(); const added=[];
-      ov.querySelectorAll(".log-ex").forEach(node=>{
-        const r = +node.getAttribute("data-row"); const exName = currentEx(r, colIdx).n;
-        const sets = [];
-        node.querySelectorAll(".lset").forEach(ls=>{
-          const wi = ls.querySelector("input.w"), pad = ls.querySelector(".reppad");
-          const w = (wi && wi.value!=="") ? +wi.value : 0;
-          const rr = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
-          if(w>0 || rr>0) sets.push({ w, r:rr });
-        });
-        if(sets.length){ const log={ date:iso, col:this.colId, mode:"session", row:r, exercise:exName, sets }; S.logs.push(log); added.push(log); }
-      });
+      for(let r=0;r<5;r++){
+        const sets = (this.pend[r]||[]).filter(s=> s && s.r>0).map(s=>({ w:+s.w||0, r:+s.r }));
+        if(sets.length){
+          const log = { date:iso, col:this.colId, mode:"session", row:r, exercise:currentEx(r, colIdx).n, sets };
+          S.logs.push(log); added.push(log);
+        }
+      }
       S.sessionsDone[iso] = this.colId;
       const prs = detectPRs(added); save(); checkAchievements(); save();
       this.teardown();
