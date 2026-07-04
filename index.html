@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#171A1F">
 <meta name="description" content="Home Strength Blueprint — a 15-minute daily strength program you can do with dumbbells, bands, or no equipment.">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Strength">
@@ -38,8 +39,10 @@ body{
 }
 button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 input,select{font-family:inherit;font-size:16px}
+/* no double-tap zoom on rapid taps (rep pad, Next button) */
+button,input,select,textarea,[role="button"],[role="radio"],.snack,.heat .hd{touch-action:manipulation}
 h1,h2,h3{font-family:var(--head);margin:0;letter-spacing:.01em}
-.app{max-width:720px;margin:0 auto;min-height:100vh;padding:0 0 calc(60px + var(--safe-b))}
+.app{max-width:720px;margin:0 auto;min-height:100vh;padding:0 0 calc(128px + var(--safe-b))}
 
 /* ================================================================= HEADER */
 header.top{
@@ -168,6 +171,11 @@ section[hidden]{display:none}
 .overlay .obar .phase{flex:1;font-family:var(--head);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:14px}
 .ring-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;margin:8px 0}
 .ring{position:relative;width:min(74vw,300px);aspect-ratio:1}
+.ring.small{width:min(42vw,165px)}
+.ring.small .time{font-size:30px}
+.ring.small .sub{font-size:10px;margin-top:2px}
+.ring{cursor:pointer}
+.overlay.paused .ring{opacity:.55}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .track{fill:none;stroke:var(--hair);stroke-width:8}
 .ring .prog{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
@@ -184,7 +192,8 @@ section[hidden]{display:none}
 .player-ex .ptarget{margin-top:8px;font-weight:800;font-family:var(--head);letter-spacing:.03em}
 .player-list{margin:10px auto;max-width:360px;text-align:left}
 .player-list li{padding:6px 0;border-bottom:1px solid var(--hair);font-size:15px}
-.player-ctrls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto;padding-top:16px}
+.player-ctrls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:auto;padding-top:14px}
+.player-ctrls .btn{padding-left:6px;padding-right:6px}
 .player-ctrls .btn{margin-top:0}
 .player-ctrls .wide{grid-column:1 / -1}
 
@@ -195,25 +204,17 @@ section[hidden]{display:none}
 .modal p{color:var(--muted);margin:0 0 16px}
 
 /* quick-log sheet */
-.log-ex{display:grid;grid-template-columns:1fr;gap:5px;padding:8px 0;border-bottom:1px solid var(--hair)}
-.log-ex .lname{font-weight:700;font-size:14px}
-.log-ex .sets{display:flex;gap:6px;flex-wrap:wrap}
-.log-ex .setin{display:flex;flex-direction:column;gap:2px}
-.log-ex .setin label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
-.log-ex input{
-  width:64px;text-align:center;padding:8px 5px;border:1px solid var(--hair);border-radius:9px;
-  background:var(--paper);color:var(--ink);
-}
-.lset{margin-top:8px}
-.lset .lshead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.lset{margin-top:7px}
+.lset .lshead{display:flex;align-items:center;gap:8px}
 .lset .setn{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);min-width:38px}
-.reppad{display:flex;gap:5px;overflow-x:auto;padding:2px 1px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+/* rep pad: ALL numbers visible (wrapping grid), single tap to pick */
+.reppad{display:flex;flex-wrap:wrap;gap:4px;padding:6px 1px 2px}
 .reppad button{
-  flex:0 0 auto;min-width:36px;height:36px;border-radius:9px;border:1px solid var(--hair);
-  background:var(--paper);color:var(--ink);font-weight:800;font-size:14px;
+  flex:0 0 auto;width:31px;height:33px;border-radius:8px;border:1px solid var(--hair);
+  background:var(--paper);color:var(--ink);font-weight:800;font-size:13px;padding:0;
 }
 .reppad button.on{background:var(--accent);color:#fff;border-color:transparent}
-.reppad .repcap{font-size:11px;color:var(--muted);align-self:center;padding:0 4px;font-weight:700}
+.setw{width:82px;text-align:center;padding:8px 6px;border:1px solid var(--hair);border-radius:9px;background:var(--paper);color:var(--ink)}
 
 /* ================================================================= SNACKS */
 .snack{
@@ -240,6 +241,7 @@ section[hidden]{display:none}
 .heat .hd.partial{background:#9ec9ad}
 .heat .hd.full{background:var(--plateD)}
 .heat .hd.future{background:transparent}
+.heat .hd.today{outline:2px solid var(--ink);outline-offset:1px}
 .heatlabels{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px}
 .heatlabels span{text-align:center;font-size:10px;color:var(--muted);font-weight:700}
 .spark{width:100%;height:36px;display:block;margin-top:6px}
@@ -252,7 +254,7 @@ section[hidden]{display:none}
 .field input,.field select,.field textarea{
   padding:9px 10px;border:1px solid var(--hair);border-radius:9px;background:var(--paper);color:var(--ink);width:100%;
 }
-.field textarea{min-height:96px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;resize:vertical}
+.field textarea{min-height:96px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;resize:vertical}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--hair)}
 .switch{position:relative;width:52px;height:30px}
 .switch input{opacity:0;width:0;height:0}
@@ -310,14 +312,16 @@ section[hidden]{display:none}
 .typopt.on .tsub{color:rgba(255,255,255,.9)}
 .typopt .tck{font-weight:900;font-size:16px;opacity:0}
 .typopt.on .tck{opacity:1}
-/* swap chips */
-.swap{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.swap button{
-  flex:1;min-width:44px;padding:8px 0;border-radius:9px;border:1px solid var(--hair);
-  background:var(--paper);color:var(--ink);font-family:var(--head);font-weight:900;font-size:15px;
+.typchange{
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+  padding:8px;margin-bottom:7px;border-radius:10px;border:1.5px dashed var(--hair);
+  background:transparent;color:var(--muted);font-weight:700;font-size:12.5px;
 }
-.swap button.on{color:#fff;border-color:transparent}
 .inline-note{font-size:11.5px;color:var(--muted);margin-top:6px}
+/* player session progress bar */
+.pbar{height:4px;border-radius:99px;background:var(--hair);overflow:hidden;margin:2px 0 4px}
+.pbar>span{display:block;height:100%;background:var(--accent);transition:width .3s}
+.reduced .pbar>span{transition:none}
 /* day detail rows in modal */
 .dd-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--hair);font-size:13px}
 .dd-row:last-child{border-bottom:0}
@@ -451,26 +455,16 @@ const EXERCISES = [
   ["Bent-Over DB Row","Band Lat Pulldown","Towel Door Row","Table Inverted Row","Renegade Row"],
   ["Suitcase Carry","Pallof Press","Slow Dead Bug","Mountain Climbers","Plank DB Drag"],
 ];
-const WEEK_PLAN = { Mon:"A", Tue:"B", Wed:"C", Thu:"D", Fri:"E" };
-const WARMUP  = ["Arm circles + band pull-aparts","Bodyweight squats ×10 + hip hinges ×10","Push-up to down-dog ×5"];
+// warm-up matches the equipment you actually have out
+function warmupList(colId){
+  const banded = /band/.test(colById(colId).equipment);
+  return [
+    banded ? "Arm circles ×10 + band pull-aparts ×10" : "Arm circles ×10 each way + shoulder rolls",
+    "Bodyweight squats ×10 + hip hinges ×10",
+    "Push-up to down-dog ×5",
+  ];
+}
 const COOLDOWN= ["Doorway chest stretch","Couch stretch (hip flexors)","Standing hamstring stretch"];
-const SESSION = [
-  { phase:"warmup",   sec:120 },
-  { phase:"round",    n:1, sec:330 },
-  { phase:"round",    n:2, sec:330 },
-  { phase:"cooldown", sec:120 },
-];
-const SNACKS = [
-  { trigger:"With coffee",   row:0 }, { trigger:"Before lunch",  row:1 },
-  { trigger:"3pm slump",     row:2 }, { trigger:"After work",    row:3 },
-  { trigger:"Before dinner", row:4 },
-];
-const PROGRESSION = [
-  { week:1, label:"Baseline",     rule:"Learn the moves. Log every weight and rep." },
-  { week:2, label:"+1 Rep",       rule:"Same weights, add one rep to every set." },
-  { week:3, label:"Top of Range", rule:"Add one more rep — hit the rep ceiling." },
-  { week:4, label:"Add Weight",   rule:"Heavier DB / thicker band. Reps reset to bottom of range." },
-];
 // per-exercise one-line form cues, indexed [row][col]
 const CUES = [
   ["DB at chest, elbows inside knees, sit between your heels",
@@ -553,6 +547,15 @@ function exPickIdx(r,c){ const opts=exOptions(r,c); const i=(S.settings.exPick&&
 function currentEx(r,c){ return exOptions(r,c)[exPickIdx(r,c)]; }
 function cycleEx(r,c){ const opts=exOptions(r,c); if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[r+"-"+c]=(exPickIdx(r,c)+1)%opts.length; save(); }
 function pickedColumn(){ return S.settings.pickedCol || "A"; }
+// gentle variety: suggest the next type in the A→B→C→D→E rotation after
+// whatever you last completed (never auto-switches — just a hint)
+function suggestedCol(){
+  let last=null;
+  for(const iso in S.sessionsDone){ if(!last || iso>last.iso) last={ iso, col:S.sessionsDone[iso] }; }
+  if(!last) return null;
+  const i = COLUMNS.findIndex(c=>c.id===last.col);
+  return i<0 ? null : COLUMNS[(i+1)%COLUMNS.length].id;
+}
 // common moves for ad-hoc quick logging (bodyweight; each borrows a pictogram)
 const QUICK = [
   { n:"Push-Ups", pr:2, pc:2 }, { n:"Bodyweight Squats", pr:0, pc:2 },
@@ -566,7 +569,9 @@ function defaultState(){
   return {
     settings:{ units:"kg", pickedCol:"A", sound:true, vibrate:true,
                theme:"system", weeklyGoal:5, interval:"45/15", exPick:{} },
-    logs:[], snacksDone:{}, sessionsDone:{}, dayColumn:{}, bodyweight:[], achievements:[]
+    // snackGoals: self-set daily mini-goals, e.g. 10 push-ups, 4 times a day
+    snackGoals:[{ id:"g1", ex:"Push-Ups", reps:10, times:4, row:2, col:2, w:0 }],
+    logs:[], snacksDone:{}, sessionsDone:{}, bodyweight:[], achievements:[]
   };
 }
 let S = defaultState();
@@ -588,10 +593,10 @@ function migrate(obj){
   const s = Object.assign({}, d.settings, obj.settings || {});
   return {
     settings:s,
+    snackGoals: Array.isArray(obj.snackGoals) ? obj.snackGoals : d.snackGoals,
     logs: Array.isArray(obj.logs) ? obj.logs : [],
     snacksDone: (obj.snacksDone && typeof obj.snacksDone==="object") ? obj.snacksDone : {},
     sessionsDone: (obj.sessionsDone && typeof obj.sessionsDone==="object") ? obj.sessionsDone : {},
-    dayColumn: (obj.dayColumn && typeof obj.dayColumn==="object") ? obj.dayColumn : {},
     bodyweight: Array.isArray(obj.bodyweight) ? obj.bodyweight : [],
     achievements: Array.isArray(obj.achievements) ? obj.achievements : [],
   };
@@ -600,35 +605,20 @@ function save(){
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ /* quota / private mode */ }
 }
 
-/* ================================================================= CLOCK & CYCLE */
+/* ================================================================= CLOCK */
 function pad2(n){ return n<10 ? "0"+n : ""+n; }
 function isoOf(d){ return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
 function todayISO(){ return isoOf(new Date()); }
 function parseISO(s){ const p=(s||"").split("-"); return new Date(+p[0], (+p[1]||1)-1, +p[2]||1); }
 function addDays(d,n){ const x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
-const WK = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const WKLONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-function weekdayKey(d){ return WK[d.getDay()]; }
-function columnForDate(d){ return WEEK_PLAN[weekdayKey(d)] || null; } // null => weekend
-function isWeekend(d){ return !columnForDate(d); }
-function weekOfCycle(d){
-  const start = parseISO(S.settings.startDate);
-  const days = Math.floor((stripTime(d) - stripTime(start)) / 86400000);
-  if(days < 0) return 1;
-  return (Math.floor(days/7) % 4) + 1;
-}
 function stripTime(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); }
 function colById(id){ return COLUMNS.find(c=>c.id===id); }
 
 /* ================================================================= PROGRESSION */
-function parseRange(scheme){
-  // "3×6–8"  ->  {sets:3, low:6, high:8}
-  const m = scheme.split("×");
-  const sets = parseInt(m[0],10) || 3;
-  const rng = (m[1]||"").split(/[–\-]/);
-  const low = parseInt(rng[0],10) || 0;
-  const high = parseInt(rng[1],10) || low;
-  return { sets, low, high };
+// "3×6–8" -> 8: the rep ceiling that, once cleared, means "add load"
+function repCeiling(scheme){
+  const rng = (scheme.split("×")[1]||"").split(/[–\-]/);
+  return parseInt(rng[1],10) || parseInt(rng[0],10) || 12;
 }
 function loadType(col){
   if(/dumbbell/.test(col.equipment)) return "db";
@@ -649,12 +639,10 @@ function fmtWeight(w, lt){
 // you can". The column's rep-range top acts only as the ceiling that, once you
 // clear it, tells you to add load (double progression) — you're never told an
 // exact number to hit.
-const SESSION_SETS = 2; // a 15-min session = 2 circuit rounds = 2 working sets
-function setsForMode(mode){ return mode==="snack" ? 3 : SESSION_SETS; }
 function computeTarget(rowIdx, colIdx){
   const col = COLUMNS[colIdx];
   const exName = currentEx(rowIdx, colIdx).n;
-  const { high } = parseRange(col.scheme);
+  const high = repCeiling(col.scheme);
   const lt = loadType(col);
   const inc = S.settings.units==="kg" ? 2.5 : 5;
   const last = lastLogFor(exName);
@@ -675,7 +663,7 @@ function computeTarget(rowIdx, colIdx){
       beat = bestRep; // otherwise just beat your best set
     }
   }
-  return { col, exName, lt, last, high, weight, sug, beat, sets:setsForMode("session") };
+  return { col, exName, lt, last, high, weight, sug, beat };
 }
 function targetLineHTML(t){
   const w = fmtWeight(t.weight, t.lt);
@@ -694,13 +682,28 @@ function targetLineHTML(t){
 }
 
 /* ================================================================= STREAK & COMPLETION */
-function allSnacks(iso){ const a=S.snacksDone[iso]; return a && a.length>=5; }
+// snacksDone[iso] is {goalId:count}; old backups may hold an array of rows
+function snackTapCount(iso){
+  const a = S.snacksDone[iso];
+  if(!a) return 0;
+  if(Array.isArray(a)) return a.length;
+  let n=0; for(const k in a) n += (+a[k]||0);
+  return n;
+}
+function goalCount(iso, gid){
+  const a = S.snacksDone[iso];
+  return (a && !Array.isArray(a) && +a[gid]) || 0;
+}
+function goalsMet(iso){
+  if(!S.snackGoals.length) return false;
+  return S.snackGoals.every(g=> goalCount(iso,g.id) >= g.times);
+}
 function quickCount(iso){ let n=0; for(const l of S.logs) if(l.date===iso && l.mode==="quick") n++; return n; }
-// "activity" = snack ticks + ad-hoc quick logs done that day
-function activityCount(iso){ return (S.snacksDone[iso]?S.snacksDone[iso].length:0) + quickCount(iso); }
-function dayComplete(iso){ return !!S.sessionsDone[iso] || activityCount(iso)>=3; }
+// "activity" = snack-goal taps + ad-hoc quick logs done that day
+function activityCount(iso){ return snackTapCount(iso) + quickCount(iso); }
+function dayComplete(iso){ return !!S.sessionsDone[iso] || goalsMet(iso) || activityCount(iso)>=3; }
 function dayLevel(iso){ // 0 nothing, 1 some activity, 2 full
-  if(S.sessionsDone[iso] || allSnacks(iso) || activityCount(iso)>=5) return 2;
+  if(S.sessionsDone[iso] || goalsMet(iso)) return 2;
   if(activityCount(iso)>0) return 1;
   return 0;
 }
@@ -734,22 +737,35 @@ function inThisWeek(iso){
   const d=parseISO(iso), m=weekStart(new Date());
   return stripTime(d) >= stripTime(m) && stripTime(d) <= stripTime(addDays(m,6));
 }
-function sessionsThisWeek(){ return Object.keys(S.sessionsDone).filter(inThisWeek).length; }
+// complete days this week — same rule as the streak (session OR 3+ efforts)
+function completeDaysThisWeek(){
+  const m = weekStart(new Date()), t = stripTime(new Date());
+  let n=0;
+  for(let i=0;i<7;i++){ const d=addDays(m,i); if(stripTime(d)<=t && dayComplete(isoOf(d))) n++; }
+  return n;
+}
 function volumeThisWeek(){
   return S.logs.filter(l=>inThisWeek(l.date))
     .reduce((a,l)=> a + l.sets.reduce((b,s)=> b+(+s.w||0)*(+s.r||0),0), 0);
 }
+function repsThisWeek(){
+  return S.logs.filter(l=>inThisWeek(l.date))
+    .reduce((a,l)=> a + l.sets.reduce((b,s)=> b+(+s.r||0),0), 0);
+}
 function est1RM(w,r){ return (w>0&&r>0) ? w*(1+r/30) : 0; }
-// best set (by est 1RM) for an exercise across logs, optionally excluding the last N
+// best set for an exercise: weighted sets rank by est-1RM; bodyweight sets by reps.
+// A weighted best always outranks a rep best (heavier data beats rep counts).
 function bestSet(exName, logsArr){
   const arr = logsArr || S.logs;
-  let best=null;
+  let wt=null, bw=null;
   arr.forEach(l=>{ if(l.exercise!==exName) return;
-    l.sets.forEach(s=>{ const e=est1RM(+s.w||0,+s.r||0);
-      if(e>0 && (!best || e>best.e)) best={ w:+s.w, r:+s.r, e, date:l.date, lt:loadType(colById(l.col)) };
+    l.sets.forEach(s=>{
+      const W=+s.w||0, R=+s.r||0;
+      if(W>0 && R>0){ const e=est1RM(W,R); if(!wt || e>wt.e) wt={ w:W, r:R, e, date:l.date, lt:loadType(colById(l.col)), kind:"wt" }; }
+      else if(R>0){ if(!bw || R>bw.r) bw={ w:0, r:R, e:0, date:l.date, lt:"bw", kind:"bw" }; }
     });
   });
-  return best;
+  return wt || bw;
 }
 
 /* ================================================================= ACHIEVEMENTS */
@@ -762,7 +778,7 @@ const ACHIEVEMENTS = [
   { id:"k3",  icon:"🔥", name:"3-day",   test:()=> longestStreak()>=3 },
   { id:"k7",  icon:"🔥", name:"7-day",   test:()=> longestStreak()>=7 },
   { id:"k30", icon:"🏆", name:"30-day",  test:()=> longestStreak()>=30 },
-  { id:"pr",  icon:"📈", name:"First PR",test:()=> S.logs.some(l=>l.sets.some(s=>(+s.w||0)>0&&(+s.r||0)>0)) },
+  { id:"pr",  icon:"📈", name:"First log",test:()=> S.logs.some(l=>l.sets.some(s=>(+s.r||0)>0||(+s.w||0)>0)) },
   { id:"bw",  icon:"⚖️", name:"Weigh-in",test:()=> (S.bodyweight||[]).length>0 },
 ];
 function checkAchievements(silent){
@@ -774,15 +790,20 @@ function checkAchievements(silent){
     }
   });
 }
-// detect new personal records among a freshly-added batch of logs
+// detect new personal records among a freshly-added batch of logs.
+// Weighted sets beat the prior weighted best; bodyweight sets beat the prior
+// rep best (only while no weighted history exists for that move).
 function detectPRs(newLogs){
   const prior = S.logs.slice(0, S.logs.length - newLogs.length);
   const hits = [];
   newLogs.forEach(l=>{
     const before = bestSet(l.exercise, prior);
     l.sets.forEach(s=>{
-      const e = est1RM(+s.w||0,+s.r||0);
-      if(e>0 && (!before || e>before.e+0.01) && hits.indexOf(l.exercise)<0) hits.push(l.exercise);
+      const W=+s.w||0, R=+s.r||0;
+      let isPR=false;
+      if(W>0 && R>0){ isPR = !before || before.kind==="bw" || est1RM(W,R)>before.e+0.01; }
+      else if(R>0){ isPR = !before ? true : (before.kind==="bw" && R>before.r); }
+      if(isPR && hits.indexOf(l.exercise)<0) hits.push(l.exercise);
     });
   });
   return hits;
@@ -835,20 +856,32 @@ function pico(rowIdx, colIdx, cls){
   return '<svg class="'+(cls||"pico")+'" viewBox="0 0 100 70" style="--accent:'+COLUMNS[colIdx].color+';color:var(--ink)"><use href="#p'+rowIdx+colIdx+'"/></svg>';
 }
 function mmss(sec){ sec=Math.max(0,Math.round(sec)); return Math.floor(sec/60)+":"+pad2(sec%60); }
-// tap-to-pick reps: buttons 1..30 (single click), highlight in accent colour
+// real length of a full session with the current interval (warmup + 10 work +
+// 9 rests, the round break at least 30s, + cooldown)
+function sessionDurationMin(){
+  const iv = interval();
+  const total = 120 + 10*iv.work + 8*iv.rest + Math.max(iv.rest,30) + 120;
+  return Math.round(total/60);
+}
+function lockScroll(on){ document.body.style.overflow = on ? "hidden" : ""; }
+// tap-to-pick reps: buttons 1..30 all visible (single click)
 function repPad(preset){
   let h = '<div class="reppad" data-val="'+(preset!=null?preset:"")+'">';
   for(let n=1;n<=30;n++) h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'</button>';
-  h += '<button type="button" data-n="35" class="'+((preset!=null&&+preset>30)?"on":"")+'">30+</button></div>';
+  // honest high-rep options (the count you tap is the count that's saved)
+  [35,40,45,50].forEach(n=> h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'</button>');
+  h += '</div>';
   return h;
 }
-function wireRepPads(root){
+function wireRepPads(root, onPick){
   root.querySelectorAll(".reppad").forEach(pad=>{
     pad.addEventListener("click", e=>{
       const b = e.target.closest("button[data-n]"); if(!b) return;
       pad.dataset.val = b.getAttribute("data-n");
       pad.querySelectorAll("button").forEach(x=> x.classList.remove("on"));
       b.classList.add("on");
+      vibrate(15);
+      if(onPick) onPick(pad, +pad.dataset.val);
     });
   });
 }
@@ -856,13 +889,20 @@ function wireRepPads(root){
 /* ================================================================= RENDER: TODAY */
 function goalRingHTML(){
   const goal = Math.max(1, S.settings.weeklyGoal||5);
-  const done = sessionsThisWeek();
+  const done = completeDaysThisWeek();
   const frac = Math.max(0, Math.min(1, done/goal));
   const C = 2*Math.PI*22;
-  return '<div class="gring" title="'+done+' of '+goal+' sessions this week">'+
+  return '<div class="gring" title="'+done+' of '+goal+' active days this week">'+
     '<svg viewBox="0 0 52 52"><circle class="gt" cx="26" cy="26" r="22"/>'+
     '<circle class="gp" cx="26" cy="26" r="22" style="stroke-dasharray:'+C.toFixed(1)+';stroke-dashoffset:'+(C*(1-frac)).toFixed(1)+'"/></svg>'+
     '<div class="gc">'+done+'/'+goal+'</div></div>';
+}
+let typOpen = false; // type picker expanded?
+function typoptHTML(c, on, iv){
+  return '<div class="typopt'+(on?' on':'')+'" role="radio" aria-checked="'+on+'" data-col="'+c.id+'"'+(on?' style="background:'+c.color+'"':'')+'>'+
+    '<div class="tl"'+(on?'':' style="background:'+c.color+'"')+'>'+c.id+'</div>'+
+    '<div class="tmeta"><div class="tnm">'+esc(c.name)+' · '+esc(c.style)+'</div><div class="tsub">'+esc(c.equipment)+' · AMRAP '+iv.work+'/'+iv.rest+'s</div></div>'+
+    '<div class="tck">✓</div></div>';
 }
 function renderToday(){
   const wrap = document.getElementById("view-today");
@@ -878,15 +918,24 @@ function renderToday(){
   html += goalRingHTML();
   html += '</div>';
 
-  // workout-type picker
-  html += '<div class="section-h">Pick your set</div>';
-  COLUMNS.forEach(c=>{
-    const on = c.id===colId;
-    html += '<div class="typopt'+(on?' on':'')+'" data-col="'+c.id+'"'+(on?' style="background:'+c.color+'"':'')+'>';
-    html += '<div class="tl"'+(on?'':' style="background:'+c.color+'"')+'>'+c.id+'</div>';
-    html += '<div class="tmeta"><div class="tnm">'+esc(c.name)+' · '+esc(c.style)+'</div><div class="tsub">'+esc(c.equipment)+' · AMRAP '+iv.work+'/'+iv.rest+'s</div></div>';
-    html += '<div class="tck">✓</div></div>';
-  });
+  // instant feedback once today already counts
+  if(dayComplete(todayISO())) html += '<div class="band" style="margin-top:10px;background:var(--plateD)">✓ Done today — streak safe</div>';
+
+  // workout-type picker: selected card always visible; "Change" expands the rest
+  html += '<div class="section-h">Your set</div><div role="radiogroup" aria-label="Workout type">';
+  html += typoptHTML(col, true, iv);
+  if(typOpen){
+    COLUMNS.forEach(c=>{ if(c.id!==colId) html += typoptHTML(c, false, iv); });
+    html += '<button type="button" class="typchange" id="typToggle">▴ Done</button>';
+  } else {
+    html += '<button type="button" class="typchange" id="typToggle">⇄ Change workout type</button>';
+  }
+  const sug = suggestedCol();
+  if(sug && sug!==colId){
+    const sc = colById(sug);
+    html += '<button type="button" class="typchange" id="useSuggest" style="border-style:solid;color:var(--ink)">Mix it up — try <b style="color:'+sc.color+'">&nbsp;'+sc.id+' · '+esc(sc.name)+' ('+esc(sc.style)+')</b></button>';
+  }
+  html += '</div>';
   if(col.note) html += '<div class="inline-note" style="margin:-2px 0 4px">'+esc(col.id)+': '+esc(col.note)+'</div>';
 
   // exercises for the picked set
@@ -904,59 +953,169 @@ function renderToday(){
   }
   html += '</div>';
 
-  // actions
+  // actions — button shows the real computed session length
   html += '<div class="btn-row" style="margin-top:12px">';
-  html += '<button class="btn" id="startSession">▶ Start 15-min</button>';
-  html += '<button class="btn accent" id="startSnacks" style="background:'+col.color+'">Snack Mode</button>';
+  html += '<button class="btn" id="startSession">▶ Start · '+sessionDurationMin()+' min</button>';
+  html += '<button class="btn accent" id="startSnacks" style="background:'+col.color+'">Snacks</button>';
   html += '</div>';
 
   wrap.innerHTML = html;
 
   // wire
+  const tt = document.getElementById("typToggle");
+  if(tt) tt.addEventListener("click", ()=>{ typOpen = !typOpen; renderToday(); });
+  const us = document.getElementById("useSuggest");
+  if(us) us.addEventListener("click", ()=>{ S.settings.pickedCol = suggestedCol(); save(); typOpen=false; renderToday(); });
   wrap.querySelectorAll(".typopt").forEach(t=>{
-    t.addEventListener("click", ()=>{ S.settings.pickedCol = t.getAttribute("data-col"); save(); renderToday(); });
+    t.addEventListener("click", ()=>{
+      const id = t.getAttribute("data-col");
+      if(id!==S.settings.pickedCol){ S.settings.pickedCol = id; save(); }
+      typOpen = false; renderToday();
+    });
   });
   wrap.querySelectorAll(".swapx").forEach(x=>{
     x.addEventListener("click", e=>{ e.stopPropagation(); cycleEx(+x.getAttribute("data-row"), colIdx); renderToday(); });
+  });
+  // tap a move to see the big pictogram, cue and your history for it
+  wrap.querySelectorAll(".ex").forEach((node,r)=>{
+    node.style.cursor = "pointer";
+    node.addEventListener("click", e=>{ if(e.target.closest(".swapx")) return; exDetail(r, colIdx); });
   });
   document.getElementById("startSession").addEventListener("click", ()=> Player.startSession(colId));
   document.getElementById("startSnacks").addEventListener("click", ()=> switchTab("snacks"));
 }
 
-/* ================================================================= RENDER: SNACKS */
+/* ================================================================= RENDER: SNACKS (self-set daily goals) */
+function snackDayCounts(iso){
+  // normalise to the {goalId:count} shape (old array data reads as empty)
+  let a = S.snacksDone[iso];
+  if(!a || Array.isArray(a)){ a = {}; S.snacksDone[iso] = a; }
+  return a;
+}
 function renderSnacks(){
   const wrap = document.getElementById("view-snacks");
   const iso = todayISO();
-  const colId = pickedColumn();
-  const col = colById(colId);
-  const colIdx = COLUMNS.indexOf(col);
-  const done = S.snacksDone[iso] || [];
+  const goals = S.snackGoals;
+  const met = goals.filter(g=> goalCount(iso,g.id)>=g.times).length;
 
-  let html = '<div class="section-h">Snack Mode</div>';
-  html += '<p class="small muted" style="margin:-4px 0 12px">Five 3-minute micro-sessions spread across the day. Same five moves, one at a time.</p>';
-  html += '<div class="progressbar"><span style="width:'+(done.length/5*100)+'%"></span></div>';
-  html += '<p class="small" style="font-weight:800;margin:-10px 0 16px">'+done.length+'/5 snacks today'+(done.length>=5?' ✓ day complete':'')+'</p>';
+  let html = '<div class="section-h">Snacks</div>';
+  html += '<p class="small muted" style="margin:-4px 0 12px">Set your own mini-goals and tap a card each time you do a set. Hit them all and the day counts.</p>';
+  if(goals.length){
+    html += '<div class="progressbar"><span style="width:'+(met/goals.length*100)+'%"></span></div>';
+    html += '<p class="small" style="font-weight:800;margin:-6px 0 12px">'+met+'/'+goals.length+' goals hit today'+(met>=goals.length?' ✓ day complete':'')+'</p>';
+  }
 
-  SNACKS.forEach((sn, i)=>{
-    const r = sn.row;
-    const exName = currentEx(r, colIdx).n;
-    const isDone = done.indexOf(r) !== -1;
-    html += '<div class="snack'+(isDone?' done':'')+'" data-row="'+r+'">';
-    html += '<div class="num" style="background:'+col.color+'">'+(i+1)+'</div>';
-    html += pico(r, colIdx, "pico");
-    html += '<div style="flex:1;min-width:0"><div class="strig">'+esc(sn.trigger)+'</div>';
-    html += '<div class="sexo">'+esc(ROWS[r])+' · '+esc(exName)+'</div></div>';
-    html += '<div class="schk">'+(isDone?'✓':'')+'</div>';
+  goals.forEach(g=>{
+    const n = goalCount(iso, g.id);
+    const hit = n>=g.times;
+    let dots=""; for(let i=0;i<g.times;i++) dots += (i<n ? "●" : "○");
+    const wtxt = (+g.w>0) ? (" @ "+g.w+S.settings.units) : "";
+    html += '<div class="snack'+(hit?' done':'')+'" data-gid="'+esc(g.id)+'" role="button" aria-label="Log a set of '+esc(g.ex)+'">';
+    html += pico(g.row, g.col, "pico");
+    html += '<div style="flex:1;min-width:0"><div class="strig">'+g.reps+' × '+esc(g.ex)+wtxt+'</div>';
+    html += '<div class="sexo">'+g.times+'× today · <span style="letter-spacing:2px">'+dots+'</span></div></div>';
+    html += (n>0 ? '<button type="button" class="schk sminus" data-gid="'+esc(g.id)+'" aria-label="Undo one set" style="border:0;background:var(--paper);color:var(--muted);font-weight:900">–</button>' : '');
+    html += '<button type="button" class="schk sedit" data-gid="'+esc(g.id)+'" aria-label="Edit goal" style="border:0;background:var(--paper);color:var(--muted)">✎</button>';
+    html += '<div class="schk">'+(hit?'✓':n)+'</div>';
     html += '</div>';
   });
+  if(!goals.length) html += '<div class="card"><p class="muted small" style="margin:0">No goals yet — add one below. Example: 10 push-ups, 4 times a day.</p></div>';
+  html += '<button class="btn secondary" id="addGoal" style="margin-top:6px">+ Add goal</button>';
 
   wrap.innerHTML = html;
+
   wrap.querySelectorAll(".snack").forEach(node=>{
-    node.addEventListener("click", ()=>{
-      const r = +node.getAttribute("data-row");
-      if((S.snacksDone[iso]||[]).indexOf(r)!==-1){ return; } // already done today
-      Player.startSnack(colId, r);
+    node.addEventListener("click", (e)=>{
+      if(e.target.closest(".sedit") || e.target.closest(".sminus")) return;
+      const gid = node.getAttribute("data-gid");
+      const g = S.snackGoals.find(x=>x.id===gid); if(!g) return;
+      const counts = snackDayCounts(iso);
+      counts[gid] = (counts[gid]||0)+1;
+      const log = { date:iso, col:COLUMNS[g.col].id, mode:"snack", gid, exercise:g.ex, sets:[{ w:+g.w||0, r:+g.reps||0 }] };
+      S.logs.push(log);
+      const prs = detectPRs([log]); save(); checkAchievements(); save();
+      vibrate(20);
+      const done = counts[gid]>=g.times;
+      toast(prs.length ? ("🏆 New PR: "+g.ex) : (done ? ("✓ "+g.ex+" goal hit!") : (g.ex+" "+counts[gid]+"/"+g.times)));
+      renderSnacks();
     });
+  });
+  wrap.querySelectorAll(".sminus").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const gid = b.getAttribute("data-gid");
+      const counts = snackDayCounts(iso);
+      if(!counts[gid]) return;
+      counts[gid]--;
+      // drop the most recent matching snack log so history stays honest
+      for(let i=S.logs.length-1;i>=0;i--){
+        if(S.logs[i].date===iso && S.logs[i].mode==="snack" && S.logs[i].gid===gid){ S.logs.splice(i,1); break; }
+      }
+      save(); renderSnacks();
+    });
+  });
+  wrap.querySelectorAll(".sedit").forEach(b=>{
+    b.addEventListener("click", ()=> editGoal(b.getAttribute("data-gid")));
+  });
+  document.getElementById("addGoal").addEventListener("click", ()=> editGoal(null));
+}
+// add/edit a snack goal — pick a move, reps per set, times per day
+function editGoal(gid){
+  const g = gid ? S.snackGoals.find(x=>x.id===gid) : null;
+  let chips=""; QUICK.forEach((q,i)=> chips += '<button type="button" class="qchip" data-q="'+i+'">'+esc(q.n)+'</button>');
+  let opts = '<option value="" disabled'+(g&&g.fromLib?'':' selected')+'>Browse the full library…</option>';
+  ROWS.forEach((rn,r)=>{ opts += '<optgroup label="'+esc(rn)+'">';
+    for(let c=0;c<5;c++) exOptions(r,c).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(COLUMNS[c].equipment)+'</option>');
+    opts += '</optgroup>';
+  });
+  let times=""; for(let n=1;n<=8;n++) times += '<button type="button" data-n="'+n+'"'+((g?g.times:4)===n?' class="on"':'')+'>'+n+'</button>';
+  const m = openModal('<div class="modal" style="max-width:430px"><h3>'+(g?'Edit goal':'New goal')+'</h3>'+
+    '<p style="margin-bottom:10px">e.g. 10 push-ups, 4 times today.</p>'+
+    '<div class="qchips">'+chips+'</div>'+
+    '<div class="field"><label>…or pick any move</label><select id="gSel">'+opts+'</select></div>'+
+    '<div id="gPreview" class="lrow" style="border:0;display:none;margin-bottom:6px"></div>'+
+    '<div class="field" id="gWWrap" style="display:none"><label>Weight (optional)</label><input type="number" inputmode="decimal" id="gW" value="'+(g&&+g.w>0?g.w:'')+'"></div>'+
+    '<div class="field" style="margin-bottom:2px"><label>Reps per set</label></div>'+ repPad(g?g.reps:10) +
+    '<div class="field" style="margin:10px 0 2px"><label>Times per day</label></div><div class="reppad" id="gTimes" data-val="'+(g?g.times:4)+'">'+times+'</div>'+
+    '<div class="btn-row">'+(g?'<button class="btn danger" id="gDel" style="max-width:110px">Delete</button>':'')+
+    '<button class="btn secondary" id="gCancel">Cancel</button><button class="btn" id="gSave">Save</button></div></div>');
+  const back = m.back;
+  wireRepPads(back);
+  let pick = g ? { name:g.ex, lt:(+g.w>0||loadType(COLUMNS[g.col])!=="bw")?loadType(COLUMNS[g.col]):"bw", row:g.row, colIdx:g.col, chip:null } : null;
+  const prev = back.querySelector("#gPreview"), wWrap = back.querySelector("#gWWrap");
+  function setPick(p){
+    pick = p;
+    back.querySelectorAll(".qchip").forEach(x=> x.classList.remove("on"));
+    if(p.chip!=null){ const c=back.querySelector('.qchip[data-q="'+p.chip+'"]'); if(c) c.classList.add("on"); }
+    wWrap.style.display = p.lt==="bw" ? "none" : "flex";
+    prev.style.display = "flex";
+    prev.innerHTML = pico(p.row, p.colIdx) + '<div class="lr-main"><div class="lr-name">'+esc(p.name)+'</div></div>';
+  }
+  if(pick) setPick(pick);
+  back.querySelectorAll(".qchip").forEach(ch=> ch.addEventListener("click", ()=>{
+    const i=+ch.getAttribute("data-q"), q=QUICK[i]; back.querySelector("#gSel").value="";
+    setPick({ name:q.n, lt:"bw", row:q.pr, colIdx:q.pc, chip:i });
+  }));
+  back.querySelector("#gSel").addEventListener("change", e=>{
+    const v=e.target.value; if(!v) return; const p=v.slice(1).split("-"); const r=+p[0],c=+p[1],oi=+p[2]; const o=exOptions(r,c)[oi];
+    setPick({ name:o.n, lt:loadType(COLUMNS[c]), row:r, colIdx:c, chip:null });
+  });
+  back.querySelector("#gCancel").addEventListener("click", m.close);
+  if(g) back.querySelector("#gDel").addEventListener("click", ()=>{
+    m.close();
+    confirmDialog("Delete this goal?", g.reps+" × "+g.ex+" — today's taps for it stop counting.", ()=>{
+      S.snackGoals = S.snackGoals.filter(x=>x.id!==gid); save(); renderSnacks();
+    }, "Delete");
+  });
+  back.querySelector("#gSave").addEventListener("click", ()=>{
+    if(!pick){ toast("Pick a move first"); return; }
+    const reps = +back.querySelector(".reppad").dataset.val || 0;
+    const tms  = +back.querySelector("#gTimes").dataset.val || 0;
+    if(reps<=0){ toast("Tap reps per set"); return; }
+    if(tms<=0){ toast("Tap times per day"); return; }
+    const w = (pick.lt!=="bw" && back.querySelector("#gW").value!=="") ? +back.querySelector("#gW").value : 0;
+    if(g){ g.ex=pick.name; g.reps=reps; g.times=tms; g.row=pick.row; g.col=pick.colIdx; g.w=w; }
+    else S.snackGoals.push({ id:"g"+Math.random().toString(36).slice(2,8), ex:pick.name, reps, times:tms, row:pick.row, col:pick.colIdx, w });
+    save(); m.close(); renderSnacks();
   });
 }
 
@@ -965,12 +1124,13 @@ function renderProgress(){
   const wrap = document.getElementById("view-progress");
   const goal = Math.max(1, S.settings.weeklyGoal||5);
 
-  // KPI dashboard
+  // KPI dashboard — active days match the streak rule; reps matter for
+  // bodyweight training where volume-by-weight reads as zero
   let html = '<div class="section-h">This Week</div>';
   html += '<div class="kpis">';
-  html += '<div class="kpi"><b>'+sessionsThisWeek()+'/'+goal+'</b><span>Sessions</span></div>';
+  html += '<div class="kpi"><b>'+completeDaysThisWeek()+'/'+goal+'</b><span>Active days</span></div>';
+  html += '<div class="kpi"><b>'+repsThisWeek().toLocaleString()+'</b><span>Total reps</span></div>';
   html += '<div class="kpi"><b>'+Math.round(volumeThisWeek()).toLocaleString()+'</b><span>Volume '+S.settings.units+'</span></div>';
-  html += '<div class="kpi"><b>'+totalSessions()+'</b><span>Total sessions</span></div>';
   html += '<div class="kpi"><b>'+longestStreak()+'</b><span>Best streak</span></div>';
   html += '</div>';
 
@@ -986,7 +1146,8 @@ function renderProgress(){
     let cls = "hd";
     if(stripTime(d) > stripTime(today)) cls += " future";
     else { const lv = dayLevel(diso); if(lv===2) cls += " full"; else if(lv===1) cls += " partial"; }
-    html += '<div class="'+cls+'" data-iso="'+diso+'" title="'+diso+'"></div>';
+    if(diso===todayISO()) cls += " today";
+    html += '<div class="'+cls+'" data-iso="'+diso+'" title="'+diso+'" aria-label="'+diso+'"></div>';
   }
   html += '</div>';
   html += '<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap" class="small muted">';
@@ -1036,13 +1197,18 @@ function renderProgress(){
 function renderPRs(){
   const card = document.getElementById("prCard"); if(!card) return;
   const names = []; S.logs.forEach(l=>{ if(names.indexOf(l.exercise)<0) names.push(l.exercise); });
-  const rows = names.map(n=>({ n, b:bestSet(n) })).filter(x=>x.b).sort((a,b)=> b.b.e-a.b.e);
-  if(!rows.length){ card.innerHTML = '<p class="muted small" style="margin:0">Log a set with weight and reps — your best lifts land here.</p>'; return; }
+  // weighted PRs first (by est-1RM), then bodyweight rep PRs (by reps)
+  const rows = names.map(n=>({ n, b:bestSet(n) })).filter(x=>x.b)
+    .sort((a,b)=> (b.b.kind==="wt"?1e6+b.b.e:b.b.r) - (a.b.kind==="wt"?1e6+a.b.e:a.b.r));
+  if(!rows.length){ card.innerHTML = '<p class="muted small" style="margin:0">Log any set — your best efforts land here.</p>'; return; }
   card.innerHTML = rows.slice(0,12).map(x=>{
-    const lt=x.b.lt, w=fmtWeight(x.b.w,lt);
-    const extra = lt==="db" ? ('~'+(Math.round(x.b.e*10)/10)+S.settings.units+' 1RM') : (x.b.r+' rep best');
-    return '<div class="lrow"><div class="lr-main"><div class="lr-name">'+esc(x.n)+'</div><div class="lr-sub">'+esc(x.b.date)+'</div></div>'+
-           '<div class="lr-val">'+w+' × '+x.b.r+'<small>'+extra+'</small></div></div>';
+    const b=x.b;
+    const val = b.kind==="wt" ? (fmtWeight(b.w,b.lt)+' × '+b.r) : (b.r+' reps');
+    const extra = b.kind==="wt"
+      ? (b.lt==="db" ? '~'+(Math.round(b.e*10)/10)+S.settings.units+' 1RM' : 'best set')
+      : 'rep best';
+    return '<div class="lrow"><div class="lr-main"><div class="lr-name">'+esc(x.n)+'</div><div class="lr-sub">'+esc(b.date)+'</div></div>'+
+           '<div class="lr-val">'+val+'<small>'+extra+'</small></div></div>';
   }).join("");
 }
 function renderBW(){
@@ -1072,53 +1238,73 @@ function renderBW(){
   });
 }
 function dayDetail(iso){
-  const root = document.getElementById("modalRoot"); root.innerHTML="";
   let body="";
-  const sc = S.sessionsDone[iso], sn = S.snacksDone[iso]||[], logs = S.logs.filter(l=>l.date===iso);
-  if(sc) body += '<div class="dd-row"><span>Session</span><b>Column '+esc(sc)+'</b></div>';
-  if(sn.length) body += '<div class="dd-row"><span>Snacks</span><b>'+sn.length+'/5</b></div>';
+  const sc = S.sessionsDone[iso], taps = snackTapCount(iso), logs = S.logs.filter(l=>l.date===iso);
+  if(sc) body += '<div class="dd-row"><span>Session</span><b>Type '+esc(sc)+'</b></div>';
+  if(taps) body += '<div class="dd-row"><span>Snack sets</span><b>'+taps+(goalsMet(iso)?' · goals hit ✓':'')+'</b></div>';
   logs.forEach(l=>{
     const lt=loadType(colById(l.col));
     const sets=l.sets.map(s=> (+s.w?fmtWeight(+s.w,lt):"BW")+"×"+(+s.r||0)).join(" ");
     body += '<div class="dd-row"><span>'+esc(l.exercise)+'</span><b>'+esc(sets)+'</b></div>';
   });
   if(!body) body = '<p class="muted small" style="margin:0">Nothing logged this day.</p>';
-  const back = el('<div class="modal-back"><div class="modal"><h3>'+esc(iso)+'</h3>'+body+'<div class="btn-row"><button class="btn secondary" id="ddClose">Close</button></div></div></div>');
-  root.appendChild(back);
-  back.addEventListener("click", e=>{ if(e.target===back) root.innerHTML=""; });
-  back.querySelector("#ddClose").addEventListener("click", ()=> root.innerHTML="");
+  const m = openModal('<div class="modal"><h3>'+esc(iso)+'</h3>'+body+'<div class="btn-row"><button class="btn secondary" id="ddClose">Close</button></div></div>');
+  m.back.querySelector("#ddClose").addEventListener("click", m.close);
+}
+// tap-through detail for a move: big pictogram, cue, best + recent history
+function exDetail(row, colIdx){
+  const ex = currentEx(row, colIdx), col = COLUMNS[colIdx];
+  const lt = loadType(col);
+  const b = bestSet(ex.n);
+  const recent = S.logs.filter(l=>l.exercise===ex.n).slice(-3).reverse();
+  let body = '<div style="text-align:center">'+pico(row, colIdx, "pbig")+'</div>';
+  body += '<p style="margin:4px 0 10px">'+esc(ex.c)+'</p>';
+  body += '<div class="dd-row"><span>Pattern</span><b>'+esc(ROWS[row])+'</b></div>';
+  body += '<div class="dd-row"><span>Equipment</span><b>'+esc(col.equipment)+'</b></div>';
+  if(b) body += '<div class="dd-row"><span>Your best</span><b>'+(b.kind==="wt" ? fmtWeight(b.w,b.lt)+" × "+b.r : b.r+" reps")+'</b></div>';
+  recent.forEach(l=>{
+    const sets = l.sets.map(s=> (+s.w?fmtWeight(+s.w,lt):"BW")+"×"+(+s.r||0)).join(" ");
+    body += '<div class="dd-row"><span>'+esc(l.date)+'</span><b>'+esc(sets)+'</b></div>';
+  });
+  if(!b && !recent.length) body += '<p class="muted small" style="margin:8px 0 0">No history yet — it starts with your first logged set.</p>';
+  const m = openModal('<div class="modal"><h3>'+esc(ex.n)+'</h3>'+body+'<div class="btn-row"><button class="btn secondary" id="xdClose">Close</button></div></div>');
+  m.back.querySelector("#xdClose").addEventListener("click", m.close);
 }
 function currentTab(){ for(const t of ["today","snacks","progress","settings"]){ if(!document.getElementById("view-"+t).hidden) return t; } return "today"; }
 function refreshActive(){ switchTab(currentTab()); }
 /* ================================================================= QUICK LOG (ad-hoc, anytime) */
 function openQuickLog(){
-  const root = document.getElementById("modalRoot"); root.innerHTML="";
   let chips=""; QUICK.forEach((q,i)=> chips += '<button type="button" class="qchip" data-q="'+i+'">'+esc(q.n)+'</button>');
   let opts = '<option value="" disabled selected>Browse the full library…</option>';
   ROWS.forEach((rn,r)=>{ opts += '<optgroup label="'+esc(rn)+'">';
     for(let c=0;c<5;c++) exOptions(r,c).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(COLUMNS[c].equipment)+'</option>');
     opts += '</optgroup>';
   });
-  const back = el('<div class="modal-back"><div class="modal" style="max-width:430px">'+
+  const m = openModal('<div class="modal" style="max-width:430px">'+
     '<h3>Quick log</h3><p style="margin-bottom:12px">Did a few reps just now? Log them — no timer. Counts toward history, PRs &amp; your streak.</p>'+
     '<div class="qchips">'+chips+'</div>'+
     '<div class="field"><label>…or pick any move</label><select id="qSel">'+opts+'</select></div>'+
     '<div id="qPreview" class="lrow" style="border:0;display:none;margin-bottom:6px"></div>'+
-    '<div class="field" id="qWWrap" style="display:none"><label>Weight (optional)</label><input type="number" inputmode="decimal" id="qW" placeholder="'+S.settings.units+'"></div>'+
+    '<div class="field" id="qWWrap" style="display:none"><label id="qWLabel">Weight (optional)</label><input type="number" inputmode="decimal" id="qW" placeholder="'+S.settings.units+'"></div>'+
     '<div class="field" style="margin-bottom:4px"><label>Reps — tap one</label></div>'+ repPad(null) +
     '<div class="btn-row"><button class="btn secondary" id="qCancel">Cancel</button><button class="btn" id="qSave">Save</button></div>'+
-    '</div></div>');
-  root.appendChild(back); wireRepPads(back);
-  const close = ()=> root.innerHTML="";
-  back.addEventListener("click", e=>{ if(e.target===back) close(); });
+    '</div>');
+  const back = m.back, close = m.close;
+  wireRepPads(back);
   back.querySelector("#qCancel").addEventListener("click", close);
   const sel = back.querySelector("#qSel"), wWrap = back.querySelector("#qWWrap"), prev = back.querySelector("#qPreview");
+  const qW = back.querySelector("#qW");
   let pick = null;
   function setPick(p){
     pick = p;
     back.querySelectorAll(".qchip").forEach(x=> x.classList.remove("on"));
     if(p.chip!=null){ const c=back.querySelector('.qchip[data-q="'+p.chip+'"]'); if(c) c.classList.add("on"); }
     wWrap.style.display = p.lt==="bw" ? "none" : "flex";
+    back.querySelector("#qWLabel").textContent = p.lt==="band" ? "Band level (optional)" : "Weight (optional)";
+    qW.placeholder = p.lt==="band" ? "e.g. 2" : S.settings.units;
+    // prefill from the last log of this exercise
+    const last = lastLogFor(p.name);
+    qW.value = (p.lt!=="bw" && last) ? (Math.max.apply(null, last.sets.map(s=>+s.w||0).concat([0])) || "") : "";
     prev.style.display = "flex";
     prev.innerHTML = pico(p.row, p.colIdx) + '<div class="lr-main"><div class="lr-name">'+esc(p.name)+'</div><div class="lr-sub">'+(p.lt==="bw"?"bodyweight":esc(COLUMNS[p.colIdx].equipment))+'</div></div>';
   }
@@ -1127,45 +1313,56 @@ function openQuickLog(){
     setPick({ name:q.n, col:"C", lt:"bw", row:q.pr, colIdx:q.pc, chip:i });
   }));
   sel.addEventListener("change", ()=>{
-    const v=sel.value; if(!v) return; const m=v.slice(1).split("-"); const r=+m[0],c=+m[1],oi=+m[2]; const o=exOptions(r,c)[oi];
+    const v=sel.value; if(!v) return; const p=v.slice(1).split("-"); const r=+p[0],c=+p[1],oi=+p[2]; const o=exOptions(r,c)[oi];
     setPick({ name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:r, colIdx:c, chip:null });
   });
   back.querySelector("#qSave").addEventListener("click", ()=>{
     if(!pick){ toast("Pick a move first"); return; }
     const pad = back.querySelector(".reppad"); const reps = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
-    const w = (pick.lt!=="bw" && back.querySelector("#qW").value!=="") ? +back.querySelector("#qW").value : 0;
-    if(reps<=0 && w<=0){ toast("Tap how many reps"); return; }
-    const iso = todayISO();
-    const log = { date:iso, col:pick.col, mode:"quick", exercise:pick.name, sets:[{ w, r:reps }] };
+    if(reps<=0){ toast("Tap how many reps you did"); return; }
+    const w = (pick.lt!=="bw" && qW.value!=="") ? +qW.value : 0;
+    const log = { date:todayISO(), col:pick.col, mode:"quick", exercise:pick.name, sets:[{ w, r:reps }] };
     S.logs.push(log);
     const prs = detectPRs([log]); save(); checkAchievements(); save(); close();
-    toast(prs.length ? ("🏆 New PR: "+pick.name) : ("Logged "+pick.name+(reps?" ×"+reps:"")));
+    toast(prs.length ? ("🏆 New PR: "+pick.name) : ("Logged "+pick.name+" ×"+reps));
     refreshActive();
   });
 }
 function renderHistBody(name){
   const body = document.getElementById("histBody");
   if(!body) return;
-  const logs = S.logs.filter(l=>l.exercise===name);
+  const entries = S.logs.map((l,i)=>({l,i})).filter(x=>x.l.exercise===name);
   let html = "";
-  // sparkline of est volume
-  const vols = logs.map(l=> l.sets.reduce((a,s)=> a + (+s.w||0)*(+s.r||0), 0));
-  const anyW = vols.some(v=>v>0);
-  if(logs.length>=2 && anyW){
-    const w=280,h=36, max=Math.max.apply(null,vols)||1, min=Math.min.apply(null,vols);
-    const pts = vols.map((v,i)=>{
-      const x = logs.length>1 ? (i/(logs.length-1))*w : 0;
+  // sparkline: volume when weights exist, otherwise total reps per log
+  const anyW = entries.some(x=> x.l.sets.some(s=>(+s.w||0)>0));
+  const vals = entries.map(x=> x.l.sets.reduce((a,s)=> a + (anyW ? (+s.w||0)*(+s.r||0) : (+s.r||0)), 0));
+  if(entries.length>=2 && vals.some(v=>v>0)){
+    const w=280,h=36, max=Math.max.apply(null,vals)||1, min=Math.min.apply(null,vals);
+    const pts = vals.map((v,i)=>{
+      const x = (i/(vals.length-1))*w;
       const y = h - 4 - ((v-min)/((max-min)||1))*(h-8);
       return x.toFixed(1)+","+y.toFixed(1);
     }).join(" ");
     html += '<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><polyline points="'+pts+'" fill="none" stroke="var(--plateD)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    html += '<div class="small muted" style="margin-bottom:8px">Estimated volume (weight × reps)</div>';
+    html += '<div class="small muted" style="margin-bottom:8px">'+(anyW?'Volume (weight × reps)':'Total reps')+' over time</div>';
   }
-  logs.slice().reverse().forEach(l=>{
+  entries.slice().reverse().forEach(x=>{
+    const l=x.l;
     const sets = l.sets.map(s=> (+s.w? (s.w+ (loadType(colById(l.col)) ==="band"?"L":S.settings.units)) : "BW")+"×"+(+s.r||0)).join("  ");
-    html += '<div class="histlog"><span>'+sets+'</span><span class="hdate">'+esc(l.date)+' · '+esc(l.col)+'</span></div>';
+    html += '<div class="histlog"><span>'+sets+'</span><span style="display:flex;align-items:center;gap:8px"><span class="hdate">'+esc(l.date)+' · '+esc(l.col)+'</span>'+
+            '<button type="button" class="histdel" data-i="'+x.i+'" aria-label="Delete this log" style="border:0;background:none;color:var(--muted);font-size:15px;padding:2px 4px;cursor:pointer">✕</button></span></div>';
   });
   body.innerHTML = html;
+  body.querySelectorAll(".histdel").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const i = +b.getAttribute("data-i");
+      confirmDialog("Delete this log?", (S.logs[i]?S.logs[i].date+" · "+S.logs[i].exercise:"")+" — this can't be undone.", ()=>{
+        S.logs.splice(i,1); save(); renderProgress();
+        const hp = document.getElementById("histPick");
+        if(hp && [...hp.options].some(o=>o.value===name)){ hp.value=name; renderHistBody(name); }
+      }, "Delete");
+    });
+  });
 }
 
 /* ================================================================= RENDER: SETTINGS */
@@ -1197,8 +1394,16 @@ function renderSettings(){
   html += '<div class="toggle-row" style="border-bottom:0"><span>Vibration</span><label class="switch"><input type="checkbox" id="setVibe"'+(st.vibrate?" checked":"")+'><span class="sl"></span></label></div>';
   html += '</div>';
 
+  html += '<div class="section-h">How it works</div><div class="card small" style="line-height:1.5">';
+  html += '<b>AMRAP:</b> every work interval, do as many clean reps as you can — no prescribed numbers.<br>';
+  html += '<b>Progress:</b> the app shows the rep count to beat; clear the ceiling and it tells you to add weight (or slow the tempo).<br>';
+  html += '<b>Log as you go:</b> tap your reps during each rest; fix anything on the end screen.<br>';
+  html += '<b>A day counts</b> when you finish a session, hit all your snack goals, or log 3+ efforts.';
+  html += '</div>';
+
   html += '<div class="section-h">Backup</div><div class="card">';
-  html += '<div class="field"><label>Export data</label><textarea id="exportBox" readonly>'+esc(JSON.stringify(S))+'</textarea><button class="btn secondary" id="copyExport" style="margin-top:8px">Copy to clipboard</button></div>';
+  html += '<div class="field"><label>Export data</label><textarea id="exportBox" readonly>'+esc(JSON.stringify(S))+'</textarea>'+
+          '<div class="btn-row" style="margin-top:8px"><button class="btn secondary" id="copyExport">Copy</button><button class="btn secondary" id="dlExport">Download file</button></div></div>';
   html += '<div class="field" style="margin-bottom:0"><label>Import data</label><textarea id="importBox" placeholder="Paste exported JSON here…"></textarea><button class="btn secondary" id="doImport" style="margin-top:8px">Import & replace</button></div>';
   html += '</div>';
 
@@ -1226,6 +1431,17 @@ function renderSettings(){
     try{ await navigator.clipboard.writeText(box.value); toast("Copied to clipboard"); }
     catch(e){ try{ document.execCommand("copy"); toast("Copied"); }catch(_){ toast("Select the text and copy manually"); } }
   });
+  document.getElementById("dlExport").addEventListener("click", ()=>{
+    try{
+      const blob = new Blob([JSON.stringify(S)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "strength-blueprint-"+todayISO()+".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=> URL.revokeObjectURL(a.href), 3000);
+      toast("Backup downloaded");
+    }catch(e){ toast("Download failed — use Copy instead"); }
+  });
   document.getElementById("doImport").addEventListener("click", ()=>{
     const val = document.getElementById("importBox").value.trim();
     if(!val){ toast("Paste JSON first"); return; }
@@ -1248,7 +1464,9 @@ function switchTab(tab){
     document.getElementById("view-"+t).hidden = (t!==tab);
   });
   document.querySelectorAll("nav.tabs button").forEach(b=>{
-    b.classList.toggle("active", b.getAttribute("data-tab")===tab);
+    const on = b.getAttribute("data-tab")===tab;
+    b.classList.toggle("active", on);
+    if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
   });
   if(tab==="today") renderToday();
   if(tab==="snacks") renderSnacks();
@@ -1256,31 +1474,36 @@ function switchTab(tab){
   if(tab==="settings") renderSettings();
   window.scrollTo(0,0);
 }
+let toastN = 0; // live toast count, so stacked toasts don't overlap
 function toast(msg){
-  const t = el('<div style="position:fixed;left:50%;bottom:calc(80px + var(--safe-b));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:12px;z-index:80;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.3)">'+esc(msg)+'</div>');
+  const off = 80 + toastN*50; toastN++;
+  const t = el('<div role="status" style="position:fixed;left:50%;bottom:calc('+off+'px + var(--safe-b));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:11px 16px;border-radius:12px;z-index:80;font-weight:700;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:88vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(msg)+'</div>');
   document.body.appendChild(t);
-  setTimeout(()=>{ t.style.transition="opacity .3s"; t.style.opacity="0"; setTimeout(()=>t.remove(),300); }, 1600);
+  setTimeout(()=>{ t.style.transition="opacity .3s"; t.style.opacity="0"; setTimeout(()=>{ t.remove(); toastN=Math.max(0,toastN-1); },300); }, 1700);
+}
+function openModal(inner){ // shared backdrop + scroll-lock + close plumbing
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = ""; lockScroll(true);
+  const back = el('<div class="modal-back">'+inner+'</div>');
+  root.appendChild(back);
+  const close = ()=>{ root.innerHTML=""; lockScroll(false); };
+  back.addEventListener("click", e=>{ if(e.target===back) close(); });
+  return { back, close };
 }
 function confirmDialog(title, body, onYes, yesLabel){
-  const root = document.getElementById("modalRoot");
-  root.innerHTML = "";
-  const back = el('<div class="modal-back"><div class="modal"><h3>'+esc(title)+'</h3><p>'+esc(body)+'</p><div class="btn-row"><button class="btn secondary" id="mNo">Cancel</button><button class="btn danger" id="mYes">'+esc(yesLabel||"Confirm")+'</button></div></div></div>');
-  root.appendChild(back);
-  const close = ()=> root.innerHTML="";
-  back.addEventListener("click", e=>{ if(e.target===back) close(); });
-  back.querySelector("#mNo").addEventListener("click", close);
-  back.querySelector("#mYes").addEventListener("click", ()=>{ close(); onYes && onYes(); });
+  const m = openModal('<div class="modal"><h3>'+esc(title)+'</h3><p>'+esc(body)+'</p><div class="btn-row"><button class="btn secondary" id="mNo">Cancel</button><button class="btn danger" id="mYes">'+esc(yesLabel||"Confirm")+'</button></div></div>');
+  m.back.querySelector("#mNo").addEventListener("click", m.close);
+  m.back.querySelector("#mYes").addEventListener("click", ()=>{ m.close(); onYes && onYes(); });
 }
 
 /* ================================================================= PLAYER (state machine) */
 const Player = {
-  active:false, steps:[], idx:0, colId:null, colIdx:0, mode:"session",
-  startTs:0, dur:0, paused:false, pausedAt:0, pauseAccum:0, raf:0, snackRow:null,
-  ended:false,
+  active:false, steps:[], idx:0, colId:null, colIdx:0,
+  startTs:0, dur:0, paused:false, pausedAt:0, pauseAccum:0, raf:0,
 
   buildSessionSteps(colId){
     const colIdx = COLUMNS.indexOf(colById(colId)); const iv = interval();
-    const steps = [{ type:"warmup", sec:120, title:"Warm-up", list:WARMUP }];
+    const steps = [{ type:"warmup", sec:120, title:"Warm-up", list:warmupList(colId) }];
     for(let round=1; round<=2; round++){
       for(let r=0;r<5;r++){
         steps.push({ type:"exercise", round, row:r, colIdx, sec:iv.work });
@@ -1295,25 +1518,14 @@ const Player = {
     steps.push({ type:"summary" });
     return steps;
   },
-  buildSnackSteps(colId, row){
-    const iv = interval(); const colIdx = COLUMNS.indexOf(colById(colId));
-    const steps = [{ type:"warmup", sec:15, title:"Quick warm-up", list:["Loosen up — a few easy reps, no load"] }];
-    for(let set=1; set<=3; set++){
-      steps.push({ type:"exercise", round:set, row, colIdx, sec:iv.work, snackSet:set });
-      if(set<3) steps.push({ type:"rest", sec: Math.max(iv.rest,20), label:"Rest" });
-    }
-    steps.push({ type:"summary" });
-    return steps;
-  },
+  startSession(colId){ this._start(colId, this.buildSessionSteps(colId)); },
 
-  startSession(colId){ this._start(colId, "session", this.buildSessionSteps(colId)); },
-  startSnack(colId, row){ this.snackRow=row; this._start(colId, "snack", this.buildSnackSteps(colId, row)); },
-
-  _start(colId, mode, steps){
-    this.active=true; this.ended=false; this.mode=mode; this.colId=colId; this.colIdx=COLUMNS.indexOf(colById(colId));
+  _start(colId, steps){
+    this.active=true; this.colId=colId; this.colIdx=COLUMNS.indexOf(colById(colId));
     this.steps=steps; this.idx=0;
+    this.pend={}; // sets captured as you go: pend[row][setIdx] = {w,r}
     document.documentElement.classList.toggle("reduced", matchMedia("(prefers-reduced-motion: reduce)").matches);
-    requestWake();
+    requestWake(); lockScroll(true);
     try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); AC.resume&&AC.resume(); }catch(e){}
     this.renderShell();
     this.enter(0);
@@ -1324,8 +1536,7 @@ const Player = {
     if(!step){ this.finish(); return; }
     if(step.type==="summary"){ this.finish(); return; }
     this.startTs = Date.now(); this.dur = step.sec; this.paused=false; this.pauseAccum=0;
-    if(step.type==="rest") { cueChime(); }
-    else if(step.type!=="exercise") { cueChime(); }
+    if(step.type!=="exercise") cueChime();
     this.renderStep();
     this.loop();
   },
@@ -1341,6 +1552,11 @@ const Player = {
       const rem = this.remaining();
       this.paint(rem);
       const step = this.steps[this.idx];
+      // 3-2-1 warning ticks at the end of every rest
+      if(step.type==="rest"){
+        const s = Math.ceil(rem);
+        if(s>=1 && s<=3 && step._lastTick!==s){ step._lastTick=s; beep(600,0.06,0); vibrate(25); }
+      }
       if(rem<=0 && (step.type==="rest" || step.type==="warmup" || step.type==="cooldown")){
         if(step.type==="rest"){ cueRestEnd(); vibrate([80,60,80]); }
         else { cueChime(); vibrate(120); }
@@ -1356,7 +1572,11 @@ const Player = {
   paint(rem){
     const ring = document.getElementById("ringProg");
     const timeEl = document.getElementById("ringTime");
-    if(timeEl) timeEl.textContent = mmss(rem);
+    const step = this.steps[this.idx];
+    if(timeEl){
+      // AMRAP overtime: past zero on an exercise, count UP so you know how far over
+      timeEl.textContent = (rem<0 && step && step.type==="exercise") ? "+"+mmss(-rem) : mmss(rem);
+    }
     if(ring){
       const C = 2*Math.PI*52;
       const frac = Math.max(0, Math.min(1, rem/this.dur));
@@ -1366,10 +1586,16 @@ const Player = {
   },
   next(auto){
     const step=this.steps[this.idx];
-    if(step && step.type==="exercise") step._dinged=false;
+    if(step){ step._dinged=false; step._lastTick=null; }
     this.enter(this.idx+1);
   },
-  skip(){ this.enter(this.idx+1); },
+  skip(){ this.next(); },
+  back(){
+    if(this.idx<=0) return;
+    const step=this.steps[this.idx];
+    if(step){ step._dinged=false; step._lastTick=null; }
+    this.enter(this.idx-1);
+  },
   add30(){ this.dur += 30; this.paint(this.remaining()); },
   togglePause(){
     if(this.paused){
@@ -1379,15 +1605,23 @@ const Player = {
       this.paused=true; this.pausedAt=Date.now();
       cancelAnimationFrame(this.raf);
     }
+    const ovl = document.querySelector(".overlay");
+    if(ovl) ovl.classList.toggle("paused", this.paused);
+    const sub = document.querySelector(".ring .sub");
+    if(sub) sub.textContent = this.paused ? "paused — tap to resume" : (this._phaseLabel||"");
     this.renderControls();
   },
   exit(){
-    confirmDialog("Exit workout?","Your progress in this session won't be saved.", ()=>{
-      this.teardown();
-    });
+    // three-way: keep going / bail out to the log sheet / discard entirely
+    const m = openModal('<div class="modal"><h3>Leave workout?</h3><p>You can log what you\'ve done so far, or discard the session.</p>'+
+      '<button class="btn" id="xLog" style="margin-bottom:10px">Finish &amp; log now</button>'+
+      '<div class="btn-row" style="margin-top:0"><button class="btn secondary" id="xKeep">Keep going</button><button class="btn danger" id="xDrop">Discard</button></div></div>');
+    m.back.querySelector("#xKeep").addEventListener("click", m.close);
+    m.back.querySelector("#xLog").addEventListener("click", ()=>{ m.close(); this.finish(); });
+    m.back.querySelector("#xDrop").addEventListener("click", ()=>{ m.close(); this.teardown(); });
   },
   teardown(){
-    this.active=false; cancelAnimationFrame(this.raf); releaseWake();
+    this.active=false; cancelAnimationFrame(this.raf); releaseWake(); lockScroll(false);
     document.getElementById("overlayRoot").innerHTML="";
   },
 
@@ -1397,9 +1631,10 @@ const Player = {
     root.innerHTML = "";
     const ov = el('<div class="overlay" style="--accent:'+col.color+'"></div>');
     ov.innerHTML =
-      '<div class="obar"><button class="icon-btn" id="pExit" aria-label="Exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
+      '<div class="obar"><button class="icon-btn" id="pExit" aria-label="Exit workout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
       '<div class="phase" id="pPhase" style="color:'+col.color+'"></div>'+
-      '<button class="icon-btn" id="pMute" aria-label="Mute"></button></div>'+
+      '<button class="icon-btn" id="pMute" aria-label="Toggle sound"></button></div>'+
+      '<div class="pbar" aria-hidden="true"><span id="pProg" style="background:'+col.color+'"></span></div>'+
       '<div id="pStage"></div>';
     root.appendChild(ov);
     ov.querySelector("#pExit").addEventListener("click", ()=>this.exit());
@@ -1419,10 +1654,16 @@ const Player = {
     if(step.type==="warmup") phaseLabel = step.title;
     else if(step.type==="cooldown") phaseLabel = step.title;
     else if(step.type==="rest") phaseLabel = step.label || "Rest";
-    else if(step.type==="exercise") phaseLabel = this.mode==="snack" ? ("Set "+step.round+" of 3") : ("Round "+step.round+" · "+(step.row+1)+"/5");
+    else if(step.type==="exercise") phaseLabel = "Round "+step.round+" · "+(step.row+1)+"/5";
     phase.textContent = phaseLabel;
+    this._phaseLabel = phaseLabel;
+    // session progress bar (summary step excluded from the denominator)
+    const prog = document.getElementById("pProg");
+    if(prog) prog.style.width = Math.round(this.idx/(this.steps.length-1)*100)+"%";
 
-    let html = '<div class="ring-wrap"><div class="ring"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ringProg" cx="60" cy="60" r="52" style="stroke:'+col.color+'"/></svg>';
+    const widget = this.logWidgetHTML(); // log the set you just finished
+    const ringCls = widget ? "ring small" : "ring";
+    let html = '<div class="ring-wrap"><div class="'+ringCls+'"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ringProg" cx="60" cy="60" r="52" style="stroke:'+col.color+'"/></svg>';
     html += '<div class="center"><div class="time" id="ringTime">'+mmss(step.sec)+'</div><div class="sub">'+esc(phaseLabel)+'</div></div></div></div>';
 
     if(step.type==="exercise"){
@@ -1434,11 +1675,16 @@ const Player = {
       html += '<div class="pcue">'+esc(ex.c)+'</div>';
       html += '<div class="ptarget" style="color:'+col.color+'">AMRAP · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat:'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div></div>';
     } else if(step.type==="rest"){
+      html += widget;
+      // and preview the NEXT move so you can set up for it
       const nextStep = this.steps[this.idx+1];
-      let up="";
-      if(nextStep && nextStep.type==="exercise") up = "Next: "+currentEx(nextStep.row, nextStep.colIdx).n;
-      html += '<div class="player-ex"><div class="pname">'+esc(step.label||"Rest")+'</div><div class="pcue">'+esc(up)+'</div></div>';
+      if(nextStep && nextStep.type==="exercise"){
+        const nx = currentEx(nextStep.row, nextStep.colIdx);
+        html += '<div class="player-ex" style="margin-top:10px"><div class="pcue" style="margin-top:0">Up next: <b>'+esc(nx.n)+'</b></div>'+
+                '<div class="pcue">'+esc(nx.c)+'</div></div>';
+      }
     } else { // warmup / cooldown
+      html += widget; // cooldown carries the final set's log widget
       html += '<div class="player-ex"><div class="pname">'+esc(step.title)+'</div><ul class="player-list">'+
         step.list.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>';
     }
@@ -1446,19 +1692,65 @@ const Player = {
     // controls
     html += '<div class="player-ctrls" id="pCtrls"></div>';
     stage.innerHTML = html;
+    this.wireLogWidget();
+    // the big ring is the biggest tap target — use it for pause/resume
+    const ringEl = stage.querySelector(".ring");
+    if(ringEl){
+      ringEl.setAttribute("role","button");
+      ringEl.setAttribute("aria-label","Pause or resume timer");
+      ringEl.addEventListener("click", ()=> this.togglePause());
+    }
     this.renderControls();
     this.paint(step.sec);
+  },
+  // compact "log that set" card shown right after each exercise (during rest /
+  // cool-down) — weight prefilled, reps are one tap, saved as you go
+  logWidgetHTML(){
+    const prev = this.steps[this.idx-1];
+    if(!prev || prev.type!=="exercise") return "";
+    const row = prev.row, si = prev.round-1;
+    const t = computeTarget(row, prev.colIdx);
+    const ex = currentEx(row, prev.colIdx);
+    const cur = (this.pend[row]||[])[si] || {};
+    const set1 = (this.pend[row]||[])[0];
+    const wv = cur.w ? cur.w : (t.lt==="bw" ? "" : ((set1&&set1.w) || (t.weight!=null?t.weight:"")));
+    const wph = t.lt==="band" ? "band lvl" : S.settings.units;
+    return '<div class="card lset" id="setLog" data-row="'+row+'" data-set="'+si+'" style="margin-top:2px;padding:9px 11px">'+
+      '<div class="lshead"><span class="setn" style="min-width:0">Log · '+esc(ex.n)+' · set '+prev.round+'</span>'+
+      (t.lt==="bw" ? '' : '<input type="number" inputmode="decimal" class="w setw" placeholder="'+wph+'" value="'+wv+'" aria-label="Weight" style="margin-left:auto">')+
+      '</div>'+ repPad(cur.r||null) +
+      (t.beat!=null ? '<div class="small muted" style="margin-top:2px">Last best: '+t.beat+' reps — beat it.</div>' : '')+
+      '</div>';
+  },
+  wireLogWidget(){
+    const sl = document.getElementById("setLog");
+    if(!sl) return;
+    const row = +sl.getAttribute("data-row"), si = +sl.getAttribute("data-set");
+    const ensure = ()=>{
+      if(!this.pend[row]) this.pend[row]=[];
+      if(!this.pend[row][si]) this.pend[row][si]={w:0,r:0};
+      return this.pend[row][si];
+    };
+    const wi = sl.querySelector("input.w");
+    if(wi) wi.addEventListener("input", ()=>{ ensure().w = wi.value!=="" ? +wi.value : 0; });
+    wireRepPads(sl, (pad, v)=>{
+      const p = ensure();
+      p.r = v;
+      if(wi && wi.value!=="") p.w = +wi.value; // grab the prefilled weight too
+    });
   },
   renderControls(){
     const c = document.getElementById("pCtrls");
     if(!c) return;
     const step=this.steps[this.idx];
     const nextLabel = step.type==="rest" ? "Skip rest" :
-                      step.type==="exercise" ? (this.mode==="snack"&&step.round===3?"Finish set":"Next") : "Skip";
+                      step.type==="exercise" ? "Next" : "Skip";
     c.innerHTML =
+      '<button class="btn secondary" id="cBack" aria-label="Previous step"'+(this.idx===0?' disabled style="opacity:.4"':'')+'>◂ Back</button>'+
       '<button class="btn secondary" id="cPause">'+(this.paused?"Resume":"Pause")+'</button>'+
       '<button class="btn secondary" id="cAdd">+30s</button>'+
       '<button class="btn wide" id="cNext" style="background:'+colById(this.colId).color+'">'+nextLabel+' ▸</button>';
+    c.querySelector("#cBack").addEventListener("click", ()=>this.back());
     c.querySelector("#cPause").addEventListener("click", ()=>this.togglePause());
     c.querySelector("#cAdd").addEventListener("click", ()=>this.add30());
     c.querySelector("#cNext").addEventListener("click", ()=>this.skip());
@@ -1467,45 +1759,46 @@ const Player = {
   finish(){
     this.active=false; cancelAnimationFrame(this.raf); releaseWake();
     cueChime(); vibrate([100,50,100]);
-    if(this.mode==="snack") this.finishSnack();
-    else this.finishSession();
+    this.finishSession();
   },
   finishSession(){
     const col = colById(this.colId); const colIdx=this.colIdx;
     const root = document.getElementById("overlayRoot"); root.innerHTML="";
     const ov = el('<div class="overlay" style="--accent:'+col.color+'"></div>');
     let html = '<div class="obar"><div class="phase" style="flex:1;color:'+col.color+'">Session complete</div></div>';
-    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">Log your AMRAP sets — weight is pre-filled, enter your reps.</p></div>';
-    html += '<div class="card" style="margin-bottom:14px">';
-    for(let r=0;r<5;r++){
-      const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
-      html += '<div class="log-ex" data-row="'+r+'"><div class="lname">'+(r+1)+'. '+esc(ex.n)+'</div>';
-      for(let s=0;s<SESSION_SETS;s++){
-        const wv = t.lt==="bw" ? "" : (t.weight!=null?t.weight:"");
-        html += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
-                (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
-                             : '<input type="number" inputmode="decimal" class="w" placeholder="'+S.settings.units+'" value="'+wv+'">')+
-                '<span class="small muted">reps → tap</span></div>'+ repPad(null) +'</div>';
+    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">What you logged along the way — tap a row to fix or add sets.</p></div>';
+    html += '<div class="card" id="recapCard" style="margin-bottom:14px"></div>';
+    html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Don\'t save sets</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save session</button></div>';
+    ov.innerHTML = html; root.appendChild(ov);
+
+    const paintRecap = ()=>{
+      let inner = "";
+      for(let r=0;r<5;r++){
+        const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
+        const sets = (this.pend[r]||[]).filter(s=> s && s.r>0);
+        const txt = sets.length
+          ? sets.map(s=> (s.w>0 ? fmtWeight(s.w,t.lt) : "BW")+"×"+s.r).join("  ")
+          : "tap to add";
+        inner += '<div class="lrow" data-row="'+r+'" role="button" style="cursor:pointer"><div class="lr-main"><div class="lr-name">'+(r+1)+'. '+esc(ex.n)+'</div></div>'+
+                 '<div class="lr-val'+(sets.length?'':' muted')+'" style="font-weight:'+(sets.length?800:600)+'">'+esc(txt)+'</div></div>';
       }
-      html += '</div>';
-    }
-    html += '</div>';
-    html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Skip logging</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save session</button></div>';
-    ov.innerHTML = html; root.appendChild(ov); wireRepPads(ov);
+      const cardEl = ov.querySelector("#recapCard");
+      cardEl.innerHTML = inner;
+      cardEl.querySelectorAll(".lrow").forEach(rowEl=>{
+        rowEl.addEventListener("click", ()=> this.editRecapRow(+rowEl.getAttribute("data-row"), paintRecap));
+      });
+    };
+    paintRecap();
 
     ov.querySelector("#saveLog").addEventListener("click", ()=>{
       const iso = todayISO(); const added=[];
-      ov.querySelectorAll(".log-ex").forEach(node=>{
-        const r = +node.getAttribute("data-row"); const exName = currentEx(r, colIdx).n;
-        const sets = [];
-        node.querySelectorAll(".lset").forEach(ls=>{
-          const wi = ls.querySelector("input.w"), pad = ls.querySelector(".reppad");
-          const w = (wi && wi.value!=="") ? +wi.value : 0;
-          const rr = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
-          if(w>0 || rr>0) sets.push({ w, r:rr });
-        });
-        if(sets.length){ const log={ date:iso, col:this.colId, mode:"session", row:r, exercise:exName, sets }; S.logs.push(log); added.push(log); }
-      });
+      for(let r=0;r<5;r++){
+        const sets = (this.pend[r]||[]).filter(s=> s && s.r>0).map(s=>({ w:+s.w||0, r:+s.r }));
+        if(sets.length){
+          const log = { date:iso, col:this.colId, mode:"session", row:r, exercise:currentEx(r, colIdx).n, sets };
+          S.logs.push(log); added.push(log);
+        }
+      }
       S.sessionsDone[iso] = this.colId;
       const prs = detectPRs(added); save(); checkAchievements(); save();
       this.teardown();
@@ -1516,50 +1809,37 @@ const Player = {
       this.teardown(); toast("Marked complete"); switchTab("today");
     });
   },
-  finishSnack(){
-    const col = colById(this.colId); const r=this.snackRow;
-    const ex = currentEx(r, this.colIdx); const t = computeTarget(r, this.colIdx);
-    const root = document.getElementById("overlayRoot"); root.innerHTML="";
-    const ov = el('<div class="overlay" style="--accent:'+col.color+'"></div>');
-    let html = '<div class="obar"><div class="phase" style="flex:1;color:'+col.color+'">Snack done</div></div>';
-    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:40px">🍎</div><h2 style="font-size:18px;margin-top:4px">'+esc(ex.n)+'</h2><p class="muted small">Log it or just tick it off.</p></div>';
-    html += '<div class="card" style="margin-bottom:14px"><div class="log-ex" style="border:0">';
-    for(let s=0;s<3;s++){
-      const wv = t.lt==="bw" ? "" : (t.weight!=null?t.weight:"");
-      html += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
-              (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
-                           : '<input type="number" inputmode="decimal" class="w" placeholder="'+S.settings.units+'" value="'+wv+'">')+
-              '<span class="small muted">reps → tap</span></div>'+ repPad(null) +'</div>';
+  // fix or add both sets for one exercise from the recap screen
+  editRecapRow(r, onDone){
+    const colIdx = this.colIdx;
+    const ex = currentEx(r, colIdx), t = computeTarget(r, colIdx);
+    const cur = this.pend[r]||[];
+    let inner = '<div class="modal" style="max-width:430px"><h3>'+esc(ex.n)+'</h3>';
+    for(let s=0;s<2;s++){
+      const c = cur[s]||{};
+      const wv = c.w ? c.w : (t.lt==="bw" ? "" : (t.weight!=null?t.weight:""));
+      inner += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
+        (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
+                     : '<input type="number" inputmode="decimal" class="rw setw" data-s="'+s+'" placeholder="'+(t.lt==="band"?"band lvl":S.settings.units)+'" value="'+wv+'" style="margin-left:auto">')+
+        '</div>'+ repPad(c.r||null) +'</div>';
     }
-    html += '</div></div>';
-    html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Just tick it</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save snack</button></div>';
-    ov.innerHTML = html; root.appendChild(ov); wireRepPads(ov);
-
-    const mark = ()=>{
-      const iso=todayISO();
-      if(!S.snacksDone[iso]) S.snacksDone[iso]=[];
-      if(S.snacksDone[iso].indexOf(r)===-1) S.snacksDone[iso].push(r);
-      if(S.snacksDone[iso].length>=5) S.sessionsDone[iso] = S.sessionsDone[iso] || this.colId;
-    };
-    ov.querySelector("#saveLog").addEventListener("click", ()=>{
-      const iso=todayISO(); const added=[]; const sets=[];
-      ov.querySelectorAll(".lset").forEach(ls=>{
-        const wi=ls.querySelector("input.w"), pad=ls.querySelector(".reppad");
-        const w=(wi&&wi.value!=="")?+wi.value:0;
-        const rr=(pad&&pad.dataset.val)?+pad.dataset.val:0;
-        if(w>0||rr>0) sets.push({ w, r:rr });
+    inner += '<div class="btn-row"><button class="btn secondary" id="reCancel">Cancel</button><button class="btn" id="reSave">Save</button></div></div>';
+    const m = openModal(inner);
+    wireRepPads(m.back);
+    m.back.querySelector("#reCancel").addEventListener("click", m.close);
+    m.back.querySelector("#reSave").addEventListener("click", ()=>{
+      const pads = [...m.back.querySelectorAll(".reppad")];
+      const next = [];
+      pads.forEach((pad,s)=>{
+        const rr = pad.dataset.val ? +pad.dataset.val : 0;
+        const wi = m.back.querySelector('input.rw[data-s="'+s+'"]');
+        const w = (wi && wi.value!=="") ? +wi.value : 0;
+        next[s] = { w, r:rr };
       });
-      if(sets.length){ const log={ date:iso, col:this.colId, mode:"snack", row:r, exercise:ex.n, sets }; S.logs.push(log); added.push(log); }
-      mark(); const prs=detectPRs(added); save(); checkAchievements(); save(); this.teardown();
-      const n=(S.snacksDone[iso]||[]).length;
-      toast(prs.length ? ("🏆 New PR: "+prs[0]) : (n>=5?"All 5 done — day complete! 🔥":("Snack "+n+"/5"))); switchTab("snacks");
+      this.pend[r] = next;
+      m.close(); onDone && onDone();
     });
-    ov.querySelector("#skipLog").addEventListener("click", ()=>{
-      mark(); save(); checkAchievements(); save(); this.teardown();
-      const n=(S.snacksDone[todayISO()]||[]).length;
-      toast(n>=5?"All 5 done — day complete! 🔥":("Snack "+n+"/5")); switchTab("snacks");
-    });
-  }
+  },
 };
 
 /* ================================================================= INIT */

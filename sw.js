@@ -1,6 +1,8 @@
-/* Home Strength Blueprint — simple cache-first service worker.
-   Only registered when the app is served over https (see index.html). */
-const CACHE = "hsb-v1";
+/* Home Strength Blueprint — service worker (registered over https only).
+   HTML is network-first so deployed updates reach installed users
+   immediately; static assets are cache-first for speed. Everything still
+   works fully offline via the cache fallback. */
+const CACHE = "hsb-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -27,19 +29,39 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isHTML = req.mode === "navigate" || url.pathname.endsWith("/index.html");
+  if (isHTML) {
+    // network-first: fresh deploys win, cache covers offline
+    e.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put("./index.html", copy));
+          return res;
+        })
+        .catch(() =>
+          caches.match(req, { ignoreSearch: true }).then((h) => h || caches.match("./index.html"))
+        )
+    );
+    return;
+  }
+
+  // cache-first for icons/manifest, refreshed in the background
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(req)
+      const refetch = fetch(req)
         .then((res) => {
-          // runtime-cache same-origin GETs so the app keeps working offline
-          if (res && res.ok && new URL(req.url).origin === self.location.origin) {
+          if (res && res.ok) {
             const copy = res.clone();
             caches.open(CACHE).then((c) => c.put(req, copy));
           }
           return res;
         })
-        .catch(() => caches.match("./index.html"));
+        .catch(() => hit);
+      return hit || refetch;
     })
   );
 });
