@@ -1,116 +1,73 @@
-# garmin-push
+# Home Strength Blueprint
 
-Push running workouts to Garmin Connect from the command line. Define workouts in YAML or create them quickly via CLI, then upload them to your Garmin account where they sync to your watch.
+A mobile-first, offline-capable web app for the **Home Strength Blueprint** — a
+15-minute daily strength program you can run with dumbbells, resistance bands,
+or no equipment at all. Open it, see today's five exercises, tap **Start**, and
+a guided session with timers walks you through it. No accounts, no backend, no
+build step.
 
-## Install
+## What's inside
 
-```bash
-pip install -e .
-```
+| File | Purpose |
+| --- | --- |
+| `index.html` | The entire app — all HTML, CSS and JS inline. Works from `file://`. |
+| `manifest.webmanifest` | PWA metadata (name, colors, icons). |
+| `sw.js` | Cache-first service worker (only registers over HTTPS). |
+| `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | App icons. |
 
-## Setup
+Everything is self-contained — no frameworks, no CDN, no network calls at
+runtime. All your data lives in `localStorage` under the single key `hsb.v1`
+and never leaves the device.
 
-### Authenticate
+## The program
 
-```bash
-garmin-push login
-```
+Five movement patterns (Squat, Hinge, Push, Pull, Core) across five equipment
+tiers (columns **A–E**). Each weekday maps to a column:
 
-Enter your Garmin Connect email and password when prompted. Tokens are saved to `~/.garmin-push/tokens/` and are valid for about one year.
+| Mon | Tue | Wed | Thu | Fri | Sat / Sun |
+| --- | --- | --- | --- | --- | --- |
+| A · Dumbbells (Heavy) | B · Bands (Volume) | C · No Equipment (Tempo) | D · No Equipment (Power) | E · Full Kit (Mix) | Rest / repeat a favorite |
 
-You can also set environment variables:
+Progress runs on a repeating **4-week cycle** (Baseline → +1 Rep → Top of Range
+→ Add Weight) using double progression: the app looks at your last log for each
+exercise and tells you what to aim for today.
 
-```bash
-export GARMIN_EMAIL="your@email.com"
-export GARMIN_PASSWORD="yourpassword"
-```
+### Two ways to train
+- **15-minute session** — warm-up → two rounds of the five exercises with rest
+  timers → cool-down → quick-log your sets.
+- **Snack Mode** — the same five moves spread across the day as five 3-minute
+  micro-sessions, ticked off one at a time. All five = a complete day.
 
 ## Usage
 
-### Quick workouts
+### (a) Open it directly — no hosting
 
-Create common workout types with a single command:
+1. Download this folder (or just `index.html`).
+2. Open `index.html` in your phone's browser.
+3. **Add to Home Screen** / bookmark it. It opens straight to today's workout.
 
-```bash
-garmin-push quick easy 45              # 45-minute easy run
-garmin-push quick intervals 6x400m    # 6x400m repeats
-garmin-push quick tempo 20             # 20-minute tempo block
-garmin-push quick long 90              # 90-minute long run
-```
+Core features (workout player, timers, logging, progression, export/import) all
+work offline from the local file — no service worker required.
 
-Schedule to a specific date:
+### (b) Host it for a full installable PWA
 
-```bash
-garmin-push quick tempo 20 --schedule 2026-03-15
-```
+Serve the folder over HTTPS — e.g. **GitHub Pages**:
 
-### From YAML files
+1. Push this folder to a repo.
+2. In the repo settings, enable **Pages** from the branch/`root`.
+3. Visit the published URL and use your browser's **Install app** option.
 
-```bash
-garmin-push push workouts/examples.yaml
-garmin-push push workouts/examples.yaml --schedule 2026-03-20
-```
+When served over HTTPS the service worker registers automatically and precaches
+everything, so the app is fully installable and works offline after the first
+load.
 
-### List uploaded workouts
+## Data & backup
 
-```bash
-garmin-push list
-garmin-push list --limit 50
-```
+Open **Settings → Backup** to copy your data out as JSON or paste a backup back
+in. Use it to move your history to another device or keep a safety copy. If the
+stored data is ever corrupted, the app backs up the raw string to
+`hsb.v1.corrupt` and starts fresh rather than losing the app.
 
-## YAML Workout Format
+## Privacy
 
-```yaml
-workouts:
-  - name: "6x400m Intervals"
-    estimated_duration_minutes: 40
-    steps:
-      - kind: warmup
-        duration: "10:00"
-      - repeat: 6
-        steps:
-          - kind: run
-            duration: 400m
-            duration_type: distance
-            pace: interval
-          - kind: recover
-            duration: 400m
-            duration_type: distance
-      - kind: cooldown
-        duration: "10:00"
-```
-
-### Step kinds
-
-| Kind | Description |
-|------|-------------|
-| `warmup` | Warmup period |
-| `cooldown` | Cooldown period |
-| `run` / `interval` | Main running step |
-| `recover` / `recovery` | Recovery between intervals |
-| `rest` | Full rest |
-
-### Duration formats
-
-- Time: `"10:00"` (MM:SS), `"1:30:00"` (HH:MM:SS), `"45min"`, `"30sec"`
-- Distance: `400m`, `1km`, `1.5mi`
-- Open: `"lap"` (press lap button to advance)
-
-### Pace targets
-
-Use built-in zone names or explicit ranges:
-
-| Zone | Default pace (min/km) |
-|------|----------------------|
-| `easy` | 6:00 - 6:30 |
-| `moderate` | 5:20 - 5:40 |
-| `tempo` | 4:40 - 5:00 |
-| `threshold` | 4:20 - 4:40 |
-| `interval` | 3:50 - 4:10 |
-| `sprint` | 3:20 - 3:40 |
-
-Or use an explicit range: `pace: "4:00-4:30"`
-
-## How it works
-
-This tool uses the [garminconnect](https://github.com/cyberjunky/python-garminconnect) Python library to authenticate with Garmin Connect and upload structured workouts. Uploaded workouts appear in your Garmin Connect workout library and can be sent to your watch.
+No accounts, no analytics, no network calls. Your logs stay in your browser.
