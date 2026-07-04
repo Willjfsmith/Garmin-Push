@@ -1,27 +1,12 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-dist/
-build/
-*.egg
+# OS
+.DS_Store
+Thumbs.db
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Garmin tokens
-.garmin-push/
-tokens/
-
-# IDE
+# Editor / IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
+# Logs / misc
+*.log
