@@ -39,6 +39,8 @@ body{
 }
 button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 input,select{font-family:inherit;font-size:16px}
+/* no double-tap zoom on rapid taps (rep pad, Next button) */
+button,input,select,textarea,[role="button"],[role="radio"],.snack,.heat .hd{touch-action:manipulation}
 h1,h2,h3{font-family:var(--head);margin:0;letter-spacing:.01em}
 .app{max-width:720px;margin:0 auto;min-height:100vh;padding:0 0 calc(128px + var(--safe-b))}
 
@@ -172,6 +174,8 @@ section[hidden]{display:none}
 .ring.small{width:min(42vw,165px)}
 .ring.small .time{font-size:30px}
 .ring.small .sub{font-size:10px;margin-top:2px}
+.ring{cursor:pointer}
+.overlay.paused .ring{opacity:.55}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .track{fill:none;stroke:var(--hair);stroke-width:8}
 .ring .prog{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
@@ -250,7 +254,7 @@ section[hidden]{display:none}
 .field input,.field select,.field textarea{
   padding:9px 10px;border:1px solid var(--hair);border-radius:9px;background:var(--paper);color:var(--ink);width:100%;
 }
-.field textarea{min-height:96px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;resize:vertical}
+.field textarea{min-height:96px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;resize:vertical}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--hair)}
 .switch{position:relative;width:52px;height:30px}
 .switch input{opacity:0;width:0;height:0}
@@ -451,7 +455,15 @@ const EXERCISES = [
   ["Bent-Over DB Row","Band Lat Pulldown","Towel Door Row","Table Inverted Row","Renegade Row"],
   ["Suitcase Carry","Pallof Press","Slow Dead Bug","Mountain Climbers","Plank DB Drag"],
 ];
-const WARMUP  = ["Arm circles + band pull-aparts","Bodyweight squats ×10 + hip hinges ×10","Push-up to down-dog ×5"];
+// warm-up matches the equipment you actually have out
+function warmupList(colId){
+  const banded = /band/.test(colById(colId).equipment);
+  return [
+    banded ? "Arm circles ×10 + band pull-aparts ×10" : "Arm circles ×10 each way + shoulder rolls",
+    "Bodyweight squats ×10 + hip hinges ×10",
+    "Push-up to down-dog ×5",
+  ];
+}
 const COOLDOWN= ["Doorway chest stretch","Couch stretch (hip flexors)","Standing hamstring stretch"];
 // per-exercise one-line form cues, indexed [row][col]
 const CUES = [
@@ -535,6 +547,15 @@ function exPickIdx(r,c){ const opts=exOptions(r,c); const i=(S.settings.exPick&&
 function currentEx(r,c){ return exOptions(r,c)[exPickIdx(r,c)]; }
 function cycleEx(r,c){ const opts=exOptions(r,c); if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[r+"-"+c]=(exPickIdx(r,c)+1)%opts.length; save(); }
 function pickedColumn(){ return S.settings.pickedCol || "A"; }
+// gentle variety: suggest the next type in the A→B→C→D→E rotation after
+// whatever you last completed (never auto-switches — just a hint)
+function suggestedCol(){
+  let last=null;
+  for(const iso in S.sessionsDone){ if(!last || iso>last.iso) last={ iso, col:S.sessionsDone[iso] }; }
+  if(!last) return null;
+  const i = COLUMNS.findIndex(c=>c.id===last.col);
+  return i<0 ? null : COLUMNS[(i+1)%COLUMNS.length].id;
+}
 // common moves for ad-hoc quick logging (bodyweight; each borrows a pictogram)
 const QUICK = [
   { n:"Push-Ups", pr:2, pc:2 }, { n:"Bodyweight Squats", pr:0, pc:2 },
@@ -847,7 +868,9 @@ function lockScroll(on){ document.body.style.overflow = on ? "hidden" : ""; }
 function repPad(preset){
   let h = '<div class="reppad" data-val="'+(preset!=null?preset:"")+'">';
   for(let n=1;n<=30;n++) h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'</button>';
-  h += '<button type="button" data-n="35" class="'+((preset!=null&&+preset>30)?"on":"")+'">30+</button></div>';
+  // honest high-rep options (the count you tap is the count that's saved)
+  [35,40,45,50].forEach(n=> h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'</button>');
+  h += '</div>';
   return h;
 }
 function wireRepPads(root, onPick){
@@ -895,6 +918,9 @@ function renderToday(){
   html += goalRingHTML();
   html += '</div>';
 
+  // instant feedback once today already counts
+  if(dayComplete(todayISO())) html += '<div class="band" style="margin-top:10px;background:var(--plateD)">✓ Done today — streak safe</div>';
+
   // workout-type picker: selected card always visible; "Change" expands the rest
   html += '<div class="section-h">Your set</div><div role="radiogroup" aria-label="Workout type">';
   html += typoptHTML(col, true, iv);
@@ -903,6 +929,11 @@ function renderToday(){
     html += '<button type="button" class="typchange" id="typToggle">▴ Done</button>';
   } else {
     html += '<button type="button" class="typchange" id="typToggle">⇄ Change workout type</button>';
+  }
+  const sug = suggestedCol();
+  if(sug && sug!==colId){
+    const sc = colById(sug);
+    html += '<button type="button" class="typchange" id="useSuggest" style="border-style:solid;color:var(--ink)">Mix it up — try <b style="color:'+sc.color+'">&nbsp;'+sc.id+' · '+esc(sc.name)+' ('+esc(sc.style)+')</b></button>';
   }
   html += '</div>';
   if(col.note) html += '<div class="inline-note" style="margin:-2px 0 4px">'+esc(col.id)+': '+esc(col.note)+'</div>';
@@ -933,6 +964,8 @@ function renderToday(){
   // wire
   const tt = document.getElementById("typToggle");
   if(tt) tt.addEventListener("click", ()=>{ typOpen = !typOpen; renderToday(); });
+  const us = document.getElementById("useSuggest");
+  if(us) us.addEventListener("click", ()=>{ S.settings.pickedCol = suggestedCol(); save(); typOpen=false; renderToday(); });
   wrap.querySelectorAll(".typopt").forEach(t=>{
     t.addEventListener("click", ()=>{
       const id = t.getAttribute("data-col");
@@ -942,6 +975,11 @@ function renderToday(){
   });
   wrap.querySelectorAll(".swapx").forEach(x=>{
     x.addEventListener("click", e=>{ e.stopPropagation(); cycleEx(+x.getAttribute("data-row"), colIdx); renderToday(); });
+  });
+  // tap a move to see the big pictogram, cue and your history for it
+  wrap.querySelectorAll(".ex").forEach((node,r)=>{
+    node.style.cursor = "pointer";
+    node.addEventListener("click", e=>{ if(e.target.closest(".swapx")) return; exDetail(r, colIdx); });
   });
   document.getElementById("startSession").addEventListener("click", ()=> Player.startSession(colId));
   document.getElementById("startSnacks").addEventListener("click", ()=> switchTab("snacks"));
@@ -1213,6 +1251,25 @@ function dayDetail(iso){
   const m = openModal('<div class="modal"><h3>'+esc(iso)+'</h3>'+body+'<div class="btn-row"><button class="btn secondary" id="ddClose">Close</button></div></div>');
   m.back.querySelector("#ddClose").addEventListener("click", m.close);
 }
+// tap-through detail for a move: big pictogram, cue, best + recent history
+function exDetail(row, colIdx){
+  const ex = currentEx(row, colIdx), col = COLUMNS[colIdx];
+  const lt = loadType(col);
+  const b = bestSet(ex.n);
+  const recent = S.logs.filter(l=>l.exercise===ex.n).slice(-3).reverse();
+  let body = '<div style="text-align:center">'+pico(row, colIdx, "pbig")+'</div>';
+  body += '<p style="margin:4px 0 10px">'+esc(ex.c)+'</p>';
+  body += '<div class="dd-row"><span>Pattern</span><b>'+esc(ROWS[row])+'</b></div>';
+  body += '<div class="dd-row"><span>Equipment</span><b>'+esc(col.equipment)+'</b></div>';
+  if(b) body += '<div class="dd-row"><span>Your best</span><b>'+(b.kind==="wt" ? fmtWeight(b.w,b.lt)+" × "+b.r : b.r+" reps")+'</b></div>';
+  recent.forEach(l=>{
+    const sets = l.sets.map(s=> (+s.w?fmtWeight(+s.w,lt):"BW")+"×"+(+s.r||0)).join(" ");
+    body += '<div class="dd-row"><span>'+esc(l.date)+'</span><b>'+esc(sets)+'</b></div>';
+  });
+  if(!b && !recent.length) body += '<p class="muted small" style="margin:8px 0 0">No history yet — it starts with your first logged set.</p>';
+  const m = openModal('<div class="modal"><h3>'+esc(ex.n)+'</h3>'+body+'<div class="btn-row"><button class="btn secondary" id="xdClose">Close</button></div></div>');
+  m.back.querySelector("#xdClose").addEventListener("click", m.close);
+}
 function currentTab(){ for(const t of ["today","snacks","progress","settings"]){ if(!document.getElementById("view-"+t).hidden) return t; } return "today"; }
 function refreshActive(){ switchTab(currentTab()); }
 /* ================================================================= QUICK LOG (ad-hoc, anytime) */
@@ -1337,6 +1394,13 @@ function renderSettings(){
   html += '<div class="toggle-row" style="border-bottom:0"><span>Vibration</span><label class="switch"><input type="checkbox" id="setVibe"'+(st.vibrate?" checked":"")+'><span class="sl"></span></label></div>';
   html += '</div>';
 
+  html += '<div class="section-h">How it works</div><div class="card small" style="line-height:1.5">';
+  html += '<b>AMRAP:</b> every work interval, do as many clean reps as you can — no prescribed numbers.<br>';
+  html += '<b>Progress:</b> the app shows the rep count to beat; clear the ceiling and it tells you to add weight (or slow the tempo).<br>';
+  html += '<b>Log as you go:</b> tap your reps during each rest; fix anything on the end screen.<br>';
+  html += '<b>A day counts</b> when you finish a session, hit all your snack goals, or log 3+ efforts.';
+  html += '</div>';
+
   html += '<div class="section-h">Backup</div><div class="card">';
   html += '<div class="field"><label>Export data</label><textarea id="exportBox" readonly>'+esc(JSON.stringify(S))+'</textarea>'+
           '<div class="btn-row" style="margin-top:8px"><button class="btn secondary" id="copyExport">Copy</button><button class="btn secondary" id="dlExport">Download file</button></div></div>';
@@ -1439,7 +1503,7 @@ const Player = {
 
   buildSessionSteps(colId){
     const colIdx = COLUMNS.indexOf(colById(colId)); const iv = interval();
-    const steps = [{ type:"warmup", sec:120, title:"Warm-up", list:WARMUP }];
+    const steps = [{ type:"warmup", sec:120, title:"Warm-up", list:warmupList(colId) }];
     for(let round=1; round<=2; round++){
       for(let r=0;r<5;r++){
         steps.push({ type:"exercise", round, row:r, colIdx, sec:iv.work });
@@ -1541,6 +1605,10 @@ const Player = {
       this.paused=true; this.pausedAt=Date.now();
       cancelAnimationFrame(this.raf);
     }
+    const ovl = document.querySelector(".overlay");
+    if(ovl) ovl.classList.toggle("paused", this.paused);
+    const sub = document.querySelector(".ring .sub");
+    if(sub) sub.textContent = this.paused ? "paused — tap to resume" : (this._phaseLabel||"");
     this.renderControls();
   },
   exit(){
@@ -1588,6 +1656,7 @@ const Player = {
     else if(step.type==="rest") phaseLabel = step.label || "Rest";
     else if(step.type==="exercise") phaseLabel = "Round "+step.round+" · "+(step.row+1)+"/5";
     phase.textContent = phaseLabel;
+    this._phaseLabel = phaseLabel;
     // session progress bar (summary step excluded from the denominator)
     const prog = document.getElementById("pProg");
     if(prog) prog.style.width = Math.round(this.idx/(this.steps.length-1)*100)+"%";
@@ -1624,6 +1693,13 @@ const Player = {
     html += '<div class="player-ctrls" id="pCtrls"></div>';
     stage.innerHTML = html;
     this.wireLogWidget();
+    // the big ring is the biggest tap target — use it for pause/resume
+    const ringEl = stage.querySelector(".ring");
+    if(ringEl){
+      ringEl.setAttribute("role","button");
+      ringEl.setAttribute("aria-label","Pause or resume timer");
+      ringEl.addEventListener("click", ()=> this.togglePause());
+    }
     this.renderControls();
     this.paint(step.sec);
   },
@@ -1690,23 +1766,29 @@ const Player = {
     const root = document.getElementById("overlayRoot"); root.innerHTML="";
     const ov = el('<div class="overlay" style="--accent:'+col.color+'"></div>');
     let html = '<div class="obar"><div class="phase" style="flex:1;color:'+col.color+'">Session complete</div></div>';
-    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">Here\'s what you logged along the way.</p></div>';
-    html += '<div class="card" style="margin-bottom:14px">';
-    let anySets = false;
-    for(let r=0;r<5;r++){
-      const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
-      const sets = (this.pend[r]||[]).filter(s=> s && s.r>0);
-      if(sets.length) anySets = true;
-      const txt = sets.length
-        ? sets.map(s=> (s.w>0 ? fmtWeight(s.w,t.lt) : "BW")+"×"+s.r).join("  ")
-        : "—";
-      html += '<div class="lrow"><div class="lr-main"><div class="lr-name">'+(r+1)+'. '+esc(ex.n)+'</div></div>'+
-              '<div class="lr-val">'+esc(txt)+'</div></div>';
-    }
-    html += '</div>';
-    if(!anySets) html += '<p class="small muted" style="text-align:center;margin:-6px 0 12px">No sets logged — you can still save the session, or add sets later with the ＋ Quick Log.</p>';
+    html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">What you logged along the way — tap a row to fix or add sets.</p></div>';
+    html += '<div class="card" id="recapCard" style="margin-bottom:14px"></div>';
     html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Don\'t save sets</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save session</button></div>';
     ov.innerHTML = html; root.appendChild(ov);
+
+    const paintRecap = ()=>{
+      let inner = "";
+      for(let r=0;r<5;r++){
+        const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
+        const sets = (this.pend[r]||[]).filter(s=> s && s.r>0);
+        const txt = sets.length
+          ? sets.map(s=> (s.w>0 ? fmtWeight(s.w,t.lt) : "BW")+"×"+s.r).join("  ")
+          : "tap to add";
+        inner += '<div class="lrow" data-row="'+r+'" role="button" style="cursor:pointer"><div class="lr-main"><div class="lr-name">'+(r+1)+'. '+esc(ex.n)+'</div></div>'+
+                 '<div class="lr-val'+(sets.length?'':' muted')+'" style="font-weight:'+(sets.length?800:600)+'">'+esc(txt)+'</div></div>';
+      }
+      const cardEl = ov.querySelector("#recapCard");
+      cardEl.innerHTML = inner;
+      cardEl.querySelectorAll(".lrow").forEach(rowEl=>{
+        rowEl.addEventListener("click", ()=> this.editRecapRow(+rowEl.getAttribute("data-row"), paintRecap));
+      });
+    };
+    paintRecap();
 
     ov.querySelector("#saveLog").addEventListener("click", ()=>{
       const iso = todayISO(); const added=[];
@@ -1725,6 +1807,37 @@ const Player = {
     ov.querySelector("#skipLog").addEventListener("click", ()=>{
       S.sessionsDone[todayISO()] = this.colId; save(); checkAchievements(); save();
       this.teardown(); toast("Marked complete"); switchTab("today");
+    });
+  },
+  // fix or add both sets for one exercise from the recap screen
+  editRecapRow(r, onDone){
+    const colIdx = this.colIdx;
+    const ex = currentEx(r, colIdx), t = computeTarget(r, colIdx);
+    const cur = this.pend[r]||[];
+    let inner = '<div class="modal" style="max-width:430px"><h3>'+esc(ex.n)+'</h3>';
+    for(let s=0;s<2;s++){
+      const c = cur[s]||{};
+      const wv = c.w ? c.w : (t.lt==="bw" ? "" : (t.weight!=null?t.weight:""));
+      inner += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
+        (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
+                     : '<input type="number" inputmode="decimal" class="rw setw" data-s="'+s+'" placeholder="'+(t.lt==="band"?"band lvl":S.settings.units)+'" value="'+wv+'" style="margin-left:auto">')+
+        '</div>'+ repPad(c.r||null) +'</div>';
+    }
+    inner += '<div class="btn-row"><button class="btn secondary" id="reCancel">Cancel</button><button class="btn" id="reSave">Save</button></div></div>';
+    const m = openModal(inner);
+    wireRepPads(m.back);
+    m.back.querySelector("#reCancel").addEventListener("click", m.close);
+    m.back.querySelector("#reSave").addEventListener("click", ()=>{
+      const pads = [...m.back.querySelectorAll(".reppad")];
+      const next = [];
+      pads.forEach((pad,s)=>{
+        const rr = pad.dataset.val ? +pad.dataset.val : 0;
+        const wi = m.back.querySelector('input.rw[data-s="'+s+'"]');
+        const w = (wi && wi.value!=="") ? +wi.value : 0;
+        next[s] = { w, r:rr };
+      });
+      this.pend[r] = next;
+      m.close(); onDone && onDone();
     });
   },
 };
