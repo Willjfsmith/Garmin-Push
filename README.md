@@ -1,10 +1,9 @@
 # Home Strength Blueprint
 
-A mobile-first, offline-capable web app for the **Home Strength Blueprint** — a
-15-minute daily strength program you can run with dumbbells, resistance bands,
-or no equipment at all. Open it, see today's five exercises, tap **Start**, and
-a guided session with timers walks you through it. No accounts, no backend, no
-build step.
+A mobile-first, offline-capable web app for the **Home Strength Blueprint** — an
+11-minute daily strength workout you can run with bodyweight, resistance bands,
+or dumbbells. Open it, pick your kit, see today's five moves, tap **Start**, and
+a guided timer walks you through it. No accounts, no backend, no build step.
 
 ## What's inside
 
@@ -19,24 +18,45 @@ Everything is self-contained — no frameworks, no CDN, no network calls at
 runtime. All your data lives in `localStorage` under the single key `hsb.v1`
 and never leaves the device.
 
-## The program
+## The workout
 
-Five movement patterns (Squat, Hinge, Push, Pull, Core) across five equipment
-tiers (columns **A–E**). Each weekday maps to a column:
+Five movement patterns (Squat, Hinge, Push, Pull, Core), done twice through,
+**45 seconds on / 15 seconds off**, with a 60-second breather between the two
+rounds. No warm-up phase, no cool-down phase.
 
-| Mon | Tue | Wed | Thu | Fri | Sat / Sun |
-| --- | --- | --- | --- | --- | --- |
-| A · Dumbbells (Heavy) | B · Bands (Volume) | C · No Equipment (Tempo) | D · No Equipment (Power) | E · Full Kit (Mix) | Rest / repeat a favorite |
+| Round 1 | Break | Round 2 | Total |
+| --- | --- | --- | --- |
+| 5 × 45s work, 15s rest | 60s | 5 × 45s work, 15s rest | **10:30** |
 
-Progress runs on a repeating **4-week cycle** (Baseline → +1 Rep → Top of Range
-→ Add Weight) using double progression: the app looks at your last log for each
-exercise and tells you what to aim for today.
+Every working set is AMRAP — as many good reps as you can in the 45 seconds.
+Once you clear the kit's rep ceiling, the app tells you to add load next time.
 
-### Two ways to train
-- **15-minute session** — warm-up → two rounds of the five exercises with rest
-  timers → cool-down → quick-log your sets.
-- **Snack Mode** — the same five moves spread across the day as five 3-minute
-  micro-sessions, ticked off one at a time. All five = a complete day.
+### Three kits
+
+| BW · Bodyweight | BD · Bands | DB · Dumbbells |
+| --- | --- | --- |
+| Bodyweight Squat | Banded Squat | Goblet Squat |
+| Glute Bridge | Band Good Morning | DB Romanian Deadlift |
+| Push-Up | Band Overhead Press | DB Floor Press |
+| Towel Door Row | Band Lat Pulldown | Bent-Over DB Row |
+| Plank | Pallof Press | Suitcase Carry |
+
+Those are the defaults. Every slot has alternates — tap **⇄** next to a move on
+the Today tab to cycle through them. Your picks are remembered per kit.
+
+### Quick Session
+
+One move, straight sets, a rest timer in between. Push-ups by default, or pick
+any move from the library.
+
+- **Reps mode** — e.g. 5 sets × 5 reps with 30s rest. Each set counts up until
+  you tap **Done**, then the rest timer runs.
+- **Timed mode** — e.g. 5 × 45s with 30s rest, counting down like the main
+  session.
+- Presets (5×5, 3×10, 10×10) or type your own sets / reps / rest.
+
+Quick sessions log like everything else. Three in a day count as a full day for
+your streak.
 
 ## Usage
 
@@ -67,6 +87,9 @@ Open **Settings → Backup** to copy your data out as JSON or paste a backup bac
 in. Use it to move your history to another device or keep a safety copy. If the
 stored data is ever corrupted, the app backs up the raw string to
 `hsb.v1.corrupt` and starts fresh rather than losing the app.
+
+Data from the earlier five-column version migrates automatically: old logs keep
+their history, and the old kits map onto Bodyweight, Bands, and Dumbbells.
 
 ## Privacy
 
