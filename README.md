@@ -31,6 +31,10 @@ rounds. No warm-up phase, no cool-down phase.
 Every working set is AMRAP — as many good reps as you can in the 45 seconds.
 Once you clear the kit's rep ceiling, the app tells you to add load next time.
 
+There is no weekly plan and no target. Open the app, pick a kit, train. The
+Progress tab keeps your streak and history; nothing tells you which day to do
+what.
+
 ### Three kits
 
 | BW · Bodyweight | BD · Bands | DB · Dumbbells |

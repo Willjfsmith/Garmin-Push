@@ -260,11 +260,6 @@ section[hidden]{display:none}
 .lrow .lr-val{font-family:var(--head);font-weight:800;text-align:right}
 .lrow .lr-val small{display:block;font-size:10.5px;color:var(--muted);font-weight:600}
 /* mini goal ring */
-.gring{width:52px;height:52px;min-width:52px;position:relative}
-.gring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.gring .gt{fill:none;stroke:var(--hair);stroke-width:9}
-.gring .gp{fill:none;stroke:var(--plateD);stroke-width:9;stroke-linecap:round}
-.gring .gc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:900;font-size:14px}
 /* workout-type picker */
 .typopt{
   display:flex;align-items:center;gap:11px;padding:10px 12px;margin-bottom:7px;
@@ -502,7 +497,7 @@ const KEY = "hsb.v1";
 function defaultState(){
   return {
     settings:{ units:"kg", pickedCol:"BW", sound:true, vibrate:true,
-               theme:"system", weeklyGoal:5, exPick:{}, schema:2,
+               theme:"system", exPick:{}, schema:2,
                quick:{ ex:null, sets:5, reps:5, rest:30, timed:false, work:45 } },
     logs:[], snacksDone:{}, sessionsDone:{}, bodyweight:[], achievements:[]
   };
@@ -537,7 +532,7 @@ function migrate(obj){
     logs.forEach(l=>{ l.col = migrateCol(l.col); });
     Object.keys(sessionsDone).forEach(k=>{ sessionsDone[k] = migrateCol(sessionsDone[k]); });
     s.exPick = {}; // v1 swaps indexed a different library; start from the defaults
-    delete s.interval;
+    delete s.interval; delete s.weeklyGoal;
     s.schema = 2;
   }
   return {
@@ -806,27 +801,16 @@ function wireRepPads(root){
 }
 
 /* ================================================================= RENDER: TODAY */
-function goalRingHTML(){
-  const goal = Math.max(1, S.settings.weeklyGoal||5);
-  const done = sessionsThisWeek();
-  const frac = Math.max(0, Math.min(1, done/goal));
-  const C = 2*Math.PI*22;
-  return '<div class="gring" title="'+done+' of '+goal+' sessions this week">'+
-    '<svg viewBox="0 0 52 52"><circle class="gt" cx="26" cy="26" r="22"/>'+
-    '<circle class="gp" cx="26" cy="26" r="22" style="stroke-dasharray:'+C.toFixed(1)+';stroke-dashoffset:'+(C*(1-frac)).toFixed(1)+'"/></svg>'+
-    '<div class="gc">'+done+'/'+goal+'</div></div>';
-}
 function renderToday(){
   const wrap = document.getElementById("view-today");
   const colId = pickedColumn(), col = colById(colId), colIdx = COLUMNS.indexOf(col);
   const streak = currentStreak();
   let html = "";
 
-  // header card: streak + weekly-goal ring
+  // header card: streak only — no weekly plan, no target. Train when you choose.
   html += '<div class="card" style="display:flex;align-items:center;gap:12px">';
   html += '<div style="flex:1;min-width:0"><div style="font-family:var(--head);font-weight:800;font-size:17px">Your workout</div>';
   html += '<div class="streak" style="margin-top:3px"><span class="flame">🔥</span><span>'+streak+'</span><span class="small muted" style="font-weight:600">day'+(streak===1?"":"s")+' streak</span></div></div>';
-  html += goalRingHTML();
   html += '</div>';
 
   // kit picker
@@ -946,12 +930,11 @@ function renderQuick(){
 /* ================================================================= RENDER: PROGRESS */
 function renderProgress(){
   const wrap = document.getElementById("view-progress");
-  const goal = Math.max(1, S.settings.weeklyGoal||5);
 
   // KPI dashboard
   let html = '<div class="section-h">This Week</div>';
   html += '<div class="kpis">';
-  html += '<div class="kpi"><b>'+sessionsThisWeek()+'/'+goal+'</b><span>Sessions</span></div>';
+  html += '<div class="kpi"><b>'+sessionsThisWeek()+'</b><span>Sessions</span></div>';
   html += '<div class="kpi"><b>'+Math.round(volumeThisWeek()).toLocaleString()+'</b><span>Volume '+S.settings.units+'</span></div>';
   html += '<div class="kpi"><b>'+totalSessions()+'</b><span>Total sessions</span></div>';
   html += '<div class="kpi"><b>'+longestStreak()+'</b><span>Best streak</span></div>';
@@ -1158,11 +1141,6 @@ function renderSettings(){
   html += '<button data-u="kg" class="'+(st.units==="kg"?"on":"")+'">kg</button><button data-u="lb" class="'+(st.units==="lb"?"on":"")+'">lb</button></div></div>';
   html += '</div>';
 
-  // training
-  html += '<div class="card" style="margin-top:10px">';
-  html += '<div class="field" style="margin-bottom:0"><label>Weekly session goal</label><input type="number" inputmode="numeric" id="setGoal" min="1" max="14" value="'+(st.weeklyGoal||5)+'"></div>';
-  html += '</div>';
-
   // appearance
   html += '<div class="card" style="margin-top:10px"><div class="field" style="margin-bottom:0"><label>Theme</label><div class="seg" id="setTheme">';
   [["system","Auto"],["light","Light"],["dark","Dark"]].forEach(x=> html += '<button data-th="'+x[0]+'" class="'+((st.theme||"system")===x[0]?"on":"")+'">'+x[1]+'</button>');
@@ -1185,9 +1163,6 @@ function renderSettings(){
 
   document.getElementById("setUnits").querySelectorAll("button").forEach(b=>{
     b.addEventListener("click", ()=>{ st.units=b.getAttribute("data-u"); save(); renderSettings(); });
-  });
-  document.getElementById("setGoal").addEventListener("change", e=>{
-    let v=parseInt(e.target.value,10)||5; v=Math.max(1,Math.min(14,v)); st.weeklyGoal=v; save();
   });
   document.getElementById("setTheme").querySelectorAll("button").forEach(b=>{
     b.addEventListener("click", ()=>{ st.theme=b.getAttribute("data-th"); save(); applyTheme(); renderSettings(); });
