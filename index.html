@@ -102,6 +102,15 @@ main{padding:12px}
 .ex .extarget{font-size:12px;margin-top:2px}
 .ex .extarget b{color:var(--ink)}
 .ex .sug{color:var(--plateD);font-weight:700}
+.extag{display:inline-block;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;vertical-align:1px;margin-left:2px}
+.pickrow{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--hair);cursor:pointer;border-radius:8px}
+.pickrow:last-child{border-bottom:0}
+.pickrow.on{background:var(--paper)}
+.pickrow .pickn{width:22px;height:22px;min-width:22px;border-radius:6px;background:var(--hair);color:var(--ink);font-family:var(--head);font-weight:900;font-size:11px;display:flex;align-items:center;justify-content:center}
+.pickrow.on .pickn{background:var(--accent);color:#fff}
+.pickrow .tck{font-weight:900;color:var(--accent);min-width:14px}
+.pswitch{margin-top:8px;font-size:13px;font-weight:700;color:var(--muted)}
+.pswitch.now{color:var(--accent);font-size:16px}
 
 .pico svg{width:100%;height:100%;display:block}
 
@@ -400,72 +409,113 @@ const COLUMNS = [
   { id:"DB", name:"Dumbbells",  equipment:"dumbbells",        color:"#C0392B", pic:0, ceiling:10 },
 ];
 const ROWS = ["Squat","Hinge","Push","Pull","Core"];
-// LIB[kit][row] = [ {n:name, c:cue}, ...alternates ]. The first entry is the default.
+// LIB[kit][row] is a ladder: easiest first, hardest last. `d` marks the default
+// move, `hold` a timed hold (logged in seconds), `sides` a one-sided move that
+// switches halfway through the 45s. Everything needs only a floor and a wall:
+// no door, table, bench, box or band anchor.
 const LIB = {
   BW: [
-    [{n:"Bodyweight Squat",c:"Feet shoulder-width, sit back, chest up, full depth"},
-     {n:"1.5-Rep Squat",c:"Down, halfway up, back down, then stand — that's one rep"},
-     {n:"Squat Jump",c:"Explode up, land soft with bent knees, reset each rep"},
-     {n:"Reverse Lunge",c:"Step back, drop the back knee, drive the front heel"},
-     {n:"Cossack Squat",c:"Shift side to side, one leg bends, one stays straight"}],
-    [{n:"Glute Bridge",c:"Feet flat, drive hips up, squeeze the glutes at the top"},
-     {n:"Single-Leg Glute Bridge",c:"One foot planted, drive hips up, squeeze the glute at the top"},
-     {n:"Glute Bridge March",c:"Hips up, march one knee at a time, hips stay level"},
-     {n:"Broad Jump",c:"Swing the arms, jump forward for distance, stick the landing"}],
-    [{n:"Push-Up",c:"Hands under shoulders, chest to floor, press up strong"},
-     {n:"Incline Push-Up",c:"Hands on a bench, lower slow, full lockout"},
-     {n:"Tempo Push-Up",c:"Three seconds down, chest to floor, press up strong"},
-     {n:"Diamond Push-Up",c:"Hands together under the chest, elbows tight"},
-     {n:"Plyo Push-Up",c:"Explode off the floor, hands leave, land soft and reset"}],
-    [{n:"Towel Door Row",c:"Towel round the handle, lean back, pull your chest to the door"},
-     {n:"Doorway Row",c:"Hold the frame, lean back, pull your chest in"},
-     {n:"Table Inverted Row",c:"Under a sturdy table, pull chest to the edge, body straight"},
-     {n:"Prone Y-T-W",c:"Face down, lift the arms in Y, T then W shapes"}],
-    [{n:"Plank",c:"Elbows under shoulders, squeeze glutes, hold rock solid"},
-     {n:"Slow Dead Bug",c:"Low back pinned down, extend opposite arm and leg slowly"},
-     {n:"Hollow Hold",c:"Low back pinned, arms and legs off the floor, hold"},
-     {n:"Mountain Climbers",c:"Strong plank, drive the knees fast, keep the hips level"},
-     {n:"Bird Dog",c:"Opposite arm and leg out, slow and steady, flat back"}],
+    [ {n:"Wall Sit",c:"Back flat on the wall, thighs parallel, hold and breathe",hold:1},
+      {n:"Bodyweight Squat",c:"Feet shoulder-width, sit back, chest up, full depth",d:1},
+      {n:"Reverse Lunge",c:"Step back, drop the back knee, drive the front heel",sides:1},
+      {n:"1.5-Rep Squat",c:"Down, halfway up, back down, then stand — that's one rep"},
+      {n:"Curtsy Lunge",c:"Step back and across behind the front leg, stay tall",sides:1},
+      {n:"Cossack Squat",c:"Shift side to side, one leg bends, one stays straight"},
+      {n:"Squat Jump",c:"Explode up, land soft with bent knees, reset every rep"} ],
+    [ {n:"Glute Bridge",c:"Feet flat, drive hips up, squeeze the glutes at the top",d:1},
+      {n:"Frog Pump",c:"Soles together, knees out, pump the hips up fast and squeeze"},
+      {n:"Glute Bridge March",c:"Hips up, march one knee at a time, hips stay level"},
+      {n:"Bodyweight Good Morning",c:"Hands behind head, hinge until you feel the hamstrings, stand tall"},
+      {n:"Single-Leg Glute Bridge",c:"One foot planted, drive hips up, squeeze the glute at the top",sides:1},
+      {n:"Single-Leg RDL",c:"Hinge over one leg, hips square, reach the floor, stand tall",sides:1} ],
+    [ {n:"Knee Push-Up",c:"Knees down, straight line from knee to head, chest to floor"},
+      {n:"Wide Push-Up",c:"Hands wide of the shoulders, chest to floor, press up strong"},
+      {n:"Push-Up",c:"Hands under shoulders, chest to floor, press up strong",d:1},
+      {n:"Tempo Push-Up",c:"Three seconds down, chest to floor, press up strong"},
+      {n:"Pike Push-Up",c:"Hips high, head to the floor between the hands, press up"},
+      {n:"Diamond Push-Up",c:"Hands together under the chest, elbows tight"},
+      {n:"Archer Push-Up",c:"Shift to one arm, the other stays straight, alternate sides"} ],
+    [ {n:"Cobra Hold",c:"Face down, lift chest and hands off the floor, squeeze the back",hold:1},
+      {n:"Prone Y-T-W",c:"Face down, lift the arms in Y, T then W shapes",d:1},
+      {n:"Superman Pulls",c:"Arms out front, lift, pull the elbows to your ribs, reach again"},
+      {n:"Prone Swimmers",c:"Face down, arms sweep from overhead to hips and back, chest up"},
+      {n:"Reverse Snow Angel",c:"Face down, arms sweep wide from hips to overhead, thumbs up"},
+      {n:"Towel Isometric Row",c:"Sit, towel round the feet, pull hard to the waist and hold",hold:1} ],
+    [ {n:"Bird Dog",c:"Opposite arm and leg out, slow and steady, flat back"},
+      {n:"Slow Dead Bug",c:"Low back pinned down, extend opposite arm and leg slowly"},
+      {n:"Plank",c:"Elbows under shoulders, squeeze glutes, hold rock solid",d:1,hold:1},
+      {n:"Side Plank",c:"Elbow under shoulder, hips high, straight line, hold",hold:1,sides:1},
+      {n:"Bear Hold",c:"On hands and toes, knees an inch off the floor, hold still",hold:1},
+      {n:"Mountain Climbers",c:"Strong plank, drive the knees fast, keep the hips level"},
+      {n:"Hollow Hold",c:"Low back pinned, arms and legs off the floor, hold",hold:1} ],
   ],
   BD: [
-    [{n:"Banded Squat",c:"Band under feet, drive your knees out against the band"},
-     {n:"Banded Split Squat",c:"Band under the front foot, drop straight down"},
-     {n:"Wall Sit",c:"Back on the wall, thighs parallel, hold and breathe"}],
-    [{n:"Band Good Morning",c:"Band on your traps, hinge at the hips, load the hamstrings"},
-     {n:"Band Pull-Through",c:"Band between the legs, snap the hips forward"},
-     {n:"Band RDL",c:"Stand on the band, hinge back, feel the hamstrings"}],
-    [{n:"Band Overhead Press",c:"Band under feet, press overhead, keep your ribs down"},
-     {n:"Band Chest Press",c:"Band behind your back, press straight forward"},
-     {n:"Banded Push-Up",c:"Band across your back, push up against the extra tension"}],
-    [{n:"Band Lat Pulldown",c:"Anchor the band high, pull your elbows down to your ribs"},
-     {n:"Band Seated Row",c:"Band round the feet, row to the waist, squeeze"},
-     {n:"Band Face Pull",c:"Pull to your forehead, elbows high, open the shoulders"}],
-    [{n:"Pallof Press",c:"Band at chest from the side, press out, resist the twist"},
-     {n:"Band Woodchop",c:"Band from high to low across the body, rotate"},
-     {n:"Band Anti-Rotation Hold",c:"Arms out, resist the band's pull, don't twist"}],
+    [ {n:"Band Split Squat",c:"Band under the front foot, drop straight down",sides:1},
+      {n:"Banded Squat",c:"Stand on the band, band on the shoulders, drive the knees out",d:1},
+      {n:"Band Sumo Squat",c:"Wide stance on the band, toes out, sit between the heels"},
+      {n:"Band Reverse Lunge",c:"Stand on the band, step back, drop under control",sides:1},
+      {n:"Band Curtsy Lunge",c:"Stand on the band, step back and across, stay tall",sides:1},
+      {n:"Band Front Squat",c:"Band on the front of the shoulders, elbows up, sit deep"} ],
+    [ {n:"Band Glute Bridge",c:"Band across the hips, pin it down, drive the hips up"},
+      {n:"Band Kickback",c:"Band round the feet, kick one leg back and squeeze",sides:1},
+      {n:"Band RDL",c:"Stand on the band, hinge back, feel the hamstrings",d:1},
+      {n:"Band Good Morning",c:"Band on your traps, hinge at the hips, load the hamstrings"},
+      {n:"Band Sumo Deadlift",c:"Wide stance on the band, hands between the knees, stand tall"},
+      {n:"Band Single-Leg RDL",c:"Stand on the band with one foot, hinge over it, hips square",sides:1} ],
+    [ {n:"Band Floor Press",c:"Band under your back, press straight up, elbows stop at the floor"},
+      {n:"Band Chest Press",c:"Band behind your back, press straight forward"},
+      {n:"Band Overhead Press",c:"Band under feet, press overhead, keep your ribs down",d:1},
+      {n:"Band Single-Arm Press",c:"Stand on the band, press one arm overhead, don't lean",sides:1},
+      {n:"Band Arnold Press",c:"Palms in at the chin, rotate out as you press overhead"},
+      {n:"Banded Push-Up",c:"Band across your back, push up against the extra tension"} ],
+    [ {n:"Band Pull-Apart",c:"Arms straight out front, pull the band to your chest, squeeze"},
+      {n:"Band Reverse Fly",c:"Hinge over, arms straight, sweep the band out wide"},
+      {n:"Band Seated Row",c:"Band round the feet, row to the waist, squeeze"},
+      {n:"Band Bent-Over Row",c:"Stand on the band, hinge, row to the hips, squeeze",d:1},
+      {n:"Band Single-Arm Row",c:"Stand on the band, staggered stance, row one arm to the hip",sides:1},
+      {n:"Overhead Band Pulldown",c:"Band held overhead, pull the hands down and apart to the shoulders"} ],
+    [ {n:"Band Bird Dog",c:"Band foot to opposite hand, extend both, slow and square"},
+      {n:"Standing Band Crunch",c:"Stand on the band, hands at the shoulders, crunch down against it"},
+      {n:"Band Dead Bug",c:"Band round one foot and the opposite hand, extend both slowly",d:1},
+      {n:"Band Russian Twist",c:"Sit, band under the feet, rotate side to side against it"},
+      {n:"Band Overhead March",c:"Stand on the band, press overhead, march on the spot"},
+      {n:"Low-to-High Band Chop",c:"Stand on the band, chop from low hip to opposite shoulder",sides:1} ],
   ],
   DB: [
-    [{n:"Goblet Squat",c:"DB at chest, elbows inside knees, sit between your heels"},
-     {n:"DB Front Squat",c:"DBs racked on your shoulders, sit tall and deep"},
-     {n:"DB Reverse Lunge",c:"DBs at your sides, step back and drop under control"},
-     {n:"DB Bulgarian Split Squat",c:"Rear foot on a box, drop straight down over the front heel"},
-     {n:"DB Step-Up",c:"Drive through the top foot, stand tall, lower slow"}],
-    [{n:"DB Romanian Deadlift",c:"Soft knees, push hips back, DBs graze the thighs, flat back"},
-     {n:"DB Single-Leg RDL",c:"Hinge over one leg, DB tracks the shin, hips square"},
-     {n:"DB Sumo Deadlift",c:"Wide stance, DB between the feet, push the floor away"},
-     {n:"DB Swing",c:"Hike the DB back, snap the hips forward, arms stay relaxed"}],
-    [{n:"DB Floor Press",c:"Back on the floor, press the DBs up, elbows stop at the ground"},
-     {n:"DB Overhead Press",c:"Press the DBs overhead, ribs down, don't arch"},
-     {n:"DB Floor Fly",c:"Wide arc, soft elbows, squeeze the chest at the top"},
-     {n:"DB Handle Push-Up",c:"Grip DBs on the floor for a deeper range, press strong"}],
-    [{n:"Bent-Over DB Row",c:"Hinge forward, pull DBs to your hips, squeeze shoulder blades"},
-     {n:"DB Single-Arm Row",c:"Hand on a support, row the DB to your hip"},
-     {n:"DB Gorilla Row",c:"Hinge over two DBs, row one then the other"},
-     {n:"Renegade Row",c:"Plank on the DBs, row one up, keep your hips square"}],
-    [{n:"Suitcase Carry",c:"One DB at your side, walk tall, don't lean or tilt"},
-     {n:"Farmer Hold",c:"Heavy DBs at your sides, brace hard and stand tall"},
-     {n:"DB Side Bend",c:"DB in one hand, bend to the side, stand tall again"},
-     {n:"Plank DB Drag",c:"Plank over a DB, drag it side to side, hips stay still"}],
+    [ {n:"DB Split Squat",c:"Long stance, DBs at your sides, drop straight down",sides:1},
+      {n:"Goblet Squat",c:"DB at chest, elbows inside knees, sit between your heels",d:1},
+      {n:"DB Sumo Squat",c:"Wide stance, DB hanging between the legs, sit deep"},
+      {n:"DB Reverse Lunge",c:"DBs at your sides, step back and drop under control",sides:1},
+      {n:"DB Curtsy Lunge",c:"DB at chest, step back and across, stay tall",sides:1},
+      {n:"DB Lateral Lunge",c:"DB at chest, step wide, sit into one hip, push back",sides:1},
+      {n:"DB Front Squat",c:"DBs racked on your shoulders, sit tall and deep"} ],
+    [ {n:"DB Hip Thrust",c:"Shoulders on the floor, DB on the hips, drive up and squeeze"},
+      {n:"DB Romanian Deadlift",c:"Soft knees, push hips back, DBs graze the thighs, flat back",d:1},
+      {n:"DB Sumo Deadlift",c:"Wide stance, DB between the feet, push the floor away"},
+      {n:"DB Single-Leg RDL",c:"Hinge over one leg, DB tracks the shin, hips square",sides:1},
+      {n:"DB Swing",c:"Hike the DB back, snap the hips forward, arms stay relaxed"},
+      {n:"DB Clean",c:"Hike and pull the DB to your shoulder in one move"} ],
+    [ {n:"DB Floor Fly",c:"Wide arc, soft elbows, squeeze the chest at the top"},
+      {n:"DB Floor Press",c:"Back on the floor, press the DBs up, elbows stop at the ground",d:1},
+      {n:"DB Overhead Press",c:"Press the DBs overhead, ribs down, don't arch"},
+      {n:"DB Arnold Press",c:"Palms in at the chin, rotate out as you press overhead"},
+      {n:"DB Z-Press",c:"Sit on the floor, legs straight, press overhead, stay tall"},
+      {n:"DB Push Press",c:"Dip the knees, drive the DBs overhead, lower slow"},
+      {n:"DB Handle Push-Up",c:"Grip DBs on the floor for a deeper range, press strong"} ],
+    [ {n:"DB Reverse Fly",c:"Hinge over, soft elbows, sweep the DBs out wide"},
+      {n:"DB Pullover",c:"On the floor, arc the DB back overhead, ribs down"},
+      {n:"Bent-Over DB Row",c:"Hinge forward, pull DBs to your hips, squeeze shoulder blades",d:1},
+      {n:"DB Single-Arm Row",c:"Free hand on your knee, row the DB to your hip",sides:1},
+      {n:"DB High Pull",c:"Pull the DBs to your chin, elbows lead the way"},
+      {n:"DB Gorilla Row",c:"Hinge over two DBs, row one then the other"},
+      {n:"Renegade Row",c:"Plank on the DBs, row one up, keep your hips square"} ],
+    [ {n:"DB Side Bend",c:"DB in one hand, bend to the side, stand tall again",sides:1},
+      {n:"Suitcase March",c:"One DB at your side, march on the spot, don't lean",sides:1},
+      {n:"Farmer Hold",c:"Heavy DBs at your sides, brace hard and stand tall",d:1,hold:1},
+      {n:"DB Russian Twist",c:"Sit back, feet up, rotate the DB side to side"},
+      {n:"DB Overhead March",c:"DBs locked out overhead, march on the spot, ribs down"},
+      {n:"Plank DB Drag",c:"Plank over a DB, drag it side to side, hips stay still"},
+      {n:"DB Windmill",c:"DB overhead, push the hips out, slide the other hand down the leg",sides:1} ],
   ],
 };
 // The workout: the five moves, twice through, 45s on / 15s off, one 60s
@@ -475,9 +525,26 @@ const SESSION_TOTAL = ROUNDS*5*WORK_SEC + (ROUNDS*5-2)*REST_SEC + BREAK_SEC; // 
 // exercise-library accessors (base move + alternates, per slot)
 function exOptions(r,c){ return LIB[COLUMNS[c].id][r]; }
 function exPickKey(r,c){ return r+"-"+COLUMNS[c].id; }
-function exPickIdx(r,c){ const opts=exOptions(r,c); const i=(S.settings.exPick&&S.settings.exPick[exPickKey(r,c)])||0; return (i>=0&&i<opts.length)?i:0; }
+function exDefaultIdx(r,c){ const i=exOptions(r,c).findIndex(o=>o.d); return i<0?0:i; }
+// picks are stored by move name, so reordering the ladder never changes a pick
+function exPickIdx(r,c){
+  const v = S.settings.exPick && S.settings.exPick[exPickKey(r,c)];
+  const i = (typeof v==="string") ? exOptions(r,c).findIndex(o=>o.n===v) : -1;
+  return i<0 ? exDefaultIdx(r,c) : i;
+}
 function currentEx(r,c){ return exOptions(r,c)[exPickIdx(r,c)]; }
-function cycleEx(r,c){ const opts=exOptions(r,c); if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[exPickKey(r,c)]=(exPickIdx(r,c)+1)%opts.length; save(); }
+function setEx(r,c,name){ if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[exPickKey(r,c)]=name; save(); }
+// the next rung up the ladder, or null at the top
+function nextRung(r,c){ const opts=exOptions(r,c), i=exPickIdx(r,c); return i+1<opts.length ? opts[i+1] : null; }
+// reroll every slot of a kit to a different move than the one showing
+function shuffleKit(c){
+  for(let r=0;r<5;r++){
+    const opts=exOptions(r,c), cur=exPickIdx(r,c);
+    if(opts.length<2) continue;
+    let i; do { i=Math.floor(Math.random()*opts.length); } while(i===cur);
+    setEx(r,c,opts[i].n);
+  }
+}
 function pickedColumn(){ return colById(S.settings.pickedCol) ? S.settings.pickedCol : COLUMNS[0].id; }
 // common bodyweight moves for quick sessions & quick logging (pr/pc pick the pictogram)
 const QUICK = [
@@ -584,45 +651,50 @@ function fmtWeight(w, lt){
 // you can in 45s". The kit's rep ceiling is the only number: once you clear it,
 // you're told to add load (double progression) — never an exact count to hit.
 const SESSION_SETS = ROUNDS; // two rounds = two working sets per move
+// the number a set is judged on: reps, or seconds for a hold
+function setMetric(s, hold){ return hold ? (+s.sec||0) : (+s.r||0); }
 function computeTarget(rowIdx, colIdx){
   const col = COLUMNS[colIdx];
-  const exName = currentEx(rowIdx, colIdx).n;
-  const high = col.ceiling;
+  const ex = currentEx(rowIdx, colIdx), exName = ex.n, hold = !!ex.hold;
+  const high = hold ? WORK_SEC : col.ceiling; // a hold is cleared when you hold the whole interval
   const lt = loadType(col);
   const inc = S.settings.units==="kg" ? 2.5 : 5;
   const last = lastLogFor(exName);
+  const rung = nextRung(rowIdx, colIdx);
   let weight = null, sug = "", beat = null;
 
   if(last && last.sets && last.sets.length){
-    const reps  = last.sets.map(s=> +s.r || 0);
+    const vals  = last.sets.map(s=> setMetric(s, hold));
     const ws    = last.sets.map(s=> +s.w || 0);
     const lastW = Math.max.apply(null, ws.concat([0]));
-    const bestRep = Math.max.apply(null, reps);
+    const best  = Math.max.apply(null, vals);
     weight = (lt==="bw") ? null : (lastW>0 ? lastW : null);
-    const cleared = bestRep >= high; // beat the rep ceiling last time
+    const cleared = best >= high; // beat the ceiling last time
     if(cleared){
-      if(lt==="db"){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units; }
-      else if(lt==="band"){ sug = "next band up"; }
-      else { sug = "slow the tempo or swap ⇄ harder"; }
+      if(lt==="db" && !hold){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units; }
+      else if(lt==="db"){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units+(rung?" or next: "+rung.n:""); }
+      else if(lt==="band"){ sug = rung ? "next: "+rung.n : "thicker band"; }
+      else { sug = rung ? "next: "+rung.n : "top of the ladder — add a rep"; }
     } else {
-      beat = bestRep; // otherwise just beat your best set
+      beat = best; // otherwise just beat your best set
     }
   }
-  return { col, exName, lt, last, high, weight, sug, beat, sets:SESSION_SETS };
+  return { col, exName, hold, lt, last, high, weight, sug, beat, rung, sets:SESSION_SETS };
 }
 function targetLineHTML(t){
   const w = fmtWeight(t.weight, t.lt);
-  const today = (t.lt==="bw") ? "AMRAP" : ("AMRAP @ " + (t.weight!=null ? w : "pick a weight"));
+  const mode = t.hold ? "Hold" : "AMRAP";
+  const today = (t.lt==="bw") ? mode : (mode+" @ " + (t.weight!=null ? w : "pick a weight"));
   let html;
   if(t.last && t.last.sets && t.last.sets.length){
     const lw = fmtWeight(Math.max.apply(null, t.last.sets.map(s=>+s.w||0).concat([0])) || null, t.lt);
-    const reps = t.last.sets.map(s=> +s.r||0).join(",");
-    html = "Last: <b>"+lw+" × "+reps+"</b> → <b>"+today+"</b>";
+    const vals = t.last.sets.map(s=> setMetric(s, t.hold)+(t.hold?"s":"")).join(",");
+    html = "Last: <b>"+lw+" × "+vals+"</b> → <b>"+today+"</b>";
   } else {
     html = "<b>"+today+"</b>";
   }
-  if(t.sug) html += ' <span class="sug">↑ '+t.sug+'</span>';
-  else if(t.beat!=null) html += ' <span class="sug">beat '+t.beat+'</span>';
+  if(t.sug) html += ' <span class="sug">↑ '+esc(t.sug)+'</span>';
+  else if(t.beat!=null) html += ' <span class="sug">beat '+t.beat+(t.hold?"s":"")+'</span>';
   return html;
 }
 
@@ -778,7 +850,7 @@ function libraryOptions(){
 }
 function pickFromLibraryValue(v){
   const m=v.slice(1).split("-"); const r=+m[0],c=+m[1],oi=+m[2]; const o=exOptions(r,c)[oi];
-  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:r, colIdx:c };
+  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:r, colIdx:c, hold:!!o.hold, sides:!!o.sides };
 }
 function pickFromQuick(i){ const q=QUICK[i]; return { name:q.n, col:COLUMNS[q.pc].id, lt:"bw", row:q.pr, colIdx:q.pc }; }
 function mmss(sec){ sec=Math.max(0,Math.round(sec)); return Math.floor(sec/60)+":"+pad2(sec%60); }
@@ -788,6 +860,17 @@ function repPad(preset){
   for(let n=1;n<=30;n++) h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'</button>';
   h += '<button type="button" data-n="35" class="'+((preset!=null&&+preset>30)?"on":"")+'">30+</button></div>';
   return h;
+}
+// tap-to-pick seconds for a hold: 5..120 in 5s steps
+function secPad(preset){
+  let h = '<div class="reppad" data-val="'+(preset!=null?preset:"")+'">';
+  for(let n=5;n<=120;n+=5) h += '<button type="button" data-n="'+n+'"'+((preset!=null&&+preset===n)?' class="on"':'')+'>'+n+'s</button>';
+  return h+'</div>';
+}
+function agoText(iso){
+  if(!iso) return "never";
+  const d = Math.round((stripTime(new Date()) - stripTime(parseISO(iso)))/86400000);
+  return d<=0 ? "today" : d===1 ? "yesterday" : d+"d ago";
 }
 function wireRepPads(root){
   root.querySelectorAll(".reppad").forEach(pad=>{
@@ -824,20 +907,21 @@ function renderToday(){
   });
 
   // exercises for the picked set
-  html += '<div class="section-h">The Five</div><div class="card">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><div class="section-h">The Five</div><button type="button" class="chip" id="shuffleBtn" style="margin-left:auto;margin-bottom:8px">🎲 Shuffle</button></div><div class="card">';
   for(let r=0;r<5;r++){
     const ex = currentEx(r, colIdx), t = computeTarget(r, colIdx);
     const nOpts = exOptions(r, colIdx).length;
     html += '<div class="ex">';
     html += '<div class="badge" style="background:'+col.color+'">'+(r+1)+'</div>';
     html += pico(r, colIdx);
-    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+(nOpts>1?' <span class="swapx" data-row="'+r+'" title="Swap exercise" style="color:var(--muted);cursor:pointer">⇄</span>':'')+'</div>';
+    const tags = (ex.hold?' <span class="extag">hold</span>':'')+(ex.sides?' <span class="extag">switch sides</span>':'');
+    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+(nOpts>1?' <span class="swapx" data-row="'+r+'" title="Choose exercise" style="color:var(--muted);cursor:pointer">⇄</span>':'')+tags+'</div>';
     html += '<div class="excue">'+esc(ex.c)+'</div>';
     html += '<div class="extarget">'+targetLineHTML(t)+'</div></div>';
     html += '</div>';
   }
   html += '</div>';
-  html += '<div class="inline-note">Tap ⇄ to swap a move. '+ROUNDS+' rounds × 5 · '+WORK_SEC+'s on / '+REST_SEC+'s off · '+BREAK_SEC+'s breather halfway · '+mmss(SESSION_TOTAL)+' total.</div>';
+  html += '<div class="inline-note">Tap ⇄ to choose a move, 🎲 to reroll all five. '+ROUNDS+' rounds × 5 · '+WORK_SEC+'s on / '+REST_SEC+'s off · '+BREAK_SEC+'s breather halfway · '+mmss(SESSION_TOTAL)+' total.</div>';
 
   // actions
   html += '<div class="btn-row" style="margin-top:12px">';
@@ -852,10 +936,37 @@ function renderToday(){
     t.addEventListener("click", ()=>{ S.settings.pickedCol = t.getAttribute("data-col"); save(); renderToday(); });
   });
   wrap.querySelectorAll(".swapx").forEach(x=>{
-    x.addEventListener("click", e=>{ e.stopPropagation(); cycleEx(+x.getAttribute("data-row"), colIdx); renderToday(); });
+    x.addEventListener("click", e=>{ e.stopPropagation(); openExPicker(+x.getAttribute("data-row"), colIdx); });
   });
+  document.getElementById("shuffleBtn").addEventListener("click", ()=>{ shuffleKit(colIdx); renderToday(); toast("Rerolled — tap again for another set"); });
   document.getElementById("startSession").addEventListener("click", ()=> Player.startSession(colId));
   document.getElementById("startQuick").addEventListener("click", ()=> switchTab("quick"));
+}
+
+// pick a move for one slot: the whole ladder, easiest first, with when you last did each
+function openExPicker(r, colIdx){
+  const root = document.getElementById("modalRoot"); root.innerHTML="";
+  const col = COLUMNS[colIdx], opts = exOptions(r, colIdx), cur = exPickIdx(r, colIdx);
+  let rows = "";
+  opts.forEach((o,i)=>{
+    const last = lastLogFor(o.n);
+    const tags = (o.d?'<span class="extag">default</span>':'')+(o.hold?'<span class="extag">hold</span>':'')+(o.sides?'<span class="extag">sides</span>':'');
+    rows += '<div class="pickrow'+(i===cur?' on':'')+'" data-i="'+i+'" style="--accent:'+col.color+'">'+
+      '<div class="pickn">'+(i+1)+'</div>'+
+      '<div class="lr-main"><div class="lr-name">'+esc(o.n)+' '+tags+'</div><div class="lr-sub">'+esc(o.c)+'</div><div class="lr-sub" style="margin-top:2px">last: '+agoText(last&&last.date)+'</div></div>'+
+      '<div class="tck">'+(i===cur?'✓':'')+'</div></div>';
+  });
+  const back = el('<div class="modal-back"><div class="modal" style="max-width:430px;padding:16px">'+
+    '<h3 style="margin-bottom:2px">'+esc(ROWS[r])+' · '+esc(col.name)+'</h3><p class="small" style="margin-bottom:10px">Easiest at the top, hardest at the bottom.</p>'+
+    '<div id="pickList">'+rows+'</div>'+
+    '<div class="btn-row"><button class="btn secondary" id="pkClose">Close</button></div></div></div>');
+  root.appendChild(back);
+  const close = ()=> root.innerHTML="";
+  back.addEventListener("click", e=>{ if(e.target===back) close(); });
+  back.querySelector("#pkClose").addEventListener("click", close);
+  back.querySelectorAll(".pickrow").forEach(row=> row.addEventListener("click", ()=>{
+    setEx(r, colIdx, opts[+row.getAttribute("data-i")].n); close(); renderToday();
+  }));
 }
 
 /* ================================================================= RENDER: QUICK SESSION */
@@ -872,7 +983,7 @@ function qsConfig(){
 }
 function qsSummary(q){
   if(q.timed){ const total = q.sets*q.work + Math.max(0,q.sets-1)*q.rest; return q.sets+' × '+q.work+'s · '+q.rest+'s rest · '+mmss(total)+' total'; }
-  return q.sets+' sets × '+q.reps+' reps · '+q.rest+'s rest between sets';
+  return q.sets+' sets × '+q.reps+(q.ex.hold?'s hold':' reps')+' · '+q.rest+'s rest between sets';
 }
 function renderQuick(){
   const wrap = document.getElementById("view-quick");
@@ -901,7 +1012,7 @@ function renderQuick(){
   html += '<div class="qsgrid">';
   html += '<div class="field"><label>Sets</label><input type="number" inputmode="numeric" id="qsSets" min="1" max="20" value="'+q.sets+'"></div>';
   if(q.timed) html += '<div class="field"><label>Work (s)</label><input type="number" inputmode="numeric" id="qsWork" min="5" max="300" value="'+q.work+'"></div>';
-  else        html += '<div class="field"><label>Reps</label><input type="number" inputmode="numeric" id="qsReps" min="1" max="100" value="'+q.reps+'"></div>';
+  else        html += '<div class="field"><label>'+(q.ex.hold?'Target (s)':'Reps')+'</label><input type="number" inputmode="numeric" id="qsReps" min="1" max="100" value="'+q.reps+'"></div>';
   html += '<div class="field"><label>Rest (s)</label><input type="number" inputmode="numeric" id="qsRest" min="0" max="300" value="'+q.rest+'"></div>';
   html += '</div>';
   html += '<div class="inline-note" style="margin-top:0">'+esc(qsSummary(q))+'</div>';
@@ -1231,7 +1342,7 @@ const Player = {
     const steps = [];
     for(let round=1; round<=ROUNDS; round++){
       for(let r=0;r<5;r++){
-        steps.push({ type:"exercise", round, row:r, colIdx, sec:WORK_SEC });
+        steps.push({ type:"exercise", round, row:r, colIdx, sec:WORK_SEC, sides:!!currentEx(r,colIdx).sides });
         const lastOfRound = (r===4), lastOfAll = lastOfRound && round===ROUNDS;
         if(lastOfAll) continue;
         if(lastOfRound) steps.push({ type:"rest", sec:BREAK_SEC, label:"Halfway · breathe" });
@@ -1246,7 +1357,7 @@ const Player = {
   buildQuickSteps(q){
     const steps = [];
     for(let set=1; set<=q.sets; set++){
-      steps.push({ type:"exercise", quick:true, round:set, sec: q.timed ? q.work : 0, countUp: !q.timed });
+      steps.push({ type:"exercise", quick:true, round:set, sec: q.timed ? q.work : 0, countUp: !q.timed, sides: q.timed && !!q.ex.sides });
       if(set<q.sets && q.rest>0) steps.push({ type:"rest", sec:q.rest, label:"Rest" });
     }
     steps.push({ type:"summary" });
@@ -1291,6 +1402,10 @@ const Player = {
         cueRestEnd(); vibrate([80,60,80]);
         this.next(true); return;
       }
+      if(step.type==="exercise" && step.sides && !step._half && step.sec>0 && this.elapsed() >= step.sec/2){
+        step._half=true; beep(600,0.1,0); beep(600,0.1,0.15); vibrate([60,40,60]);
+        const sw = document.getElementById("pSwitch"); if(sw){ sw.textContent="Switch sides ▸"; sw.classList.add("now"); }
+      }
       if(rem<=0 && step.type==="exercise" && !step.countUp && !step._dinged){
         step._dinged=true; beep(760,0.12,0); vibrate(60);
       }
@@ -1313,7 +1428,7 @@ const Player = {
   },
   next(auto){
     const step=this.steps[this.idx];
-    if(step && step.type==="exercise") step._dinged=false;
+    if(step && step.type==="exercise"){ step._dinged=false; step._half=false; }
     this.enter(this.idx+1);
   },
   skip(){ this.enter(this.idx+1); },
@@ -1374,8 +1489,10 @@ const Player = {
     if(step.type==="exercise" && step.quick){
       html += '<div class="player-ex">'+pico(q.ex.row, q.ex.colIdx, "pbig");
       html += '<div class="pname">'+esc(q.ex.name)+'</div>';
-      html += '<div class="pcue">'+(q.timed ? "Keep moving until the timer ends" : "Tap Done when the set is finished")+'</div>';
-      html += '<div class="ptarget" style="color:'+col.color+'">'+(q.timed ? (q.work+'s work') : (q.reps+' reps'))+' · '+q.sets+' sets</div></div>';
+      html += '<div class="pcue">'+(q.timed ? "Keep going until the timer ends" : "Tap Done when the set is finished")+'</div>';
+      html += '<div class="ptarget" style="color:'+col.color+'">'+(q.timed ? (q.work+'s work') : (q.reps+(q.ex.hold?'s hold':' reps')))+' · '+q.sets+' sets</div>';
+      if(step.sides) html += '<div class="pswitch" id="pSwitch">Switch sides at '+mmss(Math.floor(step.sec/2))+'</div>';
+      html += '</div>';
     } else if(step.type==="exercise"){
       const ex = currentEx(step.row, step.colIdx);
       const t = computeTarget(step.row, step.colIdx);
@@ -1383,7 +1500,9 @@ const Player = {
       html += '<div class="player-ex">'+pico(step.row, step.colIdx, "pbig");
       html += '<div class="pname">'+esc(ex.n)+'</div>';
       html += '<div class="pcue">'+esc(ex.c)+'</div>';
-      html += '<div class="ptarget" style="color:'+col.color+'">AMRAP · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat:'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div></div>';
+      html += '<div class="ptarget" style="color:'+col.color+'">'+(t.hold?'HOLD':'AMRAP')+' · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat+(t.hold?'s':''):'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div>';
+      if(step.sides) html += '<div class="pswitch" id="pSwitch">Switch sides at '+mmss(Math.floor(step.sec/2))+'</div>';
+      html += '</div>';
     } else if(step.type==="rest"){
       const nextStep = this.steps[this.idx+1];
       let up="";
@@ -1429,13 +1548,13 @@ const Player = {
     html += '<div class="card" style="margin-bottom:14px">';
     for(let r=0;r<5;r++){
       const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
-      html += '<div class="log-ex" data-row="'+r+'"><div class="lname">'+(r+1)+'. '+esc(ex.n)+'</div>';
+      html += '<div class="log-ex" data-row="'+r+'" data-hold="'+(ex.hold?1:0)+'"><div class="lname">'+(r+1)+'. '+esc(ex.n)+'</div>';
       for(let s=0;s<SESSION_SETS;s++){
         const wv = t.lt==="bw" ? "" : (t.weight!=null?t.weight:"");
         html += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
                 (t.lt==="bw" ? '<span class="small muted">bodyweight</span>'
                              : '<input type="number" inputmode="decimal" class="w" placeholder="'+S.settings.units+'" value="'+wv+'">')+
-                '<span class="small muted">reps → tap</span></div>'+ repPad(null) +'</div>';
+                '<span class="small muted">'+(ex.hold?'seconds held → tap':'reps → tap')+'</span></div>'+ (ex.hold ? secPad(null) : repPad(null)) +'</div>';
       }
       html += '</div>';
     }
@@ -1447,12 +1566,13 @@ const Player = {
       const iso = todayISO(); const added=[];
       ov.querySelectorAll(".log-ex").forEach(node=>{
         const r = +node.getAttribute("data-row"); const exName = currentEx(r, colIdx).n;
+        const hold = node.getAttribute("data-hold")==="1";
         const sets = [];
         node.querySelectorAll(".lset").forEach(ls=>{
           const wi = ls.querySelector("input.w"), pad = ls.querySelector(".reppad");
           const w = (wi && wi.value!=="") ? +wi.value : 0;
-          const rr = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
-          if(w>0 || rr>0) sets.push({ w, r:rr });
+          const v = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
+          if(w>0 || v>0) sets.push(hold ? { w, r:0, sec:v } : { w, r:v });
         });
         if(sets.length){ const log={ date:iso, col:this.colId, mode:"session", row:r, exercise:exName, sets }; S.logs.push(log); added.push(log); }
       });
@@ -1477,7 +1597,8 @@ const Player = {
       html += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
               (q.ex.lt==="bw" ? '<span class="small muted">bodyweight</span>'
                               : '<input type="number" inputmode="decimal" class="w" placeholder="'+S.settings.units+'">')+
-              '<span class="small muted">'+(q.timed ? (q.work+'s · reps optional') : 'reps → tap')+'</span></div>'+ repPad(q.timed ? null : q.reps) +'</div>';
+              '<span class="small muted">'+(q.timed ? (q.work+'s'+(q.ex.hold?'':' · reps optional')) : (q.ex.hold?'seconds held → tap':'reps → tap'))+'</span></div>'+
+              (q.timed && q.ex.hold ? '' : q.ex.hold ? secPad(null) : repPad(q.timed ? null : q.reps)) +'</div>';
     }
     html += '</div></div>';
     html += '<div class="player-ctrls"><button class="btn secondary wide" id="skipLog">Discard</button><button class="btn wide" id="saveLog" style="background:'+col.color+'">Save quick session</button></div>';
@@ -1488,9 +1609,10 @@ const Player = {
       ov.querySelectorAll(".lset").forEach(ls=>{
         const wi=ls.querySelector("input.w"), pad=ls.querySelector(".reppad");
         const w=(wi&&wi.value!=="")?+wi.value:0;
-        const rr=(pad&&pad.dataset.val)?+pad.dataset.val:0;
-        const set = { w, r:rr }; if(q.timed) set.sec = q.work;
-        if(w>0||rr>0||q.timed) sets.push(set);
+        const v=(pad&&pad.dataset.val)?+pad.dataset.val:0;
+        const set = q.ex.hold ? { w, r:0, sec:(q.timed?q.work:v) } : { w, r:v };
+        if(!q.ex.hold && q.timed) set.sec = q.work;
+        if(w>0||v>0||q.timed) sets.push(set);
       });
       if(!sets.length){ toast("Tap the reps for at least one set"); return; }
       const log={ date:iso, col:q.ex.col, mode:"quick", exercise:q.ex.name, sets };

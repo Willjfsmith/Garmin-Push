@@ -35,18 +35,34 @@ There is no weekly plan and no target. Open the app, pick a kit, train. The
 Progress tab keeps your streak and history; nothing tells you which day to do
 what.
 
-### Three kits
+### Three kits, ~95 moves
 
 | BW · Bodyweight | BD · Bands | DB · Dumbbells |
 | --- | --- | --- |
 | Bodyweight Squat | Banded Squat | Goblet Squat |
-| Glute Bridge | Band Good Morning | DB Romanian Deadlift |
+| Glute Bridge | Band RDL | DB Romanian Deadlift |
 | Push-Up | Band Overhead Press | DB Floor Press |
-| Towel Door Row | Band Lat Pulldown | Bent-Over DB Row |
-| Plank | Pallof Press | Suitcase Carry |
+| Prone Y-T-W | Band Bent-Over Row | Bent-Over DB Row |
+| Plank | Band Dead Bug | Farmer Hold |
 
-Those are the defaults. Every slot has alternates — tap **⇄** next to a move on
-the Today tab to cycle through them. Your picks are remembered per kit.
+Those are the defaults. Every slot has six or seven options arranged as a
+**ladder**, easiest at the top and hardest at the bottom. Tap **⇄** next to a
+move to see the whole ladder with when you last did each one, or tap
+**🎲 Shuffle** to reroll all five. Picks are remembered per kit.
+
+Everything needs only a floor and a wall. No door frames, tables, benches,
+boxes, or anchor points for bands.
+
+Two kinds of move get special handling:
+
+- **Holds** (Plank, Wall Sit, Farmer Hold, …) are logged in seconds, not reps.
+  Hold the full 45s and the app points you at the next rung.
+- **One-sided moves** (lunges, single-leg bridges, single-arm rows, …) get a
+  beep and an on-screen cue at the halfway mark so you switch sides.
+
+Progression is by ladder as well as by load. Clear the rep ceiling on a
+bodyweight or band move and the app names the next rung up. Clear it on a
+dumbbell move and it tells you how much to add.
 
 ### Quick Session
 
