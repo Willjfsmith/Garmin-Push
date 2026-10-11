@@ -75,7 +75,21 @@ the kit's equipment: dumbbells in the hands, or the band running from the feet.
 Within each category the moves are a **ladder**, easiest first, which drives
 the "next:" progression hints.
 
-Everything needs only a floor and a wall. No door frames, tables, benches,
+### Add-on equipment
+
+Got more kit (or planning to)? **＋ My equipment** on Today (or Settings) turns
+on three more kits, each with its own moves and pictures:
+
+| PB · Pull-up bar | DP · Dip station | KB · Kettlebell |
+| --- | --- | --- |
+| Dead hangs → chin-ups → commando pull-ups, hanging knee / leg raises, toes-to-bar | Support holds → dips → L-sit dips, inverted rows, knee raises, L-sit holds | Goblet squats, swings, cleans, snatches, presses, rows, halos, get-ups, thrusters |
+
+They're off until you switch them on, so the picker only shows what you can do.
+A kit without moves for a category (no squats on a pull-up bar) borrows
+bodyweight moves when building a workout. Kettlebell sets log weight like
+dumbbells; bar and dip moves are bodyweight.
+
+The core library needs only a floor and a wall. No door frames, tables, benches,
 boxes, or anchor points for bands.
 
 Two kinds of move get special handling:
