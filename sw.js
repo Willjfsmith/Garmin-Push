@@ -1,6 +1,6 @@
 /* Home Strength Blueprint — simple cache-first service worker.
    Only registered when the app is served over https (see index.html). */
-const CACHE = "hsb-v1";
+const CACHE = "hsb-v2";
 const ASSETS = [
   "./",
   "./index.html",
