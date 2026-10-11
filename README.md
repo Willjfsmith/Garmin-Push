@@ -51,11 +51,22 @@ what.
 | Prone Y-T-W | Band Bent-Over Row | Bent-Over DB Row |
 | Plank | Band Dead Bug | Farmer Hold |
 
-Those are the defaults. Every slot has six or seven options arranged as a
-**ladder**, easiest at the top and hardest at the bottom. Tap **⇄ Swap** (or
-the move itself) to see the whole ladder with when you last did each one, or
-tap **🎲 Shuffle** to reroll all five. **Leave it out** in the same sheet
-drops a move from the session. Picks are remembered per kit.
+Those are the defaults — a starting point, not a rule. Each kit keeps its own
+list of moves, and you can change it however you like:
+
+- **⇄ Swap** (or tap a move) opens the full library: every move from all three
+  kits, in nine categories — Squat, Hinge, Push, Pull, Core, plus **Arms,
+  Shoulders, Legs and Cardio** (~165 moves). Search by name, or filter by
+  category and kit. Moves you've done show when you last did them.
+- **＋ Add a move** — build a workout of 1 to 12 moves; mix kits freely (a dumbbell
+  curl in a bodyweight session is fine — weights log correctly).
+- **✎ Edit** — reorder with ↑ ↓, remove with ✕, or reset to the kit's default five.
+- **Create your own move** — name, category, equipment, reps or hold, and
+  one-sided. Your moves appear under ★ Mine and in Quick Session / Quick log.
+- **🎲 Shuffle** rerolls every move to another rung of the same ladder.
+
+Within each category the moves are a **ladder**, easiest first, which drives
+the "next:" progression hints.
 
 Everything needs only a floor and a wall. No door frames, tables, benches,
 boxes, or anchor points for bands.
