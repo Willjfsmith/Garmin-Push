@@ -54,6 +54,10 @@ what.
 Those are the defaults — a starting point, not a rule. Each kit keeps its own
 list of moves, and you can change it however you like:
 
+- **Workout type** — one tap builds a workout: Full body (the five patterns,
+  the default), Upper body, Lower body, Arms & shoulders, Core or Cardio. It's
+  only a starting point; once you change a move it shows as Custom.
+
 - **⇄ Swap** (or tap a move) opens the full library: every move from all three
   kits, in nine categories — Squat, Hinge, Push, Pull, Core, plus **Arms,
   Shoulders, Legs and Cardio** (~165 moves). Search by name, or filter by
@@ -64,6 +68,9 @@ list of moves, and you can change it however you like:
 - **Create your own move** — name, category, equipment, reps or hold, and
   one-sided. Your moves appear under ★ Mine and in Quick Session / Quick log.
 - **🎲 Shuffle** rerolls every move to another rung of the same ladder.
+
+Every move has its own stick-figure pictogram (about 70 poses), drawn with
+the kit's equipment: dumbbells in the hands, or the band running from the feet.
 
 Within each category the moves are a **ladder**, easiest first, which drives
 the "next:" progression hints.
