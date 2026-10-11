@@ -28,7 +28,13 @@ rounds. No warm-up phase, no cool-down phase.
 | --- | --- | --- | --- |
 | 5 × 45s work, 15s rest | 60s | 5 × 45s work, 15s rest | **10:30** |
 
-Every working set is AMRAP — as many good reps as you can in the 45 seconds.
+That's the default. The **Timing** card on the Today tab sets work, rest and
+rounds (steppers plus 45/15, 40/20, 30/15, 30/30, 50/10 and 60/15 presets),
+and the Start button shows the real length. The workout is hands-free: every
+work interval and rest moves on by itself after a 3-2-1 countdown, and
+**Done early** skips ahead.
+
+Every working set is AMRAP — as many good reps as you can in the interval.
 Once you clear the kit's rep ceiling, the app tells you to add load next time.
 
 There is no weekly plan and no target. Open the app, pick a kit, train. The
@@ -46,9 +52,10 @@ what.
 | Plank | Band Dead Bug | Farmer Hold |
 
 Those are the defaults. Every slot has six or seven options arranged as a
-**ladder**, easiest at the top and hardest at the bottom. Tap **⇄** next to a
-move to see the whole ladder with when you last did each one, or tap
-**🎲 Shuffle** to reroll all five. Picks are remembered per kit.
+**ladder**, easiest at the top and hardest at the bottom. Tap **⇄ Swap** (or
+the move itself) to see the whole ladder with when you last did each one, or
+tap **🎲 Shuffle** to reroll all five. **Leave it out** in the same sheet
+drops a move from the session. Picks are remembered per kit.
 
 Everything needs only a floor and a wall. No door frames, tables, benches,
 boxes, or anchor points for bands.
