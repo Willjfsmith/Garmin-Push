@@ -2311,7 +2311,12 @@ function init(){
 
   // service worker: only when hosted over https
   if(location.protocol==="https:" && "serviceWorker" in navigator){
-    window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+    window.addEventListener("load", ()=>{
+      navigator.serviceWorker.register("sw.js", { updateViaCache:"none" }).then(reg=>{
+        // look for a new deploy whenever the app comes back to the foreground
+        document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) reg.update().catch(()=>{}); });
+      }).catch(()=>{});
+    });
   }
 }
 init();
