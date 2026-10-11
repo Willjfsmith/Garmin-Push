@@ -318,6 +318,40 @@ section[hidden]{display:none}
   background:transparent;color:var(--muted);font-weight:700;font-size:12.5px;
 }
 .inline-note{font-size:11.5px;color:var(--muted);margin-top:6px}
+/* swap button on each move + skipped moves */
+.swapbtn{
+  flex:none;padding:6px 10px;border-radius:999px;border:1px solid var(--hair);
+  background:var(--paper);color:var(--ink);font-weight:800;font-size:12px;min-height:32px;
+}
+.ex.off .pico,.ex.off .exbody{opacity:.38}
+.ex.off .exname{text-decoration:line-through}
+/* workout setup: work / rest / rounds steppers */
+.steppers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.stepper{background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:7px 2px 6px;text-align:center}
+.stepper .slab{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.stepper .sval{font-family:var(--head);font-weight:900;font-size:24px;line-height:1.1;margin:2px 0 5px;white-space:nowrap}
+.stepper .sval small{font-size:13px;font-weight:700;color:var(--muted);margin-left:1px}
+.stepper .sctl{display:flex;gap:5px;padding:0 4px}
+.stepper button{
+  flex:1;min-width:0;height:38px;border-radius:9px;border:1px solid var(--hair);
+  background:var(--card);font-weight:900;font-size:19px;line-height:1;padding:0;
+}
+.stepper button:disabled{opacity:.35}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.presets button{padding:6px 10px;border-radius:999px;border:1px solid var(--hair);background:var(--card);font-weight:700;font-size:12.5px;min-height:32px}
+.presets button.on{background:var(--ink);color:var(--paper);border-color:transparent}
+/* swap sheet */
+.modal.sheet{max-width:440px;max-height:calc(100vh - 48px);overflow-y:auto;padding:18px}
+.swopt{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;border:1.5px solid transparent;cursor:pointer}
+.swopt + .swopt{margin-top:2px}
+.swopt.on{border-color:var(--accent);background:var(--paper)}
+.swopt .pico{width:44px;height:32px;min-width:44px}
+.swopt .sw-main{flex:1;min-width:0}
+.swopt .sw-name{font-weight:700;font-size:14px}
+.swopt .sw-cue{font-size:11.5px;color:var(--muted)}
+.swopt .sw-tag{flex:none;font-size:10.5px;font-weight:800;color:#fff;border-radius:6px;padding:2px 6px}
+.swopt .sw-ck{flex:none;font-weight:900;color:var(--accent);width:16px;text-align:center}
+.sw-h{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin:12px 0 4px}
 /* player session progress bar */
 .pbar{height:4px;border-radius:99px;background:var(--hair);overflow:hidden;margin:2px 0 4px}
 .pbar>span{display:block;height:100%;background:var(--accent);transition:width .3s}
@@ -532,20 +566,41 @@ const ALT = [
     [{n:"DB Renegade Plank",c:"Plank on the DBs, hold rock-solid, hips square"},{n:"Plank Shoulder Taps",c:"Tap each shoulder, minimise the hip sway"}],
   ],
 ];
-// interval presets (work / rest seconds)
+// interval presets (work / rest seconds) — one-tap shortcuts on the setup card
 const INTERVALS = [
-  { id:"45/15", work:45, rest:15 },
-  { id:"40/20", work:40, rest:20 },
-  { id:"30/15", work:30, rest:15 },
-  { id:"50/10", work:50, rest:10 },
-  { id:"60/15", work:60, rest:15 },
+  { work:45, rest:15 }, { work:40, rest:20 }, { work:30, rest:15 },
+  { work:30, rest:30 }, { work:50, rest:10 }, { work:60, rest:15 },
 ];
-function interval(){ return INTERVALS.find(i=>i.id===S.settings.interval) || INTERVALS[0]; }
-// exercise-library accessors (base move + alternates, per slot)
+const LIMITS = { work:[10,180], rest:[0,120], rounds:[1,5] };
+function clampSet(k, v){ const L=LIMITS[k]; return Math.max(L[0], Math.min(L[1], Math.round(+v||0))); }
+function interval(){ const st=S.settings; return { work:clampSet("work",st.work), rest:clampSet("rest",st.rest) }; }
+function roundsN(){ return clampSet("rounds", S.settings.rounds); }
+// exercise-library accessors. A slot (movement row r × set column c) can hold
+// its own variants OR any move of the same pattern from another set — the
+// pick is stored as "srcCol:idx" (legacy plain numbers = own column).
 function exOptions(r,c){ const base={n:EXERCISES[r][c], c:CUES[r][c]}; const a=(ALT[r]&&ALT[r][c])||[]; return [base].concat(a); }
-function exPickIdx(r,c){ const opts=exOptions(r,c); const i=(S.settings.exPick&&S.settings.exPick[r+"-"+c])||0; return (i>=0&&i<opts.length)?i:0; }
-function currentEx(r,c){ return exOptions(r,c)[exPickIdx(r,c)]; }
-function cycleEx(r,c){ const opts=exOptions(r,c); if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[r+"-"+c]=(exPickIdx(r,c)+1)%opts.length; save(); }
+function exPick(r,c){
+  const v = S.settings.exPick && S.settings.exPick[r+"-"+c];
+  let src=c, i=0;
+  if(typeof v==="number") i=v;
+  else if(typeof v==="string"){ const p=v.split(":"); src=+p[0]; i=+p[1]||0; }
+  if(!(src>=0 && src<COLUMNS.length)) src=c;
+  if(!(i>=0 && i<exOptions(r,src).length)){ src=c; i=0; }
+  return { src, i };
+}
+// the move in a slot: {n, c, src} — src is the column it comes from (sets its
+// pictogram and load type)
+function currentEx(r,c){ const p=exPick(r,c); return Object.assign({ src:p.src }, exOptions(r,p.src)[p.i]); }
+function setExPick(r,c,src,i){
+  if(!S.settings.exPick) S.settings.exPick={};
+  if(src===c && i===0) delete S.settings.exPick[r+"-"+c]; else S.settings.exPick[r+"-"+c]=src+":"+i;
+  save();
+}
+function isSkipped(r,c){ return !!(S.settings.exSkip && S.settings.exSkip[r+"-"+c]); }
+function setSkipped(r,c,on){ if(!S.settings.exSkip) S.settings.exSkip={}; if(on) S.settings.exSkip[r+"-"+c]=1; else delete S.settings.exSkip[r+"-"+c]; save(); }
+function activeRows(c){ const a=[]; for(let r=0;r<5;r++) if(!isSkipped(r,c)) a.push(r); return a; }
+function slotLT(r,c){ return loadType(COLUMNS[currentEx(r,c).src]); }
+function logLT(l){ return l.lt || loadType(colById(l.col)); }
 function pickedColumn(){ return S.settings.pickedCol || "A"; }
 // gentle variety: suggest the next type in the A→B→C→D→E rotation after
 // whatever you last completed (never auto-switches — just a hint)
@@ -568,7 +623,8 @@ const KEY = "hsb.v1";
 function defaultState(){
   return {
     settings:{ units:"kg", pickedCol:"A", sound:true, vibrate:true,
-               theme:"system", weeklyGoal:5, interval:"45/15", exPick:{} },
+               theme:"system", weeklyGoal:5, work:45, rest:15, rounds:2,
+               warmup:true, cooldown:true, exPick:{}, exSkip:{} },
     // snackGoals: self-set daily mini-goals, e.g. 10 push-ups, 4 times a day
     snackGoals:[{ id:"g1", ex:"Push-Ups", reps:10, times:4, row:2, col:2, w:0 }],
     logs:[], snacksDone:{}, sessionsDone:{}, bodyweight:[], achievements:[]
@@ -591,6 +647,12 @@ function migrate(obj){
   const d = defaultState();
   if(!obj || typeof obj !== "object") return d;
   const s = Object.assign({}, d.settings, obj.settings || {});
+  // old "45/15"-style interval preset -> separate work/rest numbers
+  if(obj.settings && obj.settings.interval && obj.settings.work==null){
+    const p = String(obj.settings.interval).split("/");
+    if(+p[0]>0){ s.work=+p[0]; s.rest=+p[1]||0; }
+  }
+  delete s.interval;
   return {
     settings:s,
     snackGoals: Array.isArray(obj.snackGoals) ? obj.snackGoals : d.snackGoals,
@@ -641,9 +703,10 @@ function fmtWeight(w, lt){
 // exact number to hit.
 function computeTarget(rowIdx, colIdx){
   const col = COLUMNS[colIdx];
-  const exName = currentEx(rowIdx, colIdx).n;
+  const cur = currentEx(rowIdx, colIdx), src = COLUMNS[cur.src];
+  const exName = cur.n;
   const high = repCeiling(col.scheme);
-  const lt = loadType(col);
+  const lt = loadType(src);
   const inc = S.settings.units==="kg" ? 2.5 : 5;
   const last = lastLogFor(exName);
   let weight = null, sug = "", beat = null;
@@ -658,7 +721,7 @@ function computeTarget(rowIdx, colIdx){
     if(cleared){
       if(lt==="db"){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units; }
       else if(lt==="band"){ sug = "next band up"; }
-      else { sug = (col.id==="C") ? "slow the tempo" : "more height / distance"; }
+      else { sug = (src.id==="C") ? "slow the tempo" : "more height / distance"; }
     } else {
       beat = bestRep; // otherwise just beat your best set
     }
@@ -761,7 +824,7 @@ function bestSet(exName, logsArr){
   arr.forEach(l=>{ if(l.exercise!==exName) return;
     l.sets.forEach(s=>{
       const W=+s.w||0, R=+s.r||0;
-      if(W>0 && R>0){ const e=est1RM(W,R); if(!wt || e>wt.e) wt={ w:W, r:R, e, date:l.date, lt:loadType(colById(l.col)), kind:"wt" }; }
+      if(W>0 && R>0){ const e=est1RM(W,R); if(!wt || e>wt.e) wt={ w:W, r:R, e, date:l.date, lt:logLT(l), kind:"wt" }; }
       else if(R>0){ if(!bw || R>bw.r) bw={ w:0, r:R, e:0, date:l.date, lt:"bw", kind:"bw" }; }
     });
   });
@@ -856,12 +919,11 @@ function pico(rowIdx, colIdx, cls){
   return '<svg class="'+(cls||"pico")+'" viewBox="0 0 100 70" style="--accent:'+COLUMNS[colIdx].color+';color:var(--ink)"><use href="#p'+rowIdx+colIdx+'"/></svg>';
 }
 function mmss(sec){ sec=Math.max(0,Math.round(sec)); return Math.floor(sec/60)+":"+pad2(sec%60); }
-// real length of a full session with the current interval (warmup + 10 work +
-// 9 rests, the round break at least 30s, + cooldown)
-function sessionDurationMin(){
-  const iv = interval();
-  const total = 120 + 10*iv.work + 8*iv.rest + Math.max(iv.rest,30) + 120;
-  return Math.round(total/60);
+// real length of a session with the current setup (sum of every timed step)
+function sessionDurationMin(colId){
+  let total = 0;
+  Player.buildSessionSteps(colId).forEach(st=>{ total += st.sec||0; });
+  return Math.max(1, Math.round(total/60));
 }
 function lockScroll(on){ document.body.style.overflow = on ? "hidden" : ""; }
 // tap-to-pick reps: buttons 1..30 all visible (single click)
@@ -938,24 +1000,30 @@ function renderToday(){
   html += '</div>';
   if(col.note) html += '<div class="inline-note" style="margin:-2px 0 4px">'+esc(col.id)+': '+esc(col.note)+'</div>';
 
-  // exercises for the picked set
-  html += '<div class="section-h">The Five</div><div class="card">';
+  // exercises for the picked set — Swap opens the full library for that pattern
+  const active = activeRows(colIdx);
+  html += '<div class="section-h">Your moves</div><div class="card">';
   for(let r=0;r<5;r++){
-    const ex = currentEx(r, colIdx), t = computeTarget(r, colIdx);
-    const nOpts = exOptions(r, colIdx).length;
-    html += '<div class="ex">';
-    html += '<div class="badge" style="background:'+col.color+'">'+(r+1)+'</div>';
-    html += pico(r, colIdx);
-    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+(nOpts>1?' <span class="swapx" data-row="'+r+'" title="Swap exercise" style="color:var(--muted);cursor:pointer">⇄</span>':'')+'</div>';
-    html += '<div class="excue">'+esc(ex.c)+'</div>';
-    html += '<div class="extarget">'+targetLineHTML(t)+'</div></div>';
+    const ex = currentEx(r, colIdx), off = isSkipped(r, colIdx);
+    const t = off ? null : computeTarget(r, colIdx);
+    html += '<div class="ex'+(off?' off':'')+'" data-row="'+r+'">';
+    html += '<div class="badge" style="background:'+(off?'var(--hair)':col.color)+'">'+(off?'–':(active.indexOf(r)+1))+'</div>';
+    html += pico(r, ex.src);
+    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+'</div>';
+    html += '<div class="excue">'+(off ? 'Left out · '+esc(ROWS[r]) : esc(ex.c))+'</div>';
+    if(t) html += '<div class="extarget">'+targetLineHTML(t)+'</div>';
+    html += '</div>';
+    html += '<button type="button" class="swapbtn" data-row="'+r+'" aria-label="Change '+esc(ROWS[r])+' move">'+(off?'＋ Add':'⇄ Swap')+'</button>';
     html += '</div>';
   }
   html += '</div>';
 
+  // workout setup — tweak timing right here before you start
+  html += '<div class="section-h">Timing</div><div class="card" id="setupCard">'+setupCardHTML()+'</div>';
+
   // actions — button shows the real computed session length
   html += '<div class="btn-row" style="margin-top:12px">';
-  html += '<button class="btn" id="startSession">▶ Start · '+sessionDurationMin()+' min</button>';
+  html += '<button class="btn" id="startSession"'+(active.length?'':' disabled style="opacity:.45"')+'>▶ Start · '+sessionDurationMin(colId)+' min</button>';
   html += '<button class="btn accent" id="startSnacks" style="background:'+col.color+'">Snacks</button>';
   html += '</div>';
 
@@ -973,16 +1041,92 @@ function renderToday(){
       typOpen = false; renderToday();
     });
   });
-  wrap.querySelectorAll(".swapx").forEach(x=>{
-    x.addEventListener("click", e=>{ e.stopPropagation(); cycleEx(+x.getAttribute("data-row"), colIdx); renderToday(); });
+  wrap.querySelectorAll(".swapbtn").forEach(x=>{
+    x.addEventListener("click", e=>{ e.stopPropagation(); openSwap(+x.getAttribute("data-row"), colIdx); });
   });
   // tap a move to see the big pictogram, cue and your history for it
-  wrap.querySelectorAll(".ex").forEach((node,r)=>{
+  wrap.querySelectorAll(".ex").forEach(node=>{
+    const r = +node.getAttribute("data-row");
     node.style.cursor = "pointer";
-    node.addEventListener("click", e=>{ if(e.target.closest(".swapx")) return; exDetail(r, colIdx); });
+    node.addEventListener("click", e=>{ if(e.target.closest(".swapbtn")) return; if(isSkipped(r,colIdx)) openSwap(r,colIdx); else exDetail(r, colIdx); });
   });
-  document.getElementById("startSession").addEventListener("click", ()=> Player.startSession(colId));
+  wireSetupCard();
+  document.getElementById("startSession").addEventListener("click", ()=>{ if(activeRows(colIdx).length) Player.startSession(colId); });
   document.getElementById("startSnacks").addEventListener("click", ()=> switchTab("snacks"));
+}
+
+// work / rest / rounds steppers + presets + warm-up / cool-down toggles
+function setupCardHTML(){
+  const st = S.settings, iv = interval(), n = roundsN();
+  const stepper = (k, label, val, unit)=>
+    '<div class="stepper"><div class="slab">'+label+'</div>'+
+    '<div class="sval">'+val+(unit?'<small>'+unit+'</small>':'')+'</div><div class="sctl">'+
+    '<button type="button" data-k="'+k+'" data-d="-1" aria-label="Less '+label+'"'+(val<=LIMITS[k][0]?' disabled':'')+'>−</button>'+
+    '<button type="button" data-k="'+k+'" data-d="1" aria-label="More '+label+'"'+(val>=LIMITS[k][1]?' disabled':'')+'>+</button></div></div>';
+  let h = '<div class="steppers">'+stepper("work","Work",iv.work,"s")+stepper("rest","Rest",iv.rest,"s")+stepper("rounds","Rounds",n,"")+'</div>';
+  h += '<div class="presets" id="ivPresets">';
+  INTERVALS.forEach((p,i)=> h += '<button type="button" data-i="'+i+'" class="'+(p.work===iv.work&&p.rest===iv.rest?'on':'')+'">'+p.work+'/'+p.rest+'</button>');
+  h += '</div><div class="presets" id="phaseToggles">';
+  h += '<button type="button" data-ph="warmup" class="'+(st.warmup!==false?'on':'')+'">'+(st.warmup!==false?'✓ ':'')+'Warm-up 2m</button>';
+  h += '<button type="button" data-ph="cooldown" class="'+(st.cooldown!==false?'on':'')+'">'+(st.cooldown!==false?'✓ ':'')+'Cool-down 2m</button>';
+  h += '</div>';
+  return h;
+}
+function wireSetupCard(){
+  const card = document.getElementById("setupCard"); if(!card) return;
+  const refresh = ()=>{
+    card.innerHTML = setupCardHTML(); wireSetupCard();
+    const sb = document.getElementById("startSession");
+    if(sb) sb.textContent = "▶ Start · "+sessionDurationMin(pickedColumn())+" min";
+    // keep the type cards' "AMRAP w/r" line in sync
+    const iv = interval();
+    document.querySelectorAll("#view-today .typopt .tsub").forEach(x=>{ x.textContent = x.textContent.replace(/AMRAP \d+\/\d+s/, "AMRAP "+iv.work+"/"+iv.rest+"s"); });
+  };
+  card.querySelectorAll(".stepper button").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const k = b.getAttribute("data-k"), d = +b.getAttribute("data-d");
+      const cur = k==="rounds" ? roundsN() : interval()[k];
+      S.settings[k] = clampSet(k, cur + d*(k==="rounds"?1:5));
+      save(); vibrate(10); refresh();
+    });
+  });
+  card.querySelectorAll("#ivPresets button").forEach(b=>{
+    b.addEventListener("click", ()=>{ const p=INTERVALS[+b.getAttribute("data-i")]; S.settings.work=p.work; S.settings.rest=p.rest; save(); vibrate(10); refresh(); });
+  });
+  card.querySelectorAll("#phaseToggles button").forEach(b=>{
+    b.addEventListener("click", ()=>{ const k=b.getAttribute("data-ph"); S.settings[k] = (S.settings[k]===false); save(); refresh(); });
+  });
+}
+// pick any move for a slot: this set's variants first, then the same pattern
+// from every other set; or leave the move out of the workout
+function openSwap(r, colIdx){
+  const col = COLUMNS[colIdx], cur = exPick(r, colIdx), off = isSkipped(r, colIdx);
+  const optHTML = (src, i, o)=>{
+    const on = !off && cur.src===src && cur.i===i, sc = COLUMNS[src];
+    return '<div class="swopt'+(on?' on':'')+'" role="button" data-src="'+src+'" data-i="'+i+'" style="--accent:'+col.color+'">'+
+      pico(r, src)+'<div class="sw-main"><div class="sw-name">'+esc(o.n)+'</div><div class="sw-cue">'+esc(o.c)+'</div></div>'+
+      '<span class="sw-tag" style="background:'+sc.color+'" title="'+esc(sc.equipment)+'">'+(loadType(sc)==="db"?"DB":loadType(sc)==="band"?"Band":"BW")+'</span>'+
+      '<span class="sw-ck">'+(on?'✓':'')+'</span></div>';
+  };
+  let inner = '<div class="modal sheet"><h3>'+esc(ROWS[r])+' move</h3>';
+  inner += '<div class="sw-h">'+esc(col.id+' · '+col.name+' · '+col.style)+'</div>';
+  exOptions(r, colIdx).forEach((o,i)=> inner += optHTML(colIdx, i, o));
+  inner += '<div class="sw-h">From other sets</div>';
+  COLUMNS.forEach((c,src)=>{ if(src===colIdx) return; exOptions(r, src).forEach((o,i)=> inner += optHTML(src, i, o)); });
+  inner += '<div class="btn-row"><button class="btn secondary" id="swSkip">'+(off?'Include this move':'Leave it out')+'</button><button class="btn" id="swClose">Done</button></div></div>';
+  const m = openModal(inner);
+  m.back.querySelectorAll(".swopt").forEach(x=>{
+    x.addEventListener("click", ()=>{
+      setExPick(r, colIdx, +x.getAttribute("data-src"), +x.getAttribute("data-i"));
+      if(isSkipped(r, colIdx)) setSkipped(r, colIdx, false);
+      vibrate(15); m.close(); renderToday();
+    });
+  });
+  m.back.querySelector("#swSkip").addEventListener("click", ()=>{
+    if(!off && activeRows(colIdx).length<=1){ toast("Keep at least one move"); return; }
+    setSkipped(r, colIdx, !off); m.close(); renderToday();
+  });
+  m.back.querySelector("#swClose").addEventListener("click", m.close);
 }
 
 /* ================================================================= RENDER: SNACKS (self-set daily goals) */
@@ -1243,7 +1387,7 @@ function dayDetail(iso){
   if(sc) body += '<div class="dd-row"><span>Session</span><b>Type '+esc(sc)+'</b></div>';
   if(taps) body += '<div class="dd-row"><span>Snack sets</span><b>'+taps+(goalsMet(iso)?' · goals hit ✓':'')+'</b></div>';
   logs.forEach(l=>{
-    const lt=loadType(colById(l.col));
+    const lt=logLT(l);
     const sets=l.sets.map(s=> (+s.w?fmtWeight(+s.w,lt):"BW")+"×"+(+s.r||0)).join(" ");
     body += '<div class="dd-row"><span>'+esc(l.exercise)+'</span><b>'+esc(sets)+'</b></div>';
   });
@@ -1253,11 +1397,11 @@ function dayDetail(iso){
 }
 // tap-through detail for a move: big pictogram, cue, best + recent history
 function exDetail(row, colIdx){
-  const ex = currentEx(row, colIdx), col = COLUMNS[colIdx];
+  const ex = currentEx(row, colIdx), col = COLUMNS[ex.src];
   const lt = loadType(col);
   const b = bestSet(ex.n);
   const recent = S.logs.filter(l=>l.exercise===ex.n).slice(-3).reverse();
-  let body = '<div style="text-align:center">'+pico(row, colIdx, "pbig")+'</div>';
+  let body = '<div style="text-align:center">'+pico(row, ex.src, "pbig")+'</div>';
   body += '<p style="margin:4px 0 10px">'+esc(ex.c)+'</p>';
   body += '<div class="dd-row"><span>Pattern</span><b>'+esc(ROWS[row])+'</b></div>';
   body += '<div class="dd-row"><span>Equipment</span><b>'+esc(col.equipment)+'</b></div>';
@@ -1348,7 +1492,7 @@ function renderHistBody(name){
   }
   entries.slice().reverse().forEach(x=>{
     const l=x.l;
-    const sets = l.sets.map(s=> (+s.w? (s.w+ (loadType(colById(l.col)) ==="band"?"L":S.settings.units)) : "BW")+"×"+(+s.r||0)).join("  ");
+    const sets = l.sets.map(s=> (+s.w? (s.w+ (logLT(l)==="band"?"L":S.settings.units)) : "BW")+"×"+(+s.r||0)).join("  ");
     html += '<div class="histlog"><span>'+sets+'</span><span style="display:flex;align-items:center;gap:8px"><span class="hdate">'+esc(l.date)+' · '+esc(l.col)+'</span>'+
             '<button type="button" class="histdel" data-i="'+x.i+'" aria-label="Delete this log" style="border:0;background:none;color:var(--muted);font-size:15px;padding:2px 4px;cursor:pointer">✕</button></span></div>';
   });
@@ -1378,9 +1522,6 @@ function renderSettings(){
 
   // training
   html += '<div class="card" style="margin-top:10px">';
-  html += '<div class="field"><label>Interval — work / rest</label><div class="seg" id="setInterval">';
-  INTERVALS.forEach(iv=> html += '<button data-iv="'+iv.id+'" class="'+(st.interval===iv.id?"on":"")+'">'+iv.work+'/'+iv.rest+'</button>');
-  html += '</div><span class="small muted">Seconds of work then rest, per exercise.</span></div>';
   html += '<div class="field" style="margin-bottom:0"><label>Weekly session goal</label><input type="number" inputmode="numeric" id="setGoal" min="1" max="14" value="'+(st.weeklyGoal||5)+'"></div>';
   html += '</div>';
 
@@ -1397,6 +1538,7 @@ function renderSettings(){
   html += '<div class="section-h">How it works</div><div class="card small" style="line-height:1.5">';
   html += '<b>AMRAP:</b> every work interval, do as many clean reps as you can — no prescribed numbers.<br>';
   html += '<b>Progress:</b> the app shows the rep count to beat; clear the ceiling and it tells you to add weight (or slow the tempo).<br>';
+  html += '<b>Timing &amp; moves:</b> set work, rest and rounds on the Today tab; tap Swap on any move to pick a different one or leave it out.<br>';
   html += '<b>Log as you go:</b> tap your reps during each rest; fix anything on the end screen.<br>';
   html += '<b>A day counts</b> when you finish a session, hit all your snack goals, or log 3+ efforts.';
   html += '</div>';
@@ -1414,9 +1556,6 @@ function renderSettings(){
 
   document.getElementById("setUnits").querySelectorAll("button").forEach(b=>{
     b.addEventListener("click", ()=>{ st.units=b.getAttribute("data-u"); save(); renderSettings(); });
-  });
-  document.getElementById("setInterval").querySelectorAll("button").forEach(b=>{
-    b.addEventListener("click", ()=>{ st.interval=b.getAttribute("data-iv"); save(); renderSettings(); });
   });
   document.getElementById("setGoal").addEventListener("change", e=>{
     let v=parseInt(e.target.value,10)||5; v=Math.max(1,Math.min(14,v)); st.weeklyGoal=v; save();
@@ -1503,18 +1642,20 @@ const Player = {
 
   buildSessionSteps(colId){
     const colIdx = COLUMNS.indexOf(colById(colId)); const iv = interval();
-    const steps = [{ type:"warmup", sec:120, title:"Warm-up", list:warmupList(colId) }];
-    for(let round=1; round<=2; round++){
-      for(let r=0;r<5;r++){
-        steps.push({ type:"exercise", round, row:r, colIdx, sec:iv.work });
-        const isLast = (round===2 && r===4);
-        if(!isLast){
-          const roundBreak = (r===4); // between the two rounds — a slightly longer breather
-          steps.push({ type:"rest", sec: roundBreak ? Math.max(iv.rest,30) : iv.rest, label: roundBreak ? "Round rest" : "Rest" });
-        }
-      }
+    const rows = activeRows(colIdx), rounds = roundsN();
+    const steps = [];
+    if(S.settings.warmup!==false) steps.push({ type:"warmup", sec:120, title:"Warm-up", list:warmupList(colId) });
+    for(let round=1; round<=rounds; round++){
+      rows.forEach((r,k)=>{
+        steps.push({ type:"exercise", round, rounds, row:r, pos:k+1, of:rows.length, colIdx, sec:iv.work });
+        const lastInRound = (k===rows.length-1);
+        if(round===rounds && lastInRound) return;
+        // between rounds — a slightly longer breather; rest 0 = straight on
+        if(lastInRound && rounds>1) steps.push({ type:"rest", sec:Math.max(iv.rest,30), label:"Round rest" });
+        else if(iv.rest>0) steps.push({ type:"rest", sec:iv.rest, label:"Rest" });
+      });
     }
-    steps.push({ type:"cooldown", sec:120, title:"Cool-down", list:COOLDOWN });
+    if(S.settings.cooldown!==false) steps.push({ type:"cooldown", sec:120, title:"Cool-down", list:COOLDOWN });
     steps.push({ type:"summary" });
     return steps;
   },
@@ -1522,7 +1663,7 @@ const Player = {
 
   _start(colId, steps){
     this.active=true; this.colId=colId; this.colIdx=COLUMNS.indexOf(colById(colId));
-    this.steps=steps; this.idx=0;
+    this.steps=steps; this.idx=0; this.rounds=roundsN(); this.rows=activeRows(this.colIdx);
     this.pend={}; // sets captured as you go: pend[row][setIdx] = {w,r}
     document.documentElement.classList.toggle("reduced", matchMedia("(prefers-reduced-motion: reduce)").matches);
     requestWake(); lockScroll(true);
@@ -1536,7 +1677,7 @@ const Player = {
     if(!step){ this.finish(); return; }
     if(step.type==="summary"){ this.finish(); return; }
     this.startTs = Date.now(); this.dur = step.sec; this.paused=false; this.pauseAccum=0;
-    if(step.type!=="exercise") cueChime();
+    if(step.type!=="exercise" || i===0) cueChime();
     this.renderStep();
     this.loop();
   },
@@ -1552,18 +1693,17 @@ const Player = {
       const rem = this.remaining();
       this.paint(rem);
       const step = this.steps[this.idx];
-      // 3-2-1 warning ticks at the end of every rest
-      if(step.type==="rest"){
+      // 3-2-1 warning ticks at the end of every rest and work interval
+      if(step.type==="rest" || step.type==="exercise"){
         const s = Math.ceil(rem);
         if(s>=1 && s<=3 && step._lastTick!==s){ step._lastTick=s; beep(600,0.06,0); vibrate(25); }
       }
-      if(rem<=0 && (step.type==="rest" || step.type==="warmup" || step.type==="cooldown")){
+      // every timed step moves on by itself — no tapping at the end of a set
+      if(rem<=0){
         if(step.type==="rest"){ cueRestEnd(); vibrate([80,60,80]); }
+        else if(step.type==="exercise"){ beep(760,0.14,0); beep(560,0.18,0.16); vibrate([60,40,60]); }
         else { cueChime(); vibrate(120); }
         this.next(true); return;
-      }
-      if(rem<=0 && step.type==="exercise" && !step._dinged){
-        step._dinged=true; beep(760,0.12,0); vibrate(60);
       }
       this.raf = requestAnimationFrame(tick);
     };
@@ -1574,8 +1714,7 @@ const Player = {
     const timeEl = document.getElementById("ringTime");
     const step = this.steps[this.idx];
     if(timeEl){
-      // AMRAP overtime: past zero on an exercise, count UP so you know how far over
-      timeEl.textContent = (rem<0 && step && step.type==="exercise") ? "+"+mmss(-rem) : mmss(rem);
+      timeEl.textContent = mmss(rem);
     }
     if(ring){
       const C = 2*Math.PI*52;
@@ -1586,14 +1725,14 @@ const Player = {
   },
   next(auto){
     const step=this.steps[this.idx];
-    if(step){ step._dinged=false; step._lastTick=null; }
+    if(step){ step._lastTick=null; }
     this.enter(this.idx+1);
   },
   skip(){ this.next(); },
   back(){
     if(this.idx<=0) return;
     const step=this.steps[this.idx];
-    if(step){ step._dinged=false; step._lastTick=null; }
+    if(step){ step._lastTick=null; }
     this.enter(this.idx-1);
   },
   add30(){ this.dur += 30; this.paint(this.remaining()); },
@@ -1654,7 +1793,7 @@ const Player = {
     if(step.type==="warmup") phaseLabel = step.title;
     else if(step.type==="cooldown") phaseLabel = step.title;
     else if(step.type==="rest") phaseLabel = step.label || "Rest";
-    else if(step.type==="exercise") phaseLabel = "Round "+step.round+" · "+(step.row+1)+"/5";
+    else if(step.type==="exercise") phaseLabel = "Round "+step.round+"/"+step.rounds+" · "+step.pos+"/"+step.of;
     phase.textContent = phaseLabel;
     this._phaseLabel = phaseLabel;
     // session progress bar (summary step excluded from the denominator)
@@ -1670,7 +1809,7 @@ const Player = {
       const ex = currentEx(step.row, step.colIdx);
       const t = computeTarget(step.row, step.colIdx);
       const wtxt = t.lt==="bw" ? "Bodyweight" : (t.weight!=null ? fmtWeight(t.weight,t.lt) : "pick a weight");
-      html += '<div class="player-ex">'+pico(step.row, step.colIdx, "pbig");
+      html += '<div class="player-ex">'+pico(step.row, ex.src, "pbig");
       html += '<div class="pname">'+esc(ex.n)+'</div>';
       html += '<div class="pcue">'+esc(ex.c)+'</div>';
       html += '<div class="ptarget" style="color:'+col.color+'">AMRAP · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat:'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div></div>';
@@ -1744,7 +1883,7 @@ const Player = {
     if(!c) return;
     const step=this.steps[this.idx];
     const nextLabel = step.type==="rest" ? "Skip rest" :
-                      step.type==="exercise" ? "Next" : "Skip";
+                      step.type==="exercise" ? "Done early" : "Skip";
     c.innerHTML =
       '<button class="btn secondary" id="cBack" aria-label="Previous step"'+(this.idx===0?' disabled style="opacity:.4"':'')+'>◂ Back</button>'+
       '<button class="btn secondary" id="cPause">'+(this.paused?"Resume":"Pause")+'</button>'+
@@ -1773,15 +1912,15 @@ const Player = {
 
     const paintRecap = ()=>{
       let inner = "";
-      for(let r=0;r<5;r++){
+      this.rows.forEach((r,k)=>{
         const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
         const sets = (this.pend[r]||[]).filter(s=> s && s.r>0);
         const txt = sets.length
           ? sets.map(s=> (s.w>0 ? fmtWeight(s.w,t.lt) : "BW")+"×"+s.r).join("  ")
           : "tap to add";
-        inner += '<div class="lrow" data-row="'+r+'" role="button" style="cursor:pointer"><div class="lr-main"><div class="lr-name">'+(r+1)+'. '+esc(ex.n)+'</div></div>'+
+        inner += '<div class="lrow" data-row="'+r+'" role="button" style="cursor:pointer"><div class="lr-main"><div class="lr-name">'+(k+1)+'. '+esc(ex.n)+'</div></div>'+
                  '<div class="lr-val'+(sets.length?'':' muted')+'" style="font-weight:'+(sets.length?800:600)+'">'+esc(txt)+'</div></div>';
-      }
+      });
       const cardEl = ov.querySelector("#recapCard");
       cardEl.innerHTML = inner;
       cardEl.querySelectorAll(".lrow").forEach(rowEl=>{
@@ -1792,13 +1931,13 @@ const Player = {
 
     ov.querySelector("#saveLog").addEventListener("click", ()=>{
       const iso = todayISO(); const added=[];
-      for(let r=0;r<5;r++){
+      this.rows.forEach(r=>{
         const sets = (this.pend[r]||[]).filter(s=> s && s.r>0).map(s=>({ w:+s.w||0, r:+s.r }));
         if(sets.length){
-          const log = { date:iso, col:this.colId, mode:"session", row:r, exercise:currentEx(r, colIdx).n, sets };
+          const log = { date:iso, col:this.colId, mode:"session", row:r, exercise:currentEx(r, colIdx).n, lt:slotLT(r, colIdx), sets };
           S.logs.push(log); added.push(log);
         }
-      }
+      });
       S.sessionsDone[iso] = this.colId;
       const prs = detectPRs(added); save(); checkAchievements(); save();
       this.teardown();
@@ -1815,7 +1954,7 @@ const Player = {
     const ex = currentEx(r, colIdx), t = computeTarget(r, colIdx);
     const cur = this.pend[r]||[];
     let inner = '<div class="modal" style="max-width:430px"><h3>'+esc(ex.n)+'</h3>';
-    for(let s=0;s<2;s++){
+    for(let s=0;s<this.rounds;s++){
       const c = cur[s]||{};
       const wv = c.w ? c.w : (t.lt==="bw" ? "" : (t.weight!=null?t.weight:""));
       inner += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
