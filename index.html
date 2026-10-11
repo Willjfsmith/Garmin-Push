@@ -299,8 +299,29 @@ section[hidden]{display:none}
   flex:none;padding:6px 10px;border-radius:999px;border:1px solid var(--hair);
   background:var(--paper);color:var(--ink);font-weight:800;font-size:12px;min-height:32px;
 }
-.ex.off .pico,.ex.off .exbody{opacity:.38}
-.ex.off .exname{text-decoration:line-through}
+.ex .edbtns{display:flex;gap:4px;flex:none}
+.ex .edbtns button{width:34px;height:34px;border-radius:9px;border:1px solid var(--hair);background:var(--paper);font-weight:900;font-size:14px;padding:0}
+.ex .edbtns button:disabled{opacity:.3}
+.ex .edbtns .del{color:var(--plateA)}
+.addmove{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1.5px dashed var(--hair);background:transparent;color:var(--ink);font-weight:800;font-size:13px}
+/* move picker sheet */
+.picker-back{align-items:flex-end;padding:0}
+.picker{max-width:560px;width:100%;max-height:92vh;display:flex;flex-direction:column;border-radius:16px 16px 0 0;padding:14px 14px calc(10px + var(--safe-b))}
+.picker .pk-top{flex:none}
+.picker .pk-list{flex:1;overflow-y:auto;margin:6px -4px 0;padding:0 4px;-webkit-overflow-scrolling:touch}
+.picker .pk-search{width:100%;padding:10px 12px;border:1px solid var(--hair);border-radius:10px;background:var(--paper);color:var(--ink);font-size:16px}
+.pk-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
+.pk-chips::-webkit-scrollbar{display:none}
+.pk-chips button{flex:none;padding:6px 11px;border-radius:999px;border:1.5px solid var(--hair);background:var(--paper);color:var(--ink);font-weight:700;font-size:12.5px;white-space:nowrap}
+.pk-chips button.on{background:var(--ink);color:var(--paper);border-color:transparent}
+.pk-h{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin:12px 2px 4px}
+.pkrow{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:10px;cursor:pointer;border:1.5px solid transparent}
+.pkrow.on{border-color:var(--accent);background:var(--paper)}
+.pkrow .pico{width:42px;height:30px;min-width:42px}
+.pkrow .lr-main{flex:1;min-width:0}
+.pkrow .eqtag{flex:none;font-size:10px;font-weight:800;color:#fff;border-radius:6px;padding:2px 6px}
+.pkrow .tck{flex:none;font-weight:900;color:var(--accent);min-width:14px;text-align:center}
+.pk-empty{padding:18px 6px;text-align:center;color:var(--muted);font-size:13px}
 /* timing: work / rest / rounds steppers */
 .steppers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .stepper{background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:7px 2px 6px;text-align:center}
@@ -431,6 +452,10 @@ const COLUMNS = [
   { id:"DB", name:"Dumbbells",  equipment:"dumbbells",        color:"#C0392B", pic:0, ceiling:10 },
 ];
 const ROWS = ["Squat","Hinge","Push","Pull","Core"];
+// every category in the library: the five patterns plus extras. CATPIC picks
+// the pictogram row each category borrows from the SVG sheet.
+const CATS = ROWS.concat(["Arms","Shoulders","Legs","Cardio"]);
+const CATPIC = [0,1,2,3,4,3,2,0,0];
 // LIB[kit][row] is a ladder: easiest first, hardest last. `d` marks the default
 // move, `hold` a timed hold (logged in seconds), `sides` a one-sided move that
 // switches halfway through the 45s. Everything needs only a floor and a wall:
@@ -540,6 +565,83 @@ const LIB = {
       {n:"DB Windmill",c:"DB overhead, push the hips out, slide the other hand down the leg",sides:1} ],
   ],
 };
+// extra categories (Arms, Shoulders, Legs, Cardio), same floor-and-wall rule,
+// easiest first. Appended to each kit as LIB[kit][5..8].
+const LIB_EXTRA = {
+  BW: [
+    [ {n:"Wall Tricep Extension",c:"Forearms on the wall, press away until the elbows are straight"},
+      {n:"Close-Grip Knee Push-Up",c:"Knees down, hands narrow, elbows brush the ribs"},
+      {n:"Floor Tricep Dip",c:"Hands behind you on the floor, hips up, bend and straighten the elbows"},
+      {n:"Towel Curl Hold",c:"Towel under one foot, curl up against it as hard as you can and hold",hold:1,sides:1},
+      {n:"Plank Up-Down",c:"Forearm plank to hand plank one arm at a time, hips still"},
+      {n:"Sphinx Push-Up",c:"Forearm plank, push through the palms to lift the elbows, lower slow"} ],
+    [ {n:"Arm Circles",c:"Arms straight out, small circles growing bigger, switch direction halfway"},
+      {n:"Wall Angels",c:"Back, head and arms on the wall, slide the arms up and down slowly"},
+      {n:"Plank Shoulder Taps",c:"High plank, tap each shoulder, minimise the hip sway"},
+      {n:"Pike Hold",c:"Hips high, arms straight, push the floor away and hold",hold:1},
+      {n:"Bear Crawl",c:"Knees an inch off the floor, crawl forward and back, back flat"},
+      {n:"Wall Walk",c:"Feet against the wall, walk the hands in and the feet up, then back down"} ],
+    [ {n:"Calf Raise",c:"Hands on the wall, rise onto the toes, pause, lower slow"},
+      {n:"Fire Hydrant",c:"On all fours, lift one knee out to the side, hips level",sides:1},
+      {n:"Side-Lying Leg Raise",c:"Lie on your side, lift the top leg straight up, lower slow",sides:1},
+      {n:"Single-Leg Calf Raise",c:"One foot, fingertips on the wall, full range up and down",sides:1},
+      {n:"Lateral Lunge",c:"Step wide, sit into one hip, push back to standing",sides:1},
+      {n:"Wall Sit March",c:"Wall sit, lift one foot at a time without rising",hold:1} ],
+    [ {n:"March on the Spot",c:"Knees to hip height, swing the arms, steady pace"},
+      {n:"Jumping Jacks",c:"Jump the feet wide as the arms go up, land soft"},
+      {n:"High Knees",c:"Run on the spot, drive the knees up fast, stay on the balls of the feet"},
+      {n:"Skater Hops",c:"Leap side to side, land on one leg, stick it"},
+      {n:"Squat Thrust",c:"Hands down, jump the feet back to plank and in again, stand"},
+      {n:"Burpee",c:"Squat, jump back to plank, chest down, jump in and up"} ],
+  ],
+  BD: [
+    [ {n:"Band Curl",c:"Stand on the band, elbows pinned, curl to the shoulders"},
+      {n:"Band Hammer Curl",c:"Palms facing in, curl up, lower slow"},
+      {n:"Band Reverse Curl",c:"Palms down, curl up, wrists stay straight"},
+      {n:"Band Tricep Kickback",c:"Stand on the band, hinge, straighten the arms back, squeeze"},
+      {n:"Overhead Band Tricep Extension",c:"Stand on the band, hands behind the head, straighten overhead"},
+      {n:"Band 21s",c:"7 bottom-half curls, 7 top-half, 7 full — then repeat"} ],
+    [ {n:"Band Front Raise",c:"Stand on the band, raise straight arms to shoulder height"},
+      {n:"Band Lateral Raise",c:"Stand on the band, raise the arms out to the sides, soft elbows"},
+      {n:"Band Shoulder Dislocate",c:"Wide grip, sweep the band over your head and behind, arms straight"},
+      {n:"Band Upright Row",c:"Stand on the band, pull to the chest, elbows lead"},
+      {n:"Band Y-Raise",c:"Stand on the band, raise the arms up and out into a Y, thumbs up"} ],
+    [ {n:"Band Calf Raise",c:"Band under the balls of the feet, hold the ends, rise up and pause"},
+      {n:"Band Clamshell",c:"Band round the knees, lie on your side, open the top knee",sides:1},
+      {n:"Band Fire Hydrant",c:"Band round the knees, on all fours, lift one knee out",sides:1},
+      {n:"Band Lateral Walk",c:"Band round the knees, half squat, step side to side"},
+      {n:"Band Monster Walk",c:"Band round the knees, step wide forward and back, stay low"} ],
+    [ {n:"Band Squat to Press",c:"Stand on the band, squat, drive up into an overhead press"},
+      {n:"Band Lateral Shuffle",c:"Band round the knees, shuffle quickly side to side, stay low"},
+      {n:"Band Skater",c:"Band round the knees, bound side to side, land on one leg"},
+      {n:"Banded Squat Jump",c:"Band round the knees, squat and jump, push the knees out"} ],
+  ],
+  DB: [
+    [ {n:"DB Curl",c:"Elbows pinned to your sides, curl up, lower slow"},
+      {n:"DB Hammer Curl",c:"Palms facing in, curl to the shoulders"},
+      {n:"DB Tricep Kickback",c:"Hinge over, elbows high, straighten the arms back"},
+      {n:"DB Overhead Tricep Extension",c:"One DB in both hands overhead, lower behind the head, press up"},
+      {n:"DB Floor Skull Crusher",c:"On your back, lower the DBs beside your head, elbows still"},
+      {n:"DB Zottman Curl",c:"Curl palms up, turn palms down at the top, lower slow"} ],
+    [ {n:"DB Front Raise",c:"Raise the DBs to shoulder height in front, arms straight"},
+      {n:"DB Lateral Raise",c:"Raise the DBs out to the sides to shoulder height, soft elbows"},
+      {n:"DB Upright Row",c:"Pull the DBs up the front of the body to the chest, elbows lead"},
+      {n:"DB Bent-Over Y-Raise",c:"Hinge over, raise light DBs up and out in a Y, thumbs up"},
+      {n:"DB Cuban Press",c:"Upright row, rotate the forearms up, press overhead"} ],
+    [ {n:"DB Calf Raise",c:"DBs at your sides, rise onto the toes, pause, lower slow"},
+      {n:"DB Glute Bridge",c:"DB on the hips, drive up, squeeze at the top"},
+      {n:"DB Wall Sit",c:"Back on the wall, DB on the thighs, hold",hold:1},
+      {n:"DB Single-Leg Calf Raise",c:"DB in one hand, other hand on the wall, rise on one foot",sides:1},
+      {n:"DB Lunge to Knee Drive",c:"Reverse lunge, drive the back knee up as you stand",sides:1} ],
+    [ {n:"DB Punches",c:"Light DBs, punch straight out fast, alternate arms"},
+      {n:"DB Thruster",c:"DBs on the shoulders, squat, drive up into a press"},
+      {n:"DB Squat Clean",c:"DBs at the knees, pull and catch them on the shoulders in a squat"},
+      {n:"DB Alternating Snatch",c:"One DB from floor to overhead in one move, switch hands each rep"},
+      {n:"DB Burpee Deadlift",c:"Hands on the DBs, jump back and in, stand up with them"},
+      {n:"DB Devil's Press",c:"Burpee on the DBs, then swing them overhead in one move"} ],
+  ],
+};
+Object.keys(LIB_EXTRA).forEach(k=> LIB_EXTRA[k].forEach(lad=> LIB[k].push(lad)));
 // The workout: the five moves, N rounds, work / rest intervals, one longer
 // breather between rounds. Defaults 45/15 × 2 (10:30); set on the Today tab.
 const BREAK_SEC = 60;
@@ -552,33 +654,62 @@ function timing(k){ const L=LIMITS[k]; const v=Math.round(+S.settings[k]); retur
 function workSec(){ return timing("work"); }
 function restSec(){ return timing("rest"); }
 function roundsN(){ return timing("rounds"); }
-// moves left out of the main session (per kit), and the ones still in
-function isSkipped(r,c){ return !!(S.settings.exSkip && S.settings.exSkip[exPickKey(r,c)]); }
-function setSkipped(r,c,on){ if(!S.settings.exSkip) S.settings.exSkip={}; if(on) S.settings.exSkip[exPickKey(r,c)]=1; else delete S.settings.exSkip[exPickKey(r,c)]; save(); }
-function activeRows(c){ const a=[]; for(let r=0;r<5;r++) if(!isSkipped(r,c)) a.push(r); return a; }
-// exercise-library accessors (base move + alternates, per slot)
-function exOptions(r,c){ return LIB[COLUMNS[c].id][r]; }
-function exPickKey(r,c){ return r+"-"+COLUMNS[c].id; }
-function exDefaultIdx(r,c){ const i=exOptions(r,c).findIndex(o=>o.d); return i<0?0:i; }
-// picks are stored by move name, so reordering the ladder never changes a pick
-function exPickIdx(r,c){
-  const v = S.settings.exPick && S.settings.exPick[exPickKey(r,c)];
-  const i = (typeof v==="string") ? exOptions(r,c).findIndex(o=>o.n===v) : -1;
-  return i<0 ? exDefaultIdx(r,c) : i;
-}
-function currentEx(r,c){ return exOptions(r,c)[exPickIdx(r,c)]; }
-function setEx(r,c,name){ if(!S.settings.exPick)S.settings.exPick={}; S.settings.exPick[exPickKey(r,c)]=name; save(); }
-// the next rung up the ladder, or null at the top
-function nextRung(r,c){ const opts=exOptions(r,c), i=exPickIdx(r,c); return i+1<opts.length ? opts[i+1] : null; }
-// reroll every slot of a kit to a different move than the one showing
-function shuffleKit(c){
-  for(let r=0;r<5;r++){
-    const opts=exOptions(r,c), cur=exPickIdx(r,c);
-    if(opts.length<2) continue;
-    let i; do { i=Math.floor(Math.random()*opts.length); } while(i===cur);
-    setEx(r,c,opts[i].n);
+// ---- the workout plan: each kit keeps its own ordered list of moves. An
+// entry points at any library move {k:kit, r:category, n:name} — from any kit,
+// any category — or at one of your own moves {k:"X", n:name}.
+const MAX_MOVES = 12;
+function ladder(k, r){ return (LIB[k]||[])[r] || null; }
+function ladderDefault(k, r){ const lad=ladder(k,r); const o=lad.find(x=>x.d)||lad[0]; return o.n; }
+function customMoves(){ return Array.isArray(S.settings.custom) ? S.settings.custom : (S.settings.custom=[]); }
+// resolve a plan entry to a full move, or null if it no longer exists
+function resolveEntry(e){
+  if(!e) return null;
+  if(e.k==="X"){
+    const cm = customMoves().find(x=>x.n===e.n); if(!cm) return null;
+    const ci = Math.max(0, COLUMNS.findIndex(c=>c.id===cm.eq));
+    return { n:cm.n, c:cm.c||"Your own move", hold:!!cm.hold, sides:!!cm.sides, cat:+cm.cat||0, colIdx:ci, custom:true, lad:null, li:-1, e };
   }
+  const colIdx = COLUMNS.findIndex(c=>c.id===e.k), lad = ladder(e.k, e.r);
+  if(colIdx<0 || !lad) return null;
+  const li = lad.findIndex(o=>o.n===e.n); if(li<0) return null;
+  const o = lad[li];
+  return { n:o.n, c:o.c, hold:!!o.hold, sides:!!o.sides, cat:e.r, colIdx, custom:false, lad, li, e };
 }
+// default plan for a kit: its five pattern defaults (or the pre-plan swaps /
+// left-out moves, so nothing changes for existing users)
+function legacyPlan(kitId){
+  const out = [];
+  for(let r=0;r<5;r++){
+    const key = r+"-"+kitId;
+    if(S.settings.exSkip && S.settings.exSkip[key]) continue;
+    const v = S.settings.exPick && S.settings.exPick[key];
+    const lad = ladder(kitId, r);
+    out.push({ k:kitId, r, n:(typeof v==="string" && lad.some(o=>o.n===v)) ? v : ladderDefault(kitId, r) });
+  }
+  return out;
+}
+function kitDefaultPlan(kitId){ const out=[]; for(let r=0;r<5;r++) out.push({ k:kitId, r, n:ladderDefault(kitId, r) }); return out; }
+function planEntries(kitId){
+  if(!S.settings.plans) S.settings.plans = {};
+  const raw = Array.isArray(S.settings.plans[kitId]) ? S.settings.plans[kitId] : legacyPlan(kitId);
+  return raw.filter(e=> resolveEntry(e));
+}
+function planMoves(kitId){ return planEntries(kitId).map(resolveEntry); }
+function savePlan(kitId, entries){ if(!S.settings.plans) S.settings.plans={}; S.settings.plans[kitId]=entries.slice(0, MAX_MOVES); save(); }
+function entryOf(k, r, n){ return k==="X" ? { k:"X", n } : { k, r, n }; }
+function sameEntry(a, b){ return a.k===b.k && a.n===b.n && (a.k==="X" || a.r===b.r); }
+// the next rung up the ladder, or null at the top / for your own moves
+function nextRung(ex){ return (ex.lad && ex.li+1<ex.lad.length) ? ex.lad[ex.li+1] : null; }
+// reroll every move to a different one on the same ladder (your own moves stay)
+function shuffleKit(kitId){
+  savePlan(kitId, planEntries(kitId).map(e=>{
+    const lad = e.k==="X" ? null : ladder(e.k, e.r);
+    if(!lad || lad.length<2) return e;
+    let o; do { o = lad[Math.floor(Math.random()*lad.length)]; } while(o.n===e.n);
+    return { k:e.k, r:e.r, n:o.n };
+  }));
+}
+function exPico(ex, cls){ return pico(CATPIC[ex.cat]||0, ex.colIdx, cls); }
 function pickedColumn(){ return colById(S.settings.pickedCol) ? S.settings.pickedCol : COLUMNS[0].id; }
 // common bodyweight moves for quick sessions & quick logging (pr/pc pick the pictogram)
 const QUICK = [
@@ -598,7 +729,7 @@ const KEY = "hsb.v1";
 function defaultState(){
   return {
     settings:{ units:"kg", pickedCol:"BW", sound:true, vibrate:true,
-               theme:"system", exPick:{}, exSkip:{}, schema:2,
+               theme:"system", exPick:{}, exSkip:{}, plans:{}, custom:[], schema:2,
                work:45, rest:15, rounds:2,
                quick:{ ex:null, sets:5, reps:5, rest:30, timed:false, work:45 } },
     logs:[], snacksDone:{}, sessionsDone:{}, bodyweight:[], achievements:[]
@@ -688,14 +819,14 @@ function fmtWeight(w, lt){
 // one working set per move per round
 // the number a set is judged on: reps, or seconds for a hold
 function setMetric(s, hold){ return hold ? (+s.sec||0) : (+s.r||0); }
-function computeTarget(rowIdx, colIdx){
-  const col = COLUMNS[colIdx];
-  const ex = currentEx(rowIdx, colIdx), exName = ex.n, hold = !!ex.hold;
+function computeTarget(ex){
+  const col = COLUMNS[ex.colIdx];
+  const exName = ex.n, hold = !!ex.hold;
   const high = hold ? workSec() : col.ceiling; // a hold is cleared when you hold the whole interval
   const lt = loadType(col);
   const inc = S.settings.units==="kg" ? 2.5 : 5;
   const last = lastLogFor(exName);
-  const rung = nextRung(rowIdx, colIdx);
+  const rung = nextRung(ex);
   let weight = null, sug = "", beat = null;
 
   if(last && last.sets && last.sets.length){
@@ -709,7 +840,7 @@ function computeTarget(rowIdx, colIdx){
       if(lt==="db" && !hold){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units; }
       else if(lt==="db"){ weight = (weight||0)+inc; sug = "add "+inc+S.settings.units+(rung?" or next: "+rung.n:""); }
       else if(lt==="band"){ sug = rung ? "next: "+rung.n : "thicker band"; }
-      else { sug = rung ? "next: "+rung.n : "top of the ladder — add a rep"; }
+      else { sug = rung ? "next: "+rung.n : (ex.lad ? "top of the ladder — add a rep" : "add a rep or slow it down"); }
     } else {
       beat = best; // otherwise just beat your best set
     }
@@ -877,17 +1008,24 @@ function pico(rowIdx, colIdx, cls){
 // <option>s for every move in the library, grouped by pattern; value = "l{row}-{col}-{alt}"
 function libraryOptions(){
   let opts = '<option value="" disabled selected>Browse the full library…</option>';
-  ROWS.forEach((rn,r)=>{ opts += '<optgroup label="'+esc(rn)+'">';
-    COLUMNS.forEach((col,c)=> exOptions(r,c).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(col.name)+'</option>'));
+  const mine = customMoves();
+  if(mine.length){ opts += '<optgroup label="★ Your moves">'; mine.forEach((cm,i)=> opts += '<option value="x'+i+'">'+esc(cm.n)+'</option>'); opts += '</optgroup>'; }
+  CATS.forEach((rn,r)=>{ opts += '<optgroup label="'+esc(rn)+'">';
+    COLUMNS.forEach((col,c)=> ladder(col.id, r).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(col.name)+'</option>'));
     opts += '</optgroup>';
   });
   return opts;
 }
 function pickFromLibraryValue(v){
-  const m=v.slice(1).split("-"); const r=+m[0],c=+m[1],oi=+m[2]; const o=exOptions(r,c)[oi];
-  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:r, colIdx:c, hold:!!o.hold, sides:!!o.sides };
+  if(v[0]==="x"){
+    const cm = customMoves()[+v.slice(1)], c = Math.max(0, COLUMNS.findIndex(x=>x.id===cm.eq));
+    return { name:cm.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[+cm.cat||0], colIdx:c, hold:!!cm.hold, sides:!!cm.sides };
+  }
+  const m=v.slice(1).split("-"); const r=+m[0],c=+m[1],oi=+m[2]; const o=ladder(COLUMNS[c].id, r)[oi];
+  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[r], colIdx:c, hold:!!o.hold, sides:!!o.sides };
 }
 function pickFromQuick(i){ const q=QUICK[i]; return { name:q.n, col:COLUMNS[q.pc].id, lt:"bw", row:q.pr, colIdx:q.pc }; }
+function lockScroll(on){ document.body.style.overflow = on ? "hidden" : ""; }
 function mmss(sec){ sec=Math.max(0,Math.round(sec)); return Math.floor(sec/60)+":"+pad2(sec%60); }
 // tap-to-pick reps: buttons 1..30 (single click), highlight in accent colour
 function repPad(preset){
@@ -919,6 +1057,7 @@ function wireRepPads(root){
 }
 
 /* ================================================================= RENDER: TODAY */
+let planEditing = false; // Today's move list in reorder / remove mode
 function renderToday(){
   const wrap = document.getElementById("view-today");
   const colId = pickedColumn(), col = colById(colId), colIdx = COLUMNS.indexOf(col);
@@ -941,30 +1080,41 @@ function renderToday(){
     html += '<div class="tck">✓</div></div>';
   });
 
-  // exercises for the picked set — Swap (or tap the row) opens the ladder
-  const active = activeRows(colIdx);
-  html += '<div style="display:flex;align-items:center;gap:8px"><div class="section-h">The Five</div><button type="button" class="chip" id="shuffleBtn" style="margin-left:auto;margin-bottom:8px">🎲 Shuffle</button></div><div class="card">';
-  for(let r=0;r<5;r++){
-    const ex = currentEx(r, colIdx), off = isSkipped(r, colIdx);
-    html += '<div class="ex'+(off?' off':'')+'" data-row="'+r+'" role="button">';
-    html += '<div class="badge" style="background:'+(off?'var(--hair)':col.color)+'">'+(off?'–':(active.indexOf(r)+1))+'</div>';
-    html += pico(r, colIdx);
-    const tags = (ex.hold?' <span class="extag">hold</span>':'')+(ex.sides?' <span class="extag">switch sides</span>':'');
-    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+(off?'':tags)+'</div>';
-    html += '<div class="excue">'+(off ? 'Left out · '+esc(ROWS[r]) : esc(ex.c))+'</div>';
-    if(!off) html += '<div class="extarget">'+targetLineHTML(computeTarget(r, colIdx))+'</div>';
+  // the workout: an ordered list of any moves — Swap / tap to change one,
+  // Edit to reorder or remove, + to add
+  const moves = planMoves(colId);
+  html += '<div style="display:flex;align-items:center;gap:6px"><div class="section-h">Your moves · '+moves.length+'</div>'+
+    '<button type="button" class="chip" id="shuffleBtn" style="margin-left:auto;margin-bottom:8px">🎲 Shuffle</button>'+
+    '<button type="button" class="chip'+(planEditing?' solid':'')+'" id="editBtn" style="margin-bottom:8px">'+(planEditing?'✓ Done':'✎ Edit')+'</button></div><div class="card">';
+  moves.forEach((ex,i)=>{
+    html += '<div class="ex" data-i="'+i+'" role="button">';
+    html += '<div class="badge" style="background:'+COLUMNS[ex.colIdx].color+'">'+(i+1)+'</div>';
+    html += exPico(ex);
+    const tags = (ex.hold?' <span class="extag">hold</span>':'')+(ex.sides?' <span class="extag">switch sides</span>':'')+(ex.custom?' <span class="extag">mine</span>':'');
+    html += '<div class="exbody"><div class="exname">'+esc(ex.n)+tags+'</div>';
+    html += '<div class="excue">'+esc(CATS[ex.cat])+(ex.colIdx!==colIdx?' · '+esc(COLUMNS[ex.colIdx].name):'')+' · '+esc(ex.c)+'</div>';
+    if(!planEditing) html += '<div class="extarget">'+targetLineHTML(computeTarget(ex))+'</div>';
     html += '</div>';
-    html += '<button type="button" class="swapbtn" data-row="'+r+'" aria-label="Change '+esc(ROWS[r])+' move">'+(off?'＋ Add':'⇄ Swap')+'</button>';
+    if(planEditing){
+      html += '<div class="edbtns"><button type="button" data-mv="-1" data-i="'+i+'" aria-label="Move up"'+(i===0?' disabled':'')+'>↑</button>'+
+              '<button type="button" data-mv="1" data-i="'+i+'" aria-label="Move down"'+(i===moves.length-1?' disabled':'')+'>↓</button>'+
+              '<button type="button" class="del" data-del="'+i+'" aria-label="Remove">✕</button></div>';
+    } else {
+      html += '<button type="button" class="swapbtn" data-i="'+i+'" aria-label="Swap '+esc(ex.n)+'">⇄ Swap</button>';
+    }
     html += '</div>';
-  }
+  });
+  if(!moves.length) html += '<div class="pk-empty">No moves yet — add one to build your workout.</div>';
   html += '</div>';
+  if(moves.length<MAX_MOVES) html += '<button type="button" class="addmove" id="addMove">＋ Add a move</button>';
+  if(planEditing) html += '<button type="button" class="addmove" id="resetPlan" style="color:var(--muted)">↺ Reset to the '+esc(col.name)+' five</button>';
 
   // timing — set work / rest / rounds right here before starting
   html += '<div class="section-h">Timing</div><div class="card" id="setupCard">'+setupCardHTML()+'</div>';
 
   // actions
   html += '<div class="btn-row" style="margin-top:12px">';
-  html += '<button class="btn" id="startSession"'+(active.length?'':' disabled style="opacity:.45"')+'>▶ Start · '+mmss(sessionTotal(colIdx))+'</button>';
+  html += '<button class="btn" id="startSession"'+(moves.length?'':' disabled style="opacity:.45"')+'>▶ Start · '+mmss(sessionTotal(colIdx))+'</button>';
   html += '<button class="btn accent" id="startQuick" style="background:'+col.color+'">Quick session</button>';
   html += '</div>';
 
@@ -974,12 +1124,26 @@ function renderToday(){
   wrap.querySelectorAll(".typopt").forEach(t=>{
     t.addEventListener("click", ()=>{ S.settings.pickedCol = t.getAttribute("data-col"); save(); renderToday(); });
   });
-  wrap.querySelectorAll(".ex[data-row]").forEach(x=>{
-    x.addEventListener("click", ()=> openExPicker(+x.getAttribute("data-row"), colIdx));
+  const entries = planEntries(colId);
+  wrap.querySelectorAll(".ex[data-i]").forEach(x=>{
+    x.addEventListener("click", e=>{ if(e.target.closest(".edbtns")) return; openExPicker(colId, +x.getAttribute("data-i")); });
   });
+  wrap.querySelectorAll(".edbtns [data-mv]").forEach(b=> b.addEventListener("click", ()=>{
+    const i=+b.getAttribute("data-i"), j=i+(+b.getAttribute("data-mv"));
+    const t=entries[i]; entries[i]=entries[j]; entries[j]=t; savePlan(colId, entries); vibrate(10); renderToday();
+  }));
+  wrap.querySelectorAll(".edbtns [data-del]").forEach(b=> b.addEventListener("click", ()=>{
+    const i=+b.getAttribute("data-del"), gone=entries.splice(i,1)[0]; savePlan(colId, entries); renderToday();
+    toast("Removed "+gone.n);
+  }));
+  const am = document.getElementById("addMove"); if(am) am.addEventListener("click", ()=> openExPicker(colId, -1));
+  const rp = document.getElementById("resetPlan"); if(rp) rp.addEventListener("click", ()=>{
+    confirmDialog("Reset moves?", "Go back to the default five for "+col.name+". Your own moves stay in the library.", ()=>{ savePlan(colId, kitDefaultPlan(colId)); planEditing=false; renderToday(); }, "Reset");
+  });
+  document.getElementById("editBtn").addEventListener("click", ()=>{ planEditing=!planEditing; renderToday(); });
   wireSetupCard(colIdx);
-  document.getElementById("shuffleBtn").addEventListener("click", ()=>{ shuffleKit(colIdx); renderToday(); toast("Rerolled — tap again for another set"); });
-  document.getElementById("startSession").addEventListener("click", ()=>{ if(activeRows(colIdx).length) Player.startSession(colId); });
+  document.getElementById("shuffleBtn").addEventListener("click", ()=>{ shuffleKit(colId); renderToday(); toast("Rerolled — tap again for another set"); });
+  document.getElementById("startSession").addEventListener("click", ()=>{ if(planEntries(colId).length) Player.startSession(colId); });
   document.getElementById("startQuick").addEventListener("click", ()=> switchTab("quick"));
 }
 
@@ -1021,35 +1185,130 @@ function wireSetupCard(colIdx){
   });
 }
 
-// pick a move for one slot: the whole ladder, easiest first, with when you last did each
-function openExPicker(r, colIdx){
+// pick any move: search the whole library (every kit, every category) plus
+// your own moves. idx>=0 swaps that move in the plan; idx<0 adds a new one.
+function openExPicker(kitId, idx){
   const root = document.getElementById("modalRoot"); root.innerHTML="";
-  const col = COLUMNS[colIdx], opts = exOptions(r, colIdx), cur = isSkipped(r, colIdx) ? -1 : exPickIdx(r, colIdx);
-  let rows = "";
-  opts.forEach((o,i)=>{
-    const last = lastLogFor(o.n);
-    const tags = (o.d?'<span class="extag">default</span>':'')+(o.hold?'<span class="extag">hold</span>':'')+(o.sides?'<span class="extag">sides</span>':'');
-    rows += '<div class="pickrow'+(i===cur?' on':'')+'" data-i="'+i+'" style="--accent:'+col.color+'">'+
-      '<div class="pickn">'+(i+1)+'</div>'+
-      '<div class="lr-main"><div class="lr-name">'+esc(o.n)+' '+tags+'</div><div class="lr-sub">'+esc(o.c)+'</div><div class="lr-sub" style="margin-top:2px">last: '+agoText(last&&last.date)+'</div></div>'+
-      '<div class="tck">'+(i===cur?'✓':'')+'</div></div>';
-  });
-  const back = el('<div class="modal-back"><div class="modal" style="max-width:430px;padding:16px">'+
-    '<h3 style="margin-bottom:2px">'+esc(ROWS[r])+' · '+esc(col.name)+'</h3><p class="small" style="margin-bottom:10px">Easiest at the top, hardest at the bottom.</p>'+
-    '<div id="pickList">'+rows+'</div>'+
-    '<div class="btn-row"><button class="btn secondary" id="pkSkip">'+(isSkipped(r,colIdx)?'Include this move':'Leave it out')+'</button><button class="btn" id="pkClose">Done</button></div></div></div>');
-  root.appendChild(back);
-  const close = ()=> root.innerHTML="";
+  const kitIdx = COLUMNS.findIndex(c=>c.id===kitId), kit = COLUMNS[kitIdx];
+  const entries = planEntries(kitId);
+  const cur = idx>=0 ? resolveEntry(entries[idx]) : null;
+  const f = { q:"", cat: cur ? cur.cat : -1, eq: "" }; // -1 = all categories, 99 = mine
+  const eqName = ["BW","Band","DB"];
+  const back = el('<div class="modal-back picker-back"><div class="modal picker" style="--accent:'+kit.color+'">'+
+    '<div class="pk-top"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><h3 style="margin:0;flex:1">'+(cur ? 'Swap '+esc(cur.n) : 'Add a move')+'</h3>'+
+    '<button type="button" class="icon-btn" id="pkClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
+    '<input type="search" class="pk-search" id="pkQ" placeholder="Search '+(LIB_COUNT())+' moves…" autocomplete="off">'+
+    '<div class="pk-chips" id="pkCats"></div><div class="pk-chips" id="pkEq"></div></div>'+
+    '<div class="pk-list" id="pkList"></div>'+
+    '<button type="button" class="addmove" id="pkNew" style="flex:none">＋ Create your own move</button>'+
+    '</div></div>');
+  root.appendChild(back); lockScroll(true);
+  const close = ()=>{ root.innerHTML=""; lockScroll(false); };
   back.addEventListener("click", e=>{ if(e.target===back) close(); });
   back.querySelector("#pkClose").addEventListener("click", close);
-  back.querySelector("#pkSkip").addEventListener("click", ()=>{
-    const off = isSkipped(r, colIdx);
-    if(!off && activeRows(colIdx).length<=1){ toast("Keep at least one move"); return; }
-    setSkipped(r, colIdx, !off); close(); renderToday();
+
+  const choose = (ent)=>{
+    const list = planEntries(kitId);
+    const dup = list.findIndex((x,j)=> sameEntry(x, ent) && j!==idx);
+    if(idx>=0) list[idx] = ent; else list.push(ent);
+    if(dup>=0 && idx<0){ toast("Already in your workout — added again"); }
+    savePlan(kitId, list); vibrate(15); close(); renderToday();
+  };
+  const paintChips = ()=>{
+    let h = '<button type="button" data-cat="-1" class="'+(f.cat===-1?'on':'')+'">All</button>';
+    CATS.forEach((c,i)=> h += '<button type="button" data-cat="'+i+'" class="'+(f.cat===i?'on':'')+'">'+esc(c)+'</button>');
+    h += '<button type="button" data-cat="99" class="'+(f.cat===99?'on':'')+'">★ Mine</button>';
+    back.querySelector("#pkCats").innerHTML = h;
+    let e = '<button type="button" data-eq="" class="'+(f.eq===''?'on':'')+'">Any kit</button>';
+    COLUMNS.forEach(c=> e += '<button type="button" data-eq="'+c.id+'" class="'+(f.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>');
+    back.querySelector("#pkEq").innerHTML = e;
+    back.querySelectorAll("#pkCats button").forEach(b=> b.addEventListener("click", ()=>{ f.cat=+b.getAttribute("data-cat"); paintChips(); paintList(); }));
+    back.querySelectorAll("#pkEq button").forEach(b=> b.addEventListener("click", ()=>{ f.eq=b.getAttribute("data-eq"); paintChips(); paintList(); }));
+  };
+  const rowHTML = (ent, o, ci)=>{
+    const on = cur && sameEntry(cur.e, ent);
+    const inPlan = !on && entries.some(x=> sameEntry(x, ent));
+    const last = lastLogFor(o.n), sc = COLUMNS[ci];
+    const tags = (o.d && ent.k===kitId?'<span class="extag">default</span>':'')+(o.hold?'<span class="extag">hold</span>':'')+(o.sides?'<span class="extag">sides</span>':'')+(inPlan?'<span class="extag">in workout</span>':'');
+    return '<div class="pkrow'+(on?' on':'')+'" data-k="'+ent.k+'" data-r="'+(ent.r!=null?ent.r:"")+'" data-n="'+esc(ent.n)+'">'+
+      pico(CATPIC[ent.k==="X"?(+o.cat||0):ent.r]||0, ci)+
+      '<div class="lr-main"><div class="lr-name">'+esc(o.n)+' '+tags+'</div><div class="lr-sub">'+esc(o.c||"Your own move")+'</div>'+
+      (last?'<div class="lr-sub" style="margin-top:1px">last: '+agoText(last.date)+'</div>':'')+'</div>'+
+      '<span class="eqtag" style="background:'+sc.color+'">'+eqName[ci]+'</span><span class="tck">'+(on?'✓':'')+'</span></div>';
+  };
+  const paintList = ()=>{
+    const q = f.q.trim().toLowerCase();
+    const hit = o=> !q || o.n.toLowerCase().includes(q) || (o.c||"").toLowerCase().includes(q);
+    let h = "";
+    if(f.cat===-1 || f.cat===99){
+      const mine = customMoves().filter(cm=> hit(cm) && (!f.eq || cm.eq===f.eq));
+      if(mine.length){ h += '<div class="pk-h">★ Your moves</div>'; mine.forEach(cm=> h += rowHTML({k:"X", n:cm.n}, cm, Math.max(0,COLUMNS.findIndex(c=>c.id===cm.eq)))); }
+    }
+    if(f.cat!==99){
+      CATS.forEach((cn, r)=>{
+        if(f.cat!==-1 && f.cat!==r) return;
+        // the kit you're on first, then the others
+        const kits = [kitIdx].concat(COLUMNS.map((_,i)=>i).filter(i=>i!==kitIdx));
+        let part = "";
+        kits.forEach(ci=>{
+          const k = COLUMNS[ci].id; if(f.eq && f.eq!==k) return;
+          ladder(k, r).forEach(o=>{ if(hit(o)) part += rowHTML({k, r, n:o.n}, o, ci); });
+        });
+        if(part) h += '<div class="pk-h">'+esc(cn)+'</div>'+part;
+      });
+    }
+    if(!h) h = '<div class="pk-empty">Nothing matches'+(q?' “'+esc(f.q)+'”':'')+'.<br>Try “All”, or create it as your own move below.</div>';
+    const list = back.querySelector("#pkList"); list.innerHTML = h;
+    list.querySelectorAll(".pkrow").forEach(row=> row.addEventListener("click", ()=>{
+      const k=row.getAttribute("data-k"), n=row.getAttribute("data-n");
+      choose(k==="X" ? {k:"X", n} : {k, r:+row.getAttribute("data-r"), n});
+    }));
+  };
+  back.querySelector("#pkQ").addEventListener("input", e=>{ f.q=e.target.value; if(f.q && f.cat!==-1 && f.cat!==99){ f.cat=-1; paintChips(); } paintList(); });
+  back.querySelector("#pkNew").addEventListener("click", ()=> openCustomMove(kitId, f.q, f.cat>=0&&f.cat<CATS.length ? f.cat : (cur?cur.cat:0), ent=> choose(ent)));
+  paintChips(); paintList();
+}
+function LIB_COUNT(){ let n=customMoves().length; COLUMNS.forEach(c=> LIB[c.id].forEach(l=> n+=l.length)); return n; }
+// make your own move: name, category, equipment, reps or hold, one-sided
+function openCustomMove(kitId, name, cat, onDone){
+  const root = document.getElementById("modalRoot");
+  const kit = colById(kitId);
+  const st = { cat, eq:kitId, hold:false, sides:false };
+  const back = el('<div class="modal-back"><div class="modal" style="max-width:430px;--accent:'+kit.color+'">'+
+    '<h3>Your own move</h3>'+
+    '<div class="field"><label>Name</label><input type="text" id="cmName" maxlength="40" placeholder="e.g. Sofa Tricep Dip" value="'+esc(name||"")+'"></div>'+
+    '<div class="field"><label>Category</label><div class="pk-chips" id="cmCat" style="flex-wrap:wrap;padding-top:0"></div></div>'+
+    '<div class="field"><label>Equipment</label><div class="seg" id="cmEq"></div></div>'+
+    '<div class="field"><label>Logged as</label><div class="seg" id="cmHold"><button data-h="0">Reps</button><button data-h="1">Hold (seconds)</button></div></div>'+
+    '<div class="toggle-row" style="border-bottom:0"><span>One side at a time <span class="small muted">(beep to switch halfway)</span></span><label class="switch"><input type="checkbox" id="cmSides"><span class="sl"></span></label></div>'+
+    '<div class="field" style="margin-top:6px"><label>Form tip (optional)</label><input type="text" id="cmCue" maxlength="80" placeholder="What to focus on"></div>'+
+    '<div class="btn-row"><button class="btn secondary" id="cmCancel">Cancel</button><button class="btn" id="cmSave" style="background:'+kit.color+'">Save &amp; add</button></div>'+
+    '</div></div>');
+  const prev = root.firstChild; if(prev) prev.style.display="none";
+  root.appendChild(back);
+  const paint = ()=>{
+    back.querySelector("#cmCat").innerHTML = CATS.map((c,i)=>'<button type="button" data-c="'+i+'" class="'+(st.cat===i?'on':'')+'">'+esc(c)+'</button>').join("");
+    back.querySelector("#cmEq").innerHTML = COLUMNS.map(c=>'<button type="button" data-e="'+c.id+'" class="'+(st.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>').join("");
+    back.querySelectorAll("#cmHold button").forEach(b=> b.classList.toggle("on", (+b.getAttribute("data-h")===1)===st.hold));
+    back.querySelectorAll("#cmCat button").forEach(b=> b.addEventListener("click", ()=>{ st.cat=+b.getAttribute("data-c"); paint(); }));
+    back.querySelectorAll("#cmEq button").forEach(b=> b.addEventListener("click", ()=>{ st.eq=b.getAttribute("data-e"); paint(); }));
+  };
+  back.querySelectorAll("#cmHold button").forEach(b=> b.addEventListener("click", ()=>{ st.hold = b.getAttribute("data-h")==="1"; paint(); }));
+  paint();
+  const close = ()=>{ back.remove(); if(prev) prev.style.display=""; };
+  back.addEventListener("click", e=>{ if(e.target===back) close(); });
+  back.querySelector("#cmCancel").addEventListener("click", close);
+  back.querySelector("#cmSave").addEventListener("click", ()=>{
+    const n = back.querySelector("#cmName").value.trim().replace(/\s+/g," ");
+    if(!n){ toast("Give it a name"); return; }
+    const all = customMoves();
+    const clash = all.some(x=>x.n.toLowerCase()===n.toLowerCase()) ||
+                  COLUMNS.some(c=> LIB[c.id].some(l=> l.some(o=> o.n.toLowerCase()===n.toLowerCase())));
+    if(clash){ toast("There's already a move called that"); return; }
+    all.push({ n, c:back.querySelector("#cmCue").value.trim(), cat:st.cat, eq:st.eq, hold:st.hold?1:0, sides:back.querySelector("#cmSides").checked?1:0 });
+    save(); close(); onDone({ k:"X", n });
   });
-  back.querySelectorAll(".pickrow").forEach(row=> row.addEventListener("click", ()=>{
-    setEx(r, colIdx, opts[+row.getAttribute("data-i")].n); setSkipped(r, colIdx, false); close(); renderToday();
-  }));
+  setTimeout(()=>{ const i=back.querySelector("#cmName"); if(i && !i.value) i.focus(); }, 50);
 }
 
 /* ================================================================= RENDER: QUICK SESSION */
@@ -1422,12 +1681,12 @@ const Player = {
 
   buildSessionSteps(colId){
     const colIdx = COLUMNS.indexOf(colById(colId));
-    const rows = activeRows(colIdx), rounds = roundsN(), work = workSec(), rest = restSec();
+    const moves = planMoves(colId), rounds = roundsN(), work = workSec(), rest = restSec();
     const steps = [];
     for(let round=1; round<=rounds; round++){
-      rows.forEach((r,k)=>{
-        steps.push({ type:"exercise", round, rounds, row:r, pos:k+1, of:rows.length, colIdx, sec:work, sides:!!currentEx(r,colIdx).sides });
-        const lastOfRound = (k===rows.length-1), lastOfAll = lastOfRound && round===rounds;
+      moves.forEach((ex,k)=>{
+        steps.push({ type:"exercise", round, rounds, mi:k, ex, pos:k+1, of:moves.length, colIdx, sec:work, sides:ex.sides });
+        const lastOfRound = (k===moves.length-1), lastOfAll = lastOfRound && round===rounds;
         if(lastOfAll) return;
         if(lastOfRound) steps.push({ type:"rest", sec:Math.max(rest,BREAK_SEC), label:(round*2===rounds?"Halfway · breathe":"Round break · breathe") });
         else if(rest>0) steps.push({ type:"rest", sec:rest, label:"Rest" });
@@ -1453,7 +1712,7 @@ const Player = {
 
   _start(colId, mode, steps){
     this.active=true; this.ended=false; this.mode=mode; this.colId=colId; this.colIdx=COLUMNS.indexOf(colById(colId));
-    this.steps=steps; this.idx=0; this.rows=activeRows(this.colIdx); this.rounds=roundsN();
+    this.steps=steps; this.idx=0; this.moves=planMoves(colId); this.rounds=roundsN();
     document.documentElement.classList.toggle("reduced", matchMedia("(prefers-reduced-motion: reduce)").matches);
     requestWake();
     try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); AC.resume&&AC.resume(); }catch(e){}
@@ -1585,10 +1844,10 @@ const Player = {
       if(step.sides) html += '<div class="pswitch" id="pSwitch">Switch sides at '+mmss(Math.floor(step.sec/2))+'</div>';
       html += '</div>';
     } else if(step.type==="exercise"){
-      const ex = currentEx(step.row, step.colIdx);
-      const t = computeTarget(step.row, step.colIdx);
+      const ex = step.ex;
+      const t = computeTarget(ex);
       const wtxt = t.lt==="bw" ? "Bodyweight" : (t.weight!=null ? fmtWeight(t.weight,t.lt) : "pick a weight");
-      html += '<div class="player-ex">'+pico(step.row, step.colIdx, "pbig");
+      html += '<div class="player-ex">'+exPico(ex, "pbig");
       html += '<div class="pname">'+esc(ex.n)+'</div>';
       html += '<div class="pcue">'+esc(ex.c)+'</div>';
       html += '<div class="ptarget" style="color:'+col.color+'">'+(t.hold?'HOLD':'AMRAP')+' · '+esc(wtxt)+(t.beat!=null?' · beat '+t.beat+(t.hold?'s':''):'')+(t.sug?' · ↑ '+esc(t.sug):'')+'</div>';
@@ -1597,7 +1856,7 @@ const Player = {
     } else if(step.type==="rest"){
       const nextStep = this.steps[this.idx+1];
       let up="";
-      if(nextStep && nextStep.type==="exercise") up = nextStep.quick ? ("Next: set "+nextStep.round+" of "+q.sets) : ("Next: "+currentEx(nextStep.row, nextStep.colIdx).n);
+      if(nextStep && nextStep.type==="exercise") up = nextStep.quick ? ("Next: set "+nextStep.round+" of "+q.sets) : ("Next: "+nextStep.ex.n);
       html += '<div class="player-ex"><div class="pname">'+esc(step.label||"Rest")+'</div><div class="pcue">'+esc(up)+'</div></div>';
     }
 
@@ -1637,9 +1896,9 @@ const Player = {
     let html = '<div class="obar"><div class="phase" style="flex:1;color:'+col.color+'">Session complete</div></div>';
     html += '<div style="text-align:center;margin:8px 0 4px"><div style="font-size:42px">✅</div><h2 style="font-size:20px;margin-top:4px">Nice work</h2><p class="muted small">Log your AMRAP sets — weight is pre-filled, enter your reps.</p></div>';
     html += '<div class="card" style="margin-bottom:14px">';
-    this.rows.forEach((r,k)=>{
-      const ex = currentEx(r, colIdx); const t = computeTarget(r, colIdx);
-      html += '<div class="log-ex" data-row="'+r+'" data-hold="'+(ex.hold?1:0)+'"><div class="lname">'+(k+1)+'. '+esc(ex.n)+'</div>';
+    this.moves.forEach((ex,k)=>{
+      const t = computeTarget(ex);
+      html += '<div class="log-ex" data-mi="'+k+'" data-hold="'+(ex.hold?1:0)+'"><div class="lname">'+(k+1)+'. '+esc(ex.n)+'</div>';
       for(let s=0;s<this.rounds;s++){
         const wv = t.lt==="bw" ? "" : (t.weight!=null?t.weight:"");
         html += '<div class="lset"><div class="lshead"><span class="setn">Set '+(s+1)+'</span>'+
@@ -1656,7 +1915,7 @@ const Player = {
     ov.querySelector("#saveLog").addEventListener("click", ()=>{
       const iso = todayISO(); const added=[];
       ov.querySelectorAll(".log-ex").forEach(node=>{
-        const r = +node.getAttribute("data-row"); const exName = currentEx(r, colIdx).n;
+        const ex = this.moves[+node.getAttribute("data-mi")], exName = ex.n;
         const hold = node.getAttribute("data-hold")==="1";
         const sets = [];
         node.querySelectorAll(".lset").forEach(ls=>{
@@ -1665,7 +1924,8 @@ const Player = {
           const v = (pad && pad.dataset.val) ? +pad.dataset.val : 0;
           if(w>0 || v>0) sets.push(hold ? { w, r:0, sec:v } : { w, r:v });
         });
-        if(sets.length){ const log={ date:iso, col:this.colId, mode:"session", row:r, exercise:exName, sets }; S.logs.push(log); added.push(log); }
+        // a log's kit is the move's own kit, so weights / band levels format right
+        if(sets.length){ const log={ date:iso, col:COLUMNS[ex.colIdx].id, mode:"session", row:ex.cat, exercise:exName, sets }; S.logs.push(log); added.push(log); }
       });
       S.sessionsDone[iso] = this.colId;
       const prs = detectPRs(added); save(); checkAchievements(); save();
