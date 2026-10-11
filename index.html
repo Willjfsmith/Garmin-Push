@@ -361,6 +361,8 @@ section[hidden]{display:none}
 .fig{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .fig.far{opacity:.45}
 .eq.band{stroke-width:3}
+.eq.rig{stroke-width:4}
+.eq.post{stroke-width:2.5;opacity:.6}
 .gnd{stroke:#C9C8C2;stroke-width:3;stroke-linecap:round}
 .eq{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .eqf{fill:var(--accent);stroke:none}
@@ -424,6 +426,10 @@ const COLUMNS = [
   { id:"BW", name:"Bodyweight", equipment:"no equipment",     color:"#D9A413", pic:2, ceiling:15 },
   { id:"BD", name:"Bands",      equipment:"resistance bands", color:"#1F4E9C", pic:1, ceiling:15 },
   { id:"DB", name:"Dumbbells",  equipment:"dumbbells",        color:"#C0392B", pic:0, ceiling:10 },
+  // add-on kits: hidden until switched on under Settings → My equipment
+  { id:"PB", name:"Pull-up bar",  equipment:"pull-up bar",      color:"#6B4FA0", pic:3, ceiling:10, addon:1 },
+  { id:"DP", name:"Dip station",  equipment:"dip station",      color:"#0F8B8D", pic:4, ceiling:12, addon:1 },
+  { id:"KB", name:"Kettlebell",   equipment:"kettlebell",       color:"#D35400", pic:5, ceiling:12, addon:1 },
 ];
 const ROWS = ["Squat","Hinge","Push","Pull","Core"];
 // every category in the library: the five patterns plus extras. CATPIC picks
@@ -616,6 +622,86 @@ const LIB_EXTRA = {
   ],
 };
 Object.keys(LIB_EXTRA).forEach(k=> LIB_EXTRA[k].forEach(lad=> LIB[k].push(lad)));
+// add-on kits: [Squat, Hinge, Push, Pull, Core, Arms, Shoulders, Legs, Cardio].
+// A kit without moves in a category borrows from Bodyweight when building.
+LIB.PB = [ [], [], [],
+  [ {n:"Dead Hang",c:"Hang from the bar, arms straight, shoulders away from the ears",hold:1},
+    {n:"Scapular Pull-Up",c:"Straight arms, pull the shoulder blades down and lift an inch"},
+    {n:"Negative Pull-Up",c:"Jump to the top, lower yourself over 3–5 seconds"},
+    {n:"Flexed-Arm Hang",c:"Chin over the bar, hold, squeeze the back",hold:1},
+    {n:"Chin-Up",c:"Palms facing you, pull your chin over the bar, lower all the way",d:1},
+    {n:"Pull-Up",c:"Palms away, pull your chest to the bar, full hang at the bottom"},
+    {n:"Wide-Grip Pull-Up",c:"Hands wider than shoulders, pull the elbows down to the ribs"},
+    {n:"Commando Pull-Up",c:"Hands staggered on the bar, pull your head to one side, alternate",sides:1} ],
+  [ {n:"Hanging Knee Raise",c:"Hang, bring the knees to the chest, lower slow, no swinging",d:1},
+    {n:"Hanging Oblique Knee Raise",c:"Hang, bring the knees up and across to one side, alternate"},
+    {n:"Hanging Leg Raise",c:"Hang, lift straight legs to hip height, lower slow"},
+    {n:"Toes-to-Bar",c:"Hang, lift the feet all the way to the bar, control the way down"},
+    {n:"Hanging Windshield Wiper",c:"Legs up at the bar, sweep them side to side under control"} ],
+  [ {n:"Chin-Up Hold",c:"Chin over the bar, palms facing you, hold",hold:1},
+    {n:"Slow Negative Chin-Up",c:"Start at the top, five seconds down, reset"},
+    {n:"Close-Grip Chin-Up",c:"Hands close, palms facing you, elbows tight, pull up",d:1} ],
+  [ {n:"Active Hang",c:"Hang, pull the shoulders down and back, hold",hold:1,d:1},
+    {n:"Hanging Shoulder Shrug",c:"Straight arms, shrug down and up, slow and controlled"} ],
+  [], [] ];
+LIB.DP = [ [], [],
+  [ {n:"Support Hold",c:"Straight arms on the bars, shoulders down, hold",hold:1},
+    {n:"Assisted Dip",c:"Feet on the floor for help, lower until the elbows hit 90°"},
+    {n:"Negative Dip",c:"Start at the top, lower over 3–5 seconds, step back up"},
+    {n:"Parallel Bar Dip",c:"Lean slightly forward, lower to 90°, press up to lockout",d:1},
+    {n:"Tempo Dip",c:"Three seconds down, pause, press up strong"},
+    {n:"L-Sit Dip",c:"Legs straight out in front, dip without dropping them"} ],
+  [ {n:"Dip Bar Inverted Row",c:"Lie under the bars, heels down, pull your chest up to them",d:1},
+    {n:"Feet-Up Dip Bar Row",c:"Under the bars with the feet raised, body rigid, pull up"} ],
+  [ {n:"Tuck Hold",c:"Support on the bars, knees tucked to the chest, hold",hold:1},
+    {n:"Dip Bar Knee Raise",c:"Support on the bars, raise the knees to the chest, lower slow",d:1},
+    {n:"Dip Bar Leg Raise",c:"Support on the bars, lift straight legs to hip height"},
+    {n:"Dip Bar Oblique Knee Raise",c:"Raise the knees up and across to one side, alternate"},
+    {n:"L-Sit Hold",c:"Support on the bars, legs straight out in front, hold",hold:1} ],
+  [ {n:"Upright Tricep Dip",c:"Torso upright, elbows tight to the body, dip and press",d:1},
+    {n:"Pause Dip",c:"Lower to 90°, pause two seconds, press up"} ],
+  [ {n:"Support Shrug",c:"Straight arms on the bars, sink then push the shoulders down",d:1},
+    {n:"Dip Bar Pike Push-Up",c:"Hands on the bars, hips high, lower the head between them"} ],
+  [], [] ];
+LIB.KB = [
+  [ {n:"KB Goblet Squat",c:"Hold the bell by the horns at your chest, sit between your heels",d:1},
+    {n:"KB Split Squat",c:"Bell at your chest, long stance, drop straight down",sides:1},
+    {n:"KB Reverse Lunge",c:"Bell racked on one side, step back, drop under control",sides:1},
+    {n:"KB Front Rack Squat",c:"Bell racked on one shoulder, elbow tight, sit deep",sides:1},
+    {n:"KB Cossack Squat",c:"Bell at your chest, shift side to side, one leg straight"} ],
+  [ {n:"KB Deadlift",c:"Bell between your feet, hips back, flat back, stand tall"},
+    {n:"KB Romanian Deadlift",c:"Soft knees, push the hips back, bell close to the legs"},
+    {n:"KB Swing",c:"Hike the bell back, snap the hips, let it float to chest height",d:1},
+    {n:"KB Single-Arm Swing",c:"One hand, hips snap, resist the twist, switch halfway",sides:1},
+    {n:"KB Single-Leg RDL",c:"Bell in the opposite hand, hinge over one leg, hips square",sides:1},
+    {n:"KB Clean",c:"Swing the bell up into the rack, elbow tight, no bang on the wrist",sides:1},
+    {n:"KB Snatch",c:"Swing and punch the bell straight overhead in one move",sides:1} ],
+  [ {n:"KB Floor Press",c:"On your back, press the bell up from the floor, elbow at 45°",sides:1},
+    {n:"KB Overhead Press",c:"Bell in the rack, brace, press straight overhead",sides:1,d:1},
+    {n:"KB Push Press",c:"Dip the knees, drive the bell overhead, lower slow",sides:1},
+    {n:"KB Bottoms-Up Press",c:"Bell upside down, grip hard, press slowly overhead",sides:1} ],
+  [ {n:"KB Single-Arm Row",c:"Hinge, free hand on the knee, row the bell to your hip",sides:1,d:1},
+    {n:"KB Upright Row",c:"Both hands on the handle, pull to the chest, elbows high"},
+    {n:"KB High Pull",c:"Swing, then pull the bell to the chest with the elbow high",sides:1},
+    {n:"KB Pullover",c:"On your back, arc the bell from over the chest to behind the head"} ],
+  [ {n:"KB Halo",c:"Bell upside down at the chest, circle it round your head, switch direction",d:1},
+    {n:"KB Suitcase March",c:"Bell in one hand, march on the spot, don't lean",sides:1},
+    {n:"KB Russian Twist",c:"Sit back, feet up, rotate the bell side to side"},
+    {n:"KB Windmill",c:"Bell overhead, push the hip out, slide the other hand down the leg",sides:1},
+    {n:"KB Turkish Get-Up",c:"Bell locked out overhead, from lying to standing and back, slow",sides:1} ],
+  [ {n:"KB Curl",c:"Hold the horns, elbows pinned, curl up, lower slow",d:1},
+    {n:"KB Overhead Tricep Extension",c:"Hold the horns overhead, lower behind the head, press up"},
+    {n:"KB Floor Skull Crusher",c:"On your back, lower the bell beside your head, elbows still"} ],
+  [ {n:"KB Front Raise",c:"Hold the horns, raise the bell to shoulder height, arms straight",d:1},
+    {n:"KB Bottoms-Up Hold",c:"Bell upside down at the shoulder, grip hard, hold it steady",hold:1,sides:1},
+    {n:"KB Overhead March",c:"Bell locked out overhead, march on the spot, ribs down",sides:1} ],
+  [ {n:"KB Calf Raise",c:"Bell in one hand, fingertips on the wall, rise up and pause"},
+    {n:"KB Lateral Lunge",c:"Bell at your chest, step wide, sit into one hip",sides:1,d:1},
+    {n:"KB Glute Bridge",c:"Bell on the hips, drive up and squeeze at the top"} ],
+  [ {n:"KB Thruster",c:"Bell at the chest, squat, drive up into a press",d:1},
+    {n:"KB Clean and Press",c:"Clean the bell to the rack, then press it overhead",sides:1},
+    {n:"KB Burpee Deadlift",c:"Hands on the bell, jump back and in, stand up with it"} ],
+];
 // The workout: the five moves, N rounds, work / rest intervals, one longer
 // breather between rounds. Defaults 45/15 × 2 (10:30); set on the Today tab.
 const BREAK_SEC = 60;
@@ -633,7 +719,7 @@ function roundsN(){ return timing("rounds"); }
 // any category — or at one of your own moves {k:"X", n:name}.
 const MAX_MOVES = 12;
 function ladder(k, r){ return (LIB[k]||[])[r] || null; }
-function ladderDefault(k, r){ const lad=ladder(k,r); const o=lad.find(x=>x.d)||lad[0]; return o.n; }
+function ladderDefault(k, r){ const lad=ladder(k,r)||[]; const o=lad.find(x=>x.d)||lad[0]; return o ? o.n : null; }
 function customMoves(){ return Array.isArray(S.settings.custom) ? S.settings.custom : (S.settings.custom=[]); }
 // resolve a plan entry to a full move, or null if it no longer exists
 function resolveEntry(e){
@@ -652,6 +738,7 @@ function resolveEntry(e){
 // default plan for a kit: its five pattern defaults (or the pre-plan swaps /
 // left-out moves, so nothing changes for existing users)
 function legacyPlan(kitId){
+  if(colById(kitId).addon) return kitDefaultPlan(kitId);
   const out = [];
   for(let r=0;r<5;r++){
     const key = r+"-"+kitId;
@@ -662,7 +749,7 @@ function legacyPlan(kitId){
   }
   return out;
 }
-function kitDefaultPlan(kitId){ const out=[]; for(let r=0;r<5;r++) out.push({ k:kitId, r, n:ladderDefault(kitId, r) }); return out; }
+function kitDefaultPlan(kitId){ return buildFocus(kitId, FOCUS[0]); }
 function planEntries(kitId){
   if(!S.settings.plans) S.settings.plans = {};
   const raw = Array.isArray(S.settings.plans[kitId]) ? S.settings.plans[kitId] : legacyPlan(kitId);
@@ -694,13 +781,15 @@ const FOCUS = [
   { id:"cardio", name:"Cardio",           cats:[8,8,8,8,8] },
 ];
 function ladderOrder(lad){
+  if(!lad || !lad.length) return [];
   const d = Math.max(0, lad.findIndex(o=>o.d)), out = [d];
   for(let k=1; out.length<lad.length; k++){ if(d+k<lad.length) out.push(d+k); if(d-k>=0) out.push(d-k); }
   return out.map(i=>lad[i]);
 }
 function buildFocus(kitId, fc){
   const used = new Set(), out = [];
-  const kits = [kitId].concat(COLUMNS.map(c=>c.id).filter(k=>k!==kitId));
+  // this kit first, then Bodyweight, then the other kits you own
+  const kits = [kitId].concat(ownedKits().map(c=>c.id).filter(k=>k!==kitId));
   fc.cats.forEach(r=>{
     for(const k of kits){
       const o = ladderOrder(ladder(k, r)).find(x=> !used.has(x.n));
@@ -715,7 +804,7 @@ function focusMatch(kitId){
   return f ? f.id : null;
 }
 function exPico(ex, cls){ return movePico(ex.n, ex.cat, ex.colIdx, cls); }
-function pickedColumn(){ return colById(S.settings.pickedCol) ? S.settings.pickedCol : COLUMNS[0].id; }
+function pickedColumn(){ return owns(S.settings.pickedCol) ? S.settings.pickedCol : COLUMNS[0].id; }
 // common bodyweight moves for quick sessions & quick logging (pr/pc pick the pictogram)
 const QUICK = [
   { n:"Push-Ups", pr:2, pc:0 }, { n:"Bodyweight Squats", pr:0, pc:0 },
@@ -794,11 +883,14 @@ function parseISO(s){ const p=(s||"").split("-"); return new Date(+p[0], (+p[1]|
 function addDays(d,n){ const x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
 function stripTime(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); }
 function colById(id){ return COLUMNS.find(c=>c.id===id); }
+// equipment you have: Bodyweight always; the add-on kits start switched off
+function owns(id){ const c=colById(id); if(!c) return false; if(id==="BW") return true; const o=S.settings.owned||{}; return (id in o) ? !!o[id] : !c.addon; }
+function ownedKits(){ return COLUMNS.filter(c=> owns(c.id)); }
 
 /* ================================================================= PROGRESSION */
 function loadType(col){
   if(!col) return "bw";
-  if(/dumbbell/.test(col.equipment)) return "db";
+  if(/dumbbell|kettlebell/.test(col.equipment)) return "db";
   if(/band/.test(col.equipment)) return "band";
   return "bw";
 }
@@ -1086,6 +1178,17 @@ const POSES = {
   wallpress: { h:[58,16], s:[56,24], p:[50,42], a1:[[73,34],[73,20]], a2:[[72,35],[72,21]], l1:[[47,53],[44,64]], l2:[[49,53],[47,64]], wall:76, eq:"none" },
   donkey:    { h:[23,43], s:[30,46], p:[56,46], a1:[[30,55],[30,63]], a2:[[31,55],[31,63]], l1:[[56,63],[72,63]], l2:[[70,44],[84,40]], mo:"M76 54 L86 54 M82 50 L86 54 L82 58", eq:"none" },
   ohmarch:   { h:[50,15], s:[50,23], p:[50,42], a1:[[58,14],[63,5]], a2:[[42,14],[37,5]], l1:[[61,43],[60,54]], l2:[[50,53],[50,64]] },
+  // pull-up bar (bar: y of the bar) and dip bars (pbar: y of the bars, at the hands)
+  hang:      { h:[50,18], s:[50,26], p:[50,44], a1:[[57,16],[61,6]], a2:[[43,16],[39,6]], l1:[[51,54],[52,62]], l2:[[49,54],[48,62]], bar:6, eq:"none" },
+  chinup:    { h:[50,9],  s:[50,18], p:[50,36], a1:[[60,21],[58,13]], a2:[[40,21],[42,13]], l1:[[54,46],[50,55]], l2:[[47,46],[44,55]], bar:13, eq:"none" },
+  hangknee:  { h:[50,18], s:[50,26], p:[50,43], a1:[[57,16],[61,6]], a2:[[43,16],[39,6]], l1:[[63,38],[63,51]], l2:[[61,40],[61,52]], bar:6, eq:"none" },
+  hangleg:   { h:[50,18], s:[50,26], p:[50,43], a1:[[57,16],[61,6]], a2:[[43,16],[39,6]], l1:[[64,43],[79,43]], l2:[[64,44],[79,45]], bar:6, eq:"none" },
+  toes:      { h:[48,18], s:[48,26], p:[49,43], a1:[[55,16],[59,6]], a2:[[42,16],[38,6]], l1:[[60,30],[66,12]], l2:[[59,31],[64,13]], bar:6, eq:"none" },
+  diptop:    { h:[50,12], s:[50,20], p:[50,40], a1:[[50,29],[50,38]], a2:[[51,29],[51,38]], l1:[[50,51],[41,55]], l2:[[49,51],[40,55]], pbar:38, eq:"none" },
+  dipbot:    { h:[55,23], s:[50,31], p:[46,48], a1:[[39,35],[49,41]], a2:[[40,36],[50,41]], l1:[[48,58],[38,60]], l2:[[47,58],[37,60]], pbar:41, eq:"none" },
+  lsit:      { h:[46,12], s:[46,20], p:[46,40], a1:[[46,29],[46,38]], a2:[[47,29],[47,38]], l1:[[62,40],[78,40]], l2:[[62,41],[78,42]], pbar:38, eq:"none" },
+  tuck:      { h:[46,12], s:[46,20], p:[46,40], a1:[[46,29],[46,38]], a2:[[47,29],[47,38]], l1:[[60,33],[58,46]], l2:[[59,34],[57,47]], pbar:38, eq:"none" },
+  invrow:    { h:[25,44], s:[33,48], p:[58,55], a1:[[34,40],[35,31]], a2:[[35,40],[36,31]], l1:[[71,59],[84,63]], l2:[[71,59],[84,63]], pbar:31, eq:"none" },
   hold:      { h:[50,13], s:[50,21], p:[50,40], a1:[[52,31],[51,40]], a2:[[48,31],[49,40]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]], eq:"none" },
 };
 // draw a pose for a kit: pic 0 dumbbells, 1 band, 2 bodyweight
@@ -1094,7 +1197,10 @@ function poseSVG(id, color, pic, cls){
   const pt = a=> a[0]+" "+a[1];
   const limb = (from, j, light)=> '<path class="fig'+(light?' far':'')+'" d="M'+pt(from)+' L'+pt(j[0])+' L'+pt(j[1])+'"/>';
   let g = '<line class="gnd" x1="8" y1="64" x2="92" y2="64"/>';
-  if(P.bar) g += '<line class="gnd" x1="28" y1="'+P.bar+'" x2="72" y2="'+P.bar+'"/>';
+  if(P.bar) g += '<line class="eq rig" x1="26" y1="'+P.bar+'" x2="74" y2="'+P.bar+'"/>';
+  if(P.pbar){ const x=P.a1[1][0], y=P.pbar;
+    g += '<line class="eq rig" x1="'+(x-18)+'" y1="'+y+'" x2="'+(x+18)+'" y2="'+y+'"/>'+
+         '<line class="eq post" x1="'+(x-13)+'" y1="'+y+'" x2="'+(x-13)+'" y2="64"/><line class="eq post" x1="'+(x+13)+'" y1="'+y+'" x2="'+(x+13)+'" y2="64"/>'; }
   if(P.wall) g += '<line class="gnd" x1="'+P.wall+'" y1="6" x2="'+P.wall+'" y2="64"/>';
   g += limb(P.s, P.a2, 1) + limb(P.p, P.l2, 1);
   g += '<path class="fig" d="M'+pt(P.s)+' L'+pt(P.p)+'"/>';
@@ -1121,6 +1227,13 @@ function poseSVG(id, color, pic, cls){
       const hands = eq==="one" ? [h1] : (eq==="chest" ? [[(h1[0]+h2[0])/2,(h1[1]+h2[1])/2]] : [h1, h2]);
       hands.forEach(h=>{ const cx=(foot[0]+h[0])/2+6, cy=(foot[1]+h[1])/2; g += '<path class="eq band" d="M'+pt(foot)+' Q'+cx+' '+cy+' '+pt(h)+'"/>'; });
     }
+  }
+  if(pic===5 && eq!=="none" && eq!=="knees"){
+    // one kettlebell: in the first hand for one-sided moves, else between the hands
+    const kb = (x,y)=> '<path class="eq band" d="M'+(x-3.5)+' '+(y+3)+' Q'+x+' '+(y-3.5)+' '+(x+3.5)+' '+(y+3)+'"/><circle class="eqf" cx="'+x+'" cy="'+(y+7)+'" r="5"/>';
+    if(eq==="hips") g += kb(P.p[0], P.p[1]-12);
+    else if(eq==="one") g += kb(h1[0], h1[1]);
+    else g += kb((h1[0]+h2[0])/2, (h1[1]+h2[1])/2);
   }
   if(P.mo) g += '<path class="mo" d="'+P.mo+'"/>';
   return '<svg class="'+(cls||"pico")+'" viewBox="0 0 100 70" style="--accent:'+color+';color:var(--ink)" aria-hidden="true">'+g+'</svg>';
@@ -1294,7 +1407,80 @@ const MOVE_POSE = {"Wall Sit": "wallsit",
   "Pull-Ups": "pullup",
   "Sit-Ups": "vsit",
   "Burpees": "burpee",
-  "Dips": "dip"};
+  "Dips": "dip",
+  "Dead Hang": "hang",
+  "Scapular Pull-Up": "hang",
+  "Negative Pull-Up": "pullup",
+  "Flexed-Arm Hang": "chinup",
+  "Chin-Up": "chinup",
+  "Pull-Up": "chinup",
+  "Wide-Grip Pull-Up": "chinup",
+  "Commando Pull-Up": "chinup",
+  "Hanging Knee Raise": "hangknee",
+  "Hanging Oblique Knee Raise": "hangknee",
+  "Hanging Leg Raise": "hangleg",
+  "Toes-to-Bar": "toes",
+  "Hanging Windshield Wiper": "toes",
+  "Chin-Up Hold": "chinup",
+  "Slow Negative Chin-Up": "pullup",
+  "Close-Grip Chin-Up": "chinup",
+  "Active Hang": "hang",
+  "Hanging Shoulder Shrug": "hang",
+  "Support Hold": "diptop",
+  "Assisted Dip": "dipbot",
+  "Negative Dip": "dipbot",
+  "Parallel Bar Dip": "dipbot",
+  "Tempo Dip": "dipbot",
+  "L-Sit Dip": "lsit",
+  "Dip Bar Inverted Row": "invrow",
+  "Feet-Up Dip Bar Row": "invrow",
+  "Tuck Hold": "tuck",
+  "Dip Bar Knee Raise": "tuck",
+  "Dip Bar Leg Raise": "lsit",
+  "Dip Bar Oblique Knee Raise": "tuck",
+  "L-Sit Hold": "lsit",
+  "Upright Tricep Dip": "dipbot",
+  "Pause Dip": "dipbot",
+  "Support Shrug": "diptop",
+  "Dip Bar Pike Push-Up": "pike",
+  "KB Goblet Squat": "goblet",
+  "KB Split Squat": "lunge",
+  "KB Reverse Lunge": "lunge",
+  "KB Front Rack Squat": "frontsquat",
+  "KB Cossack Squat": "sidelunge",
+  "KB Deadlift": "hinge",
+  "KB Romanian Deadlift": "hinge",
+  "KB Swing": "swing",
+  "KB Single-Arm Swing": "swing",
+  "KB Single-Leg RDL": "slrdl",
+  "KB Clean": "clean",
+  "KB Snatch": "snatch",
+  "KB Floor Press": "floorpress",
+  "KB Overhead Press": "pressone",
+  "KB Push Press": "pressone",
+  "KB Bottoms-Up Press": "pressone",
+  "KB Single-Arm Row": "row",
+  "KB Upright Row": "upright",
+  "KB High Pull": "upright",
+  "KB Pullover": "pullover",
+  "KB Halo": "ohext",
+  "KB Suitcase March": "march",
+  "KB Russian Twist": "vsit",
+  "KB Windmill": "windmill",
+  "KB Turkish Get-Up": "sideplank",
+  "KB Curl": "curl",
+  "KB Overhead Tricep Extension": "ohext",
+  "KB Floor Skull Crusher": "skull",
+  "KB Front Raise": "raise",
+  "KB Bottoms-Up Hold": "clean",
+  "KB Overhead March": "ohmarch",
+  "KB Calf Raise": "calf",
+  "KB Lateral Lunge": "sidelunge",
+  "KB Glute Bridge": "bridge",
+  "KB Thruster": "squatpress",
+  "KB Clean and Press": "pressone",
+  "KB Burpee Deadlift": "thrust"
+};
 // your own moves (and anything unmapped) use their category's pose
 const CAT_POSE = ["squat","hinge","pushup","row","plank","curl","press","calf","jacks"];
 function movePose(name, cat){ return MOVE_POSE[name] || CAT_POSE[cat] || "stand"; }
@@ -1309,7 +1495,7 @@ function libraryOptions(){
   const mine = customMoves();
   if(mine.length){ opts += '<optgroup label="★ Your moves">'; mine.forEach((cm,i)=> opts += '<option value="x'+i+'">'+esc(cm.n)+'</option>'); opts += '</optgroup>'; }
   CATS.forEach((rn,r)=>{ opts += '<optgroup label="'+esc(rn)+'">';
-    COLUMNS.forEach((col,c)=> ladder(col.id, r).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(col.name)+'</option>'));
+    COLUMNS.forEach((col,c)=>{ if(owns(col.id)) (ladder(col.id, r)||[]).forEach((o,oi)=> opts += '<option value="l'+r+'-'+c+'-'+oi+'">'+esc(o.n)+' — '+esc(col.name)+'</option>'); });
     opts += '</optgroup>';
   });
   return opts;
@@ -1370,13 +1556,15 @@ function renderToday(){
 
   // kit picker
   html += '<div class="section-h">Pick your kit</div>';
-  COLUMNS.forEach(c=>{
+  ownedKits().forEach(c=>{
     const on = c.id===colId;
     html += '<div class="typopt'+(on?' on':'')+'" data-col="'+c.id+'"'+(on?' style="background:'+c.color+'"':'')+'>';
     html += '<div class="tl"'+(on?'':' style="background:'+c.color+'"')+'>'+c.id+'</div>';
     html += '<div class="tmeta"><div class="tnm">'+esc(c.name)+'</div><div class="tsub">'+esc(c.equipment)+' · AMRAP '+workSec()+'/'+restSec()+'s</div></div>';
     html += '<div class="tck">✓</div></div>';
   });
+
+  html += '<button type="button" class="typchange" id="addEquip">＋ My equipment</button>';
 
   // the workout: an ordered list of any moves — Swap / tap to change one,
   // Edit to reorder or remove, + to add
@@ -1444,6 +1632,7 @@ function renderToday(){
     confirmDialog("Reset moves?", "Go back to the default five for "+col.name+". Your own moves stay in the library.", ()=>{ savePlan(colId, kitDefaultPlan(colId)); planEditing=false; renderToday(); }, "Reset");
   });
   document.getElementById("editBtn").addEventListener("click", ()=>{ planEditing=!planEditing; renderToday(); });
+  document.getElementById("addEquip").addEventListener("click", ()=> openEquipment(renderToday));
   wrap.querySelectorAll("#focusRow button[data-f]").forEach(b=> b.addEventListener("click", ()=>{
     const fc = FOCUS.find(x=>x.id===b.getAttribute("data-f")); if(!fc || fm===fc.id) return;
     const apply = ()=>{ savePlan(colId, buildFocus(colId, fc)); planEditing=false; renderToday(); toast(fc.name+" — "+fc.cats.length+" moves"); };
@@ -1529,7 +1718,7 @@ function openExPicker(kitId, idx){
     h += '<button type="button" data-cat="99" class="'+(f.cat===99?'on':'')+'">★ Mine</button>';
     back.querySelector("#pkCats").innerHTML = h;
     let e = '<button type="button" data-eq="" class="'+(f.eq===''?'on':'')+'">Any kit</button>';
-    COLUMNS.forEach(c=> e += '<button type="button" data-eq="'+c.id+'" class="'+(f.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>');
+    ownedKits().forEach(c=> e += '<button type="button" data-eq="'+c.id+'" class="'+(f.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>');
     back.querySelector("#pkEq").innerHTML = e;
     back.querySelectorAll("#pkCats button").forEach(b=> b.addEventListener("click", ()=>{ f.cat=+b.getAttribute("data-cat"); paintChips(); paintList(); }));
     back.querySelectorAll("#pkEq button").forEach(b=> b.addEventListener("click", ()=>{ f.eq=b.getAttribute("data-eq"); paintChips(); paintList(); }));
@@ -1561,11 +1750,11 @@ function openExPicker(kitId, idx){
         const cn = CATS[r];
         if(f.cat!==-1 && f.cat!==r) return;
         // the kit you're on first, then the others
-        const kits = [kitIdx].concat(COLUMNS.map((_,i)=>i).filter(i=>i!==kitIdx));
+        const kits = [kitIdx].concat(COLUMNS.map((_,i)=>i).filter(i=>i!==kitIdx && owns(COLUMNS[i].id)));
         let part = "";
         kits.forEach(ci=>{
           const k = COLUMNS[ci].id; if(f.eq && f.eq!==k) return;
-          ladder(k, r).forEach(o=>{ if(hit(o)) part += rowHTML({k, r, n:o.n}, o, ci); });
+          (ladder(k, r)||[]).forEach(o=>{ if(hit(o)) part += rowHTML({k, r, n:o.n}, o, ci); });
         });
         if(part) h += '<div class="pk-h">'+esc(cn)+'</div>'+part;
       });
@@ -1581,7 +1770,7 @@ function openExPicker(kitId, idx){
   back.querySelector("#pkNew").addEventListener("click", ()=> openCustomMove(kitId, f.q, f.cat>=0&&f.cat<CATS.length ? f.cat : (cur?cur.cat:0), ent=> choose(ent)));
   paintChips(); paintList();
 }
-function LIB_COUNT(){ let n=customMoves().length; COLUMNS.forEach(c=> LIB[c.id].forEach(l=> n+=l.length)); return n; }
+function LIB_COUNT(){ let n=customMoves().length; ownedKits().forEach(c=> LIB[c.id].forEach(l=> n+=l.length)); return n; }
 // make your own move: name, category, equipment, reps or hold, one-sided
 function openCustomMove(kitId, name, cat, onDone){
   const root = document.getElementById("modalRoot");
@@ -1601,7 +1790,7 @@ function openCustomMove(kitId, name, cat, onDone){
   root.appendChild(back);
   const paint = ()=>{
     back.querySelector("#cmCat").innerHTML = CATS.map((c,i)=>'<button type="button" data-c="'+i+'" class="'+(st.cat===i?'on':'')+'">'+esc(c)+'</button>').join("");
-    back.querySelector("#cmEq").innerHTML = COLUMNS.map(c=>'<button type="button" data-e="'+c.id+'" class="'+(st.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>').join("");
+    back.querySelector("#cmEq").innerHTML = ownedKits().map(c=>'<button type="button" data-e="'+c.id+'" class="'+(st.eq===c.id?'on':'')+'">'+esc(c.name)+'</button>').join("");
     back.querySelectorAll("#cmHold button").forEach(b=> b.classList.toggle("on", (+b.getAttribute("data-h")===1)===st.hold));
     back.querySelectorAll("#cmCat button").forEach(b=> b.addEventListener("click", ()=>{ st.cat=+b.getAttribute("data-c"); paint(); }));
     back.querySelectorAll("#cmEq button").forEach(b=> b.addEventListener("click", ()=>{ st.eq=b.getAttribute("data-e"); paint(); }));
@@ -1622,6 +1811,31 @@ function openCustomMove(kitId, name, cat, onDone){
     save(); close(); onDone({ k:"X", n });
   });
   setTimeout(()=>{ const i=back.querySelector("#cmName"); if(i && !i.value) i.focus(); }, 50);
+}
+
+// switch kits on as you get them; their moves appear everywhere once on
+function equipmentRowsHTML(){
+  return COLUMNS.filter(c=>c.id!=="BW").map(c=>
+    '<div class="toggle-row"><span style="display:flex;align-items:center;gap:10px"><span class="badge" style="background:'+c.color+';width:30px;height:30px;min-width:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:12px">'+c.id+'</span>'+
+    '<span><b>'+esc(c.name)+'</b><br><span class="small muted">'+LIB[c.id].reduce((n,l)=>n+l.length,0)+' moves</span></span></span>'+
+    '<label class="switch"><input type="checkbox" data-own="'+c.id+'"'+(owns(c.id)?' checked':'')+'><span class="sl"></span></label></div>').join("");
+}
+function wireEquipment(root, onChange){
+  root.querySelectorAll("input[data-own]").forEach(i=> i.addEventListener("change", ()=>{
+    if(!S.settings.owned) S.settings.owned = {};
+    S.settings.owned[i.getAttribute("data-own")] = i.checked; save();
+    onChange && onChange();
+  }));
+}
+function openEquipment(onDone){
+  const root = document.getElementById("modalRoot"); root.innerHTML="";
+  const back = el('<div class="modal-back"><div class="modal" style="max-width:430px">'+
+    '<h3>My equipment</h3><p class="small" style="margin-bottom:6px">Switch on what you have. Each one adds a kit and its moves; bodyweight is always there.</p>'+
+    equipmentRowsHTML()+'<div class="btn-row"><button class="btn" id="eqDone">Done</button></div></div></div>');
+  root.appendChild(back); wireEquipment(back);
+  const close = ()=>{ root.innerHTML=""; onDone && onDone(); };
+  back.addEventListener("click", e=>{ if(e.target===back) close(); });
+  back.querySelector("#eqDone").addEventListener("click", close);
 }
 
 /* ================================================================= RENDER: QUICK SESSION */
@@ -1907,6 +2121,8 @@ function renderSettings(){
   html += '<button data-u="kg" class="'+(st.units==="kg"?"on":"")+'">kg</button><button data-u="lb" class="'+(st.units==="lb"?"on":"")+'">lb</button></div></div>';
   html += '</div>';
 
+  html += '<div class="card" style="margin-top:10px"><div class="field" style="margin-bottom:2px"><label>My equipment</label></div>'+equipmentRowsHTML().replace(/toggle-row"/g,'toggle-row eqrow"')+'</div>';
+
   // appearance
   html += '<div class="card" style="margin-top:10px"><div class="field" style="margin-bottom:0"><label>Theme</label><div class="seg" id="setTheme">';
   [["system","Auto"],["light","Light"],["dark","Dark"]].forEach(x=> html += '<button data-th="'+x[0]+'" class="'+((st.theme||"system")===x[0]?"on":"")+'">'+x[1]+'</button>');
@@ -1926,6 +2142,7 @@ function renderSettings(){
   html += '<p class="small muted" style="text-align:center;margin-top:16px">Home Strength Blueprint · v2 · works offline</p>';
 
   wrap.innerHTML = html;
+  wireEquipment(wrap);
 
   document.getElementById("setUnits").querySelectorAll("button").forEach(b=>{
     b.addEventListener("click", ()=>{ st.units=b.getAttribute("data-u"); save(); renderSettings(); });
