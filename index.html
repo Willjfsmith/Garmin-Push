@@ -95,7 +95,7 @@ main{padding:12px}
   display:flex;align-items:center;justify-content:center;
   font-family:var(--head);font-weight:900;font-size:13px;color:#fff;
 }
-.ex .pico{width:44px;height:32px;min-width:44px}
+.ex .pico{width:54px;height:38px;min-width:54px}
 .ex .exbody{flex:1;min-width:0}
 .ex .exname{font-weight:700;font-size:14px}
 .ex .excue{font-size:11.5px;color:var(--muted);margin-top:0}
@@ -172,7 +172,7 @@ section[hidden]{display:none}
 .ring .time{font-family:var(--head);font-weight:900;font-size:56px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .ring .sub{font-size:13px;color:var(--muted);margin-top:6px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .player-ex{text-align:center;margin-top:6px}
-.player-ex .pbig{width:120px;height:88px;margin:0 auto}
+.player-ex .pbig{width:150px;height:105px;margin:0 auto}
 .player-ex .pname{font-family:var(--head);font-weight:800;font-size:22px;margin-top:6px}
 .player-ex .pcue{color:var(--muted);font-size:14px;margin-top:4px;max-width:340px;margin-left:auto;margin-right:auto}
 .player-ex .ptarget{margin-top:8px;font-weight:800;font-family:var(--head);letter-spacing:.03em}
@@ -212,7 +212,7 @@ section[hidden]{display:none}
 /* ================================================================= QUICK SESSION */
 .qsgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8px}
 .qsgrid .field{margin-bottom:8px}
-.lrow .pico{width:44px;height:33px;min-width:44px}
+.lrow .pico{width:52px;height:37px;min-width:52px}
 
 /* ================================================================= PROGRESS */
 .heat{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
@@ -317,7 +317,7 @@ section[hidden]{display:none}
 .pk-h{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin:12px 2px 4px}
 .pkrow{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:10px;cursor:pointer;border:1.5px solid transparent}
 .pkrow.on{border-color:var(--accent);background:var(--paper)}
-.pkrow .pico{width:42px;height:30px;min-width:42px}
+.pkrow .pico{width:52px;height:37px;min-width:52px}
 .pkrow .lr-main{flex:1;min-width:0}
 .pkrow .eqtag{flex:none;font-size:10px;font-weight:800;color:#fff;border-radius:6px;padding:2px 6px}
 .pkrow .tck{flex:none;font-weight:900;color:var(--accent);min-width:14px;text-align:center}
@@ -359,6 +359,8 @@ section[hidden]{display:none}
 
 /* pictogram helpers */
 .fig{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.fig.far{opacity:.45}
+.eq.band{stroke-width:3}
 .gnd{stroke:#C9C8C2;stroke-width:3;stroke-linecap:round}
 .eq{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .eqf{fill:var(--accent);stroke:none}
@@ -409,35 +411,7 @@ section[hidden]{display:none}
 <div id="overlayRoot"></div>
 <div id="modalRoot"></div>
 
-<!-- ================================================================= SVG PICTOGRAM SHEET -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<!-- viewBox 0 0 100 70, ground y=64. Ids p{row}{pic}: pic 0 = dumbbells, 1 = bands, 2 = bodyweight -->
 
-<!-- ===== SQUAT (row 0) ===== -->
-<symbol id="p00" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><circle class="eqf" cx="44" cy="36" r="3.2"/><circle class="eqf" cx="56" cy="36" r="3.2"/><line class="eq" x1="44" y1="36" x2="56" y2="36"/><circle cx="50" cy="18" r="6" fill="currentColor"/><path class="fig" d="M50 24 L51 42"/><path class="fig" d="M51 42 L63 47 L58 63"/><path class="fig" d="M51 42 L40 47 L43 63"/><path class="fig" d="M51 30 L45 37 M51 30 L55 37"/></symbol>
-<symbol id="p01" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><path class="eq" d="M42 62 C42 46 42 40 50 34 C58 40 58 46 58 62"/><circle cx="50" cy="18" r="6" fill="currentColor"/><path class="fig" d="M50 24 L51 42"/><path class="fig" d="M51 42 L63 47 L58 63"/><path class="fig" d="M51 42 L40 47 L43 63"/><path class="fig" d="M51 30 L47 40 M51 30 L55 40"/></symbol>
-<symbol id="p02" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><circle cx="50" cy="18" r="6" fill="currentColor"/><path class="fig" d="M50 24 L51 42"/><path class="fig" d="M51 42 L63 47 L58 63"/><path class="fig" d="M51 42 L40 47 L43 63"/><path class="fig" d="M51 30 L45 36 M51 30 L57 36"/><path class="mo" d="M78 30 L78 46 M74 41 L78 46 L82 41"/></symbol>
-
-<!-- ===== HINGE (row 1) ===== -->
-<symbol id="p10" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><circle class="eqf" cx="58" cy="50" r="3.2"/><circle class="eqf" cx="70" cy="50" r="3.2"/><line class="eq" x1="58" y1="50" x2="70" y2="50"/><circle cx="34" cy="24" r="6" fill="currentColor"/><path class="fig" d="M39 27 L58 34"/><path class="fig" d="M58 34 L60 63"/><path class="fig" d="M58 34 L64 50 L64 63"/><path class="fig" d="M60 36 L64 50"/></symbol>
-<symbol id="p11" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><path class="eq" d="M40 26 C34 40 40 55 44 63 M40 26 C48 40 54 55 60 63"/><circle cx="34" cy="24" r="6" fill="currentColor"/><path class="fig" d="M39 27 L58 33"/><path class="fig" d="M58 33 L52 63"/><path class="fig" d="M58 33 L62 63"/><path class="fig" d="M44 26 L44 40"/></symbol>
-<symbol id="p12" viewBox="0 0 100 70"><line class="gnd" x1="14" y1="60" x2="86" y2="60"/><circle cx="24" cy="34" r="6" fill="currentColor"/><path class="fig" d="M30 36 L54 46"/><path class="fig" d="M54 46 L70 34 L74 40"/><path class="fig" d="M54 46 L66 58 L74 58"/><path class="fig" d="M40 40 L42 58"/><path class="mo" d="M70 24 L70 30 M67 27 L70 24 L73 27"/></symbol>
-
-<!-- ===== PUSH (row 2) ===== -->
-<symbol id="p20" viewBox="0 0 100 70"><line class="gnd" x1="14" y1="60" x2="86" y2="60"/><circle class="eqf" cx="44" cy="30" r="3.2"/><circle class="eqf" cx="56" cy="30" r="3.2"/><line class="eq" x1="44" y1="30" x2="56" y2="30"/><circle cx="24" cy="52" r="6" fill="currentColor"/><path class="fig" d="M30 54 L70 54"/><path class="fig" d="M50 54 L50 34"/><path class="fig" d="M50 34 L45 30 M50 34 L55 30"/></symbol>
-<symbol id="p21" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><path class="eq" d="M40 62 C40 44 42 40 50 40 C58 40 60 44 60 62"/><circle cx="50" cy="20" r="6" fill="currentColor"/><path class="fig" d="M50 26 L50 46"/><path class="fig" d="M50 46 L44 62 M50 46 L56 62"/><path class="fig" d="M50 28 L44 18 L44 10 M50 28 L56 18 L56 10"/></symbol>
-<symbol id="p22" viewBox="0 0 100 70"><line class="gnd" x1="12" y1="60" x2="88" y2="60"/><circle cx="20" cy="46" r="6" fill="currentColor"/><path class="fig" d="M26 47 L74 55"/><path class="fig" d="M40 49 L42 60"/><path class="fig" d="M62 52 L60 60"/><path class="mo" d="M50 30 L50 40 M47 37 L50 40 L53 37"/></symbol>
-
-<!-- ===== PULL (row 3) ===== -->
-<symbol id="p30" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><circle class="eqf" cx="58" cy="46" r="3.2"/><circle class="eqf" cx="70" cy="46" r="3.2"/><line class="eq" x1="58" y1="46" x2="70" y2="46"/><circle cx="34" cy="26" r="6" fill="currentColor"/><path class="fig" d="M39 29 L58 34"/><path class="fig" d="M58 34 L58 63"/><path class="fig" d="M58 34 L50 48 L50 63"/><path class="fig" d="M55 36 L64 46"/><path class="fig" d="M64 46 L64 40"/></symbol>
-<symbol id="p31" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><line class="eq" x1="66" y1="6" x2="66" y2="30"/><path class="eq" d="M66 10 C60 20 56 28 50 34"/><circle cx="46" cy="24" r="6" fill="currentColor"/><path class="fig" d="M46 30 L46 46"/><path class="fig" d="M46 46 L40 62 M46 46 L52 62"/><path class="fig" d="M46 30 L54 24"/></symbol>
-<symbol id="p32" viewBox="0 0 100 70"><line class="gnd" x1="14" y1="64" x2="86" y2="64"/><line class="eq" x1="74" y1="8" x2="74" y2="64"/><path class="eq" d="M56 30 L72 26"/><circle cx="40" cy="34" r="6" fill="currentColor"/><path class="fig" d="M40 40 L36 56 L36 63"/><path class="fig" d="M40 40 L44 56 L48 62"/><path class="fig" d="M42 32 L56 30"/></symbol>
-
-<!-- ===== CORE (row 4) ===== -->
-<symbol id="p40" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><circle class="eqf" cx="66" cy="42" r="3.2"/><circle class="eqf" cx="66" cy="54" r="3.2"/><line class="eq" x1="66" y1="42" x2="66" y2="54"/><circle cx="50" cy="16" r="6" fill="currentColor"/><path class="fig" d="M50 22 L50 44"/><path class="fig" d="M50 44 L45 62 M50 44 L55 62"/><path class="fig" d="M50 26 L66 40"/><path class="fig" d="M50 28 L42 34"/></symbol>
-<symbol id="p41" viewBox="0 0 100 70"><line class="gnd" x1="18" y1="64" x2="82" y2="64"/><line class="eq" x1="80" y1="30" x2="80" y2="50"/><path class="eq" d="M60 40 L80 40"/><circle cx="44" cy="18" r="6" fill="currentColor"/><path class="fig" d="M44 24 L44 44"/><path class="fig" d="M44 44 L38 62 M44 44 L50 62"/><path class="fig" d="M44 30 L60 40"/><path class="fig" d="M44 32 L56 40"/></symbol>
-<symbol id="p42" viewBox="0 0 100 70"><line class="gnd" x1="10" y1="58" x2="90" y2="58"/><circle cx="26" cy="46" r="6" fill="currentColor"/><path class="fig" d="M32 46 L58 46"/><path class="fig" d="M32 46 L16 38"/><path class="fig" d="M58 46 L74 40"/><path class="fig" d="M58 46 L58 38"/><path class="mo" d="M74 30 L74 36 M71 33 L74 36 L77 33"/></symbol>
-</defs></svg>
 
 <script>
 "use strict";
@@ -571,70 +545,70 @@ const LIB_EXTRA = {
   BW: [
     [ {n:"Wall Tricep Extension",c:"Forearms on the wall, press away until the elbows are straight"},
       {n:"Close-Grip Knee Push-Up",c:"Knees down, hands narrow, elbows brush the ribs"},
-      {n:"Floor Tricep Dip",c:"Hands behind you on the floor, hips up, bend and straighten the elbows"},
+      {n:"Floor Tricep Dip",c:"Hands behind you on the floor, hips up, bend and straighten the elbows",d:1},
       {n:"Towel Curl Hold",c:"Towel under one foot, curl up against it as hard as you can and hold",hold:1,sides:1},
       {n:"Plank Up-Down",c:"Forearm plank to hand plank one arm at a time, hips still"},
       {n:"Sphinx Push-Up",c:"Forearm plank, push through the palms to lift the elbows, lower slow"} ],
     [ {n:"Arm Circles",c:"Arms straight out, small circles growing bigger, switch direction halfway"},
       {n:"Wall Angels",c:"Back, head and arms on the wall, slide the arms up and down slowly"},
-      {n:"Plank Shoulder Taps",c:"High plank, tap each shoulder, minimise the hip sway"},
+      {n:"Plank Shoulder Taps",c:"High plank, tap each shoulder, minimise the hip sway",d:1},
       {n:"Pike Hold",c:"Hips high, arms straight, push the floor away and hold",hold:1},
       {n:"Bear Crawl",c:"Knees an inch off the floor, crawl forward and back, back flat"},
       {n:"Wall Walk",c:"Feet against the wall, walk the hands in and the feet up, then back down"} ],
     [ {n:"Calf Raise",c:"Hands on the wall, rise onto the toes, pause, lower slow"},
       {n:"Fire Hydrant",c:"On all fours, lift one knee out to the side, hips level",sides:1},
       {n:"Side-Lying Leg Raise",c:"Lie on your side, lift the top leg straight up, lower slow",sides:1},
-      {n:"Single-Leg Calf Raise",c:"One foot, fingertips on the wall, full range up and down",sides:1},
+      {n:"Single-Leg Calf Raise",c:"One foot, fingertips on the wall, full range up and down",d:1,sides:1},
       {n:"Lateral Lunge",c:"Step wide, sit into one hip, push back to standing",sides:1},
       {n:"Wall Sit March",c:"Wall sit, lift one foot at a time without rising",hold:1} ],
     [ {n:"March on the Spot",c:"Knees to hip height, swing the arms, steady pace"},
       {n:"Jumping Jacks",c:"Jump the feet wide as the arms go up, land soft"},
-      {n:"High Knees",c:"Run on the spot, drive the knees up fast, stay on the balls of the feet"},
+      {n:"High Knees",c:"Run on the spot, drive the knees up fast, stay on the balls of the feet",d:1},
       {n:"Skater Hops",c:"Leap side to side, land on one leg, stick it"},
       {n:"Squat Thrust",c:"Hands down, jump the feet back to plank and in again, stand"},
       {n:"Burpee",c:"Squat, jump back to plank, chest down, jump in and up"} ],
   ],
   BD: [
-    [ {n:"Band Curl",c:"Stand on the band, elbows pinned, curl to the shoulders"},
+    [ {n:"Band Curl",c:"Stand on the band, elbows pinned, curl to the shoulders",d:1},
       {n:"Band Hammer Curl",c:"Palms facing in, curl up, lower slow"},
       {n:"Band Reverse Curl",c:"Palms down, curl up, wrists stay straight"},
       {n:"Band Tricep Kickback",c:"Stand on the band, hinge, straighten the arms back, squeeze"},
       {n:"Overhead Band Tricep Extension",c:"Stand on the band, hands behind the head, straighten overhead"},
       {n:"Band 21s",c:"7 bottom-half curls, 7 top-half, 7 full — then repeat"} ],
     [ {n:"Band Front Raise",c:"Stand on the band, raise straight arms to shoulder height"},
-      {n:"Band Lateral Raise",c:"Stand on the band, raise the arms out to the sides, soft elbows"},
+      {n:"Band Lateral Raise",c:"Stand on the band, raise the arms out to the sides, soft elbows",d:1},
       {n:"Band Shoulder Dislocate",c:"Wide grip, sweep the band over your head and behind, arms straight"},
       {n:"Band Upright Row",c:"Stand on the band, pull to the chest, elbows lead"},
       {n:"Band Y-Raise",c:"Stand on the band, raise the arms up and out into a Y, thumbs up"} ],
     [ {n:"Band Calf Raise",c:"Band under the balls of the feet, hold the ends, rise up and pause"},
       {n:"Band Clamshell",c:"Band round the knees, lie on your side, open the top knee",sides:1},
       {n:"Band Fire Hydrant",c:"Band round the knees, on all fours, lift one knee out",sides:1},
-      {n:"Band Lateral Walk",c:"Band round the knees, half squat, step side to side"},
+      {n:"Band Lateral Walk",c:"Band round the knees, half squat, step side to side",d:1},
       {n:"Band Monster Walk",c:"Band round the knees, step wide forward and back, stay low"} ],
-    [ {n:"Band Squat to Press",c:"Stand on the band, squat, drive up into an overhead press"},
+    [ {n:"Band Squat to Press",c:"Stand on the band, squat, drive up into an overhead press",d:1},
       {n:"Band Lateral Shuffle",c:"Band round the knees, shuffle quickly side to side, stay low"},
       {n:"Band Skater",c:"Band round the knees, bound side to side, land on one leg"},
       {n:"Banded Squat Jump",c:"Band round the knees, squat and jump, push the knees out"} ],
   ],
   DB: [
-    [ {n:"DB Curl",c:"Elbows pinned to your sides, curl up, lower slow"},
+    [ {n:"DB Curl",c:"Elbows pinned to your sides, curl up, lower slow",d:1},
       {n:"DB Hammer Curl",c:"Palms facing in, curl to the shoulders"},
       {n:"DB Tricep Kickback",c:"Hinge over, elbows high, straighten the arms back"},
       {n:"DB Overhead Tricep Extension",c:"One DB in both hands overhead, lower behind the head, press up"},
       {n:"DB Floor Skull Crusher",c:"On your back, lower the DBs beside your head, elbows still"},
       {n:"DB Zottman Curl",c:"Curl palms up, turn palms down at the top, lower slow"} ],
     [ {n:"DB Front Raise",c:"Raise the DBs to shoulder height in front, arms straight"},
-      {n:"DB Lateral Raise",c:"Raise the DBs out to the sides to shoulder height, soft elbows"},
+      {n:"DB Lateral Raise",c:"Raise the DBs out to the sides to shoulder height, soft elbows",d:1},
       {n:"DB Upright Row",c:"Pull the DBs up the front of the body to the chest, elbows lead"},
       {n:"DB Bent-Over Y-Raise",c:"Hinge over, raise light DBs up and out in a Y, thumbs up"},
       {n:"DB Cuban Press",c:"Upright row, rotate the forearms up, press overhead"} ],
-    [ {n:"DB Calf Raise",c:"DBs at your sides, rise onto the toes, pause, lower slow"},
+    [ {n:"DB Calf Raise",c:"DBs at your sides, rise onto the toes, pause, lower slow",d:1},
       {n:"DB Glute Bridge",c:"DB on the hips, drive up, squeeze at the top"},
       {n:"DB Wall Sit",c:"Back on the wall, DB on the thighs, hold",hold:1},
       {n:"DB Single-Leg Calf Raise",c:"DB in one hand, other hand on the wall, rise on one foot",sides:1},
       {n:"DB Lunge to Knee Drive",c:"Reverse lunge, drive the back knee up as you stand",sides:1} ],
     [ {n:"DB Punches",c:"Light DBs, punch straight out fast, alternate arms"},
-      {n:"DB Thruster",c:"DBs on the shoulders, squat, drive up into a press"},
+      {n:"DB Thruster",c:"DBs on the shoulders, squat, drive up into a press",d:1},
       {n:"DB Squat Clean",c:"DBs at the knees, pull and catch them on the shoulders in a squat"},
       {n:"DB Alternating Snatch",c:"One DB from floor to overhead in one move, switch hands each rep"},
       {n:"DB Burpee Deadlift",c:"Hands on the DBs, jump back and in, stand up with them"},
@@ -709,7 +683,38 @@ function shuffleKit(kitId){
     return { k:e.k, r:e.r, n:o.n };
   }));
 }
-function exPico(ex, cls){ return pico(CATPIC[ex.cat]||0, ex.colIdx, cls); }
+// one-tap workout types: a list of categories, filled from the kit's ladders
+// (default move first, then its neighbours; other kits only if a kit runs out)
+const FOCUS = [
+  { id:"full",   name:"Full body",        cats:[0,1,2,3,4] },
+  { id:"upper",  name:"Upper body",       cats:[2,3,6,5,4] },
+  { id:"lower",  name:"Lower body",       cats:[0,1,7,0,1] },
+  { id:"arms",   name:"Arms & shoulders", cats:[5,6,5,6,2] },
+  { id:"core",   name:"Core",             cats:[4,4,4,4,4] },
+  { id:"cardio", name:"Cardio",           cats:[8,8,8,8,8] },
+];
+function ladderOrder(lad){
+  const d = Math.max(0, lad.findIndex(o=>o.d)), out = [d];
+  for(let k=1; out.length<lad.length; k++){ if(d+k<lad.length) out.push(d+k); if(d-k>=0) out.push(d-k); }
+  return out.map(i=>lad[i]);
+}
+function buildFocus(kitId, fc){
+  const used = new Set(), out = [];
+  const kits = [kitId].concat(COLUMNS.map(c=>c.id).filter(k=>k!==kitId));
+  fc.cats.forEach(r=>{
+    for(const k of kits){
+      const o = ladderOrder(ladder(k, r)).find(x=> !used.has(x.n));
+      if(o){ used.add(o.n); out.push({ k, r, n:o.n }); return; }
+    }
+  });
+  return out;
+}
+function focusMatch(kitId){
+  const cur = planEntries(kitId);
+  const f = FOCUS.find(fc=>{ const b=buildFocus(kitId, fc); return b.length===cur.length && b.every((e,i)=> sameEntry(e, cur[i])); });
+  return f ? f.id : null;
+}
+function exPico(ex, cls){ return movePico(ex.n, ex.cat, ex.colIdx, cls); }
 function pickedColumn(){ return colById(S.settings.pickedCol) ? S.settings.pickedCol : COLUMNS[0].id; }
 // common bodyweight moves for quick sessions & quick logging (pr/pc pick the pictogram)
 const QUICK = [
@@ -999,12 +1004,305 @@ document.addEventListener("visibilitychange", ()=>{
   if(document.visibilityState==="visible" && Player.active && !wakeLock) requestWake();
 });
 
+/* ================================================================= PICTOGRAMS */
+// Stick-figure poses, side view facing right unless noted. viewBox 0 0 100 70,
+// ground y=64. h head centre, s shoulder, p hip; a1/a2 arms [elbow, hand],
+// l1/l2 legs [knee, foot] (the "2" limbs are drawn lighter, as the far side).
+// eq: where kit equipment goes — "hands" (default: DB in each hand / band
+// from foot to hand), "one" (first hand only), "chest" (one DB held at chest),
+// "hips" (DB across the hips), "none". wall: x of a wall. mo: motion path.
+const POSES = {
+  stand:     { h:[50,13], s:[50,21], p:[50,40], a1:[[51,31],[52,41]], a2:[[49,31],[48,41]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]] },
+  squat:     { h:[56,21], s:[51,28], p:[40,46], a1:[[61,31],[72,31]], a2:[[60,33],[71,33]], l1:[[60,47],[57,64]], l2:[[58,49],[53,64]] },
+  goblet:    { h:[56,21], s:[51,28], p:[40,46], a1:[[57,37],[59,31]], a2:[[56,38],[58,32]], l1:[[60,47],[57,64]], l2:[[58,49],[53,64]], eq:"chest" },
+  frontsquat:{ h:[55,20], s:[50,28], p:[40,46], a1:[[58,32],[55,26]], a2:[[57,33],[54,27]], l1:[[60,47],[57,64]], l2:[[58,49],[53,64]], eq:"hands" },
+  squatpress:{ h:[56,22], s:[51,29], p:[40,47], a1:[[58,19],[64,10]], a2:[[46,19],[44,9]], l1:[[60,48],[57,64]], l2:[[58,50],[53,64]] },
+  wallsit:   { h:[36,22], s:[36,30], p:[36,46], a1:[[44,40],[52,44]], a2:[[43,41],[51,45]], l1:[[54,46],[54,64]], l2:[[53,47],[52,64]], wall:30, eq:"hands" },
+  lunge:     { h:[50,15], s:[50,23], p:[49,42], a1:[[50,32],[51,42]], a2:[[49,32],[48,42]], l1:[[62,50],[62,64]], l2:[[40,58],[30,63]] },
+  sidelunge: { h:[45,18], s:[46,26], p:[50,44], a1:[[44,34],[50,38]], a2:[[48,34],[52,38]], l1:[[36,52],[34,64]], l2:[[63,54],[76,64]], eq:"chest" },
+  sumo:      { h:[50,17], s:[50,25], p:[50,43], a1:[[45,34],[49,50]], a2:[[55,34],[51,50]], l1:[[35,48],[36,64]], l2:[[65,48],[64,64]], eq:"chest" },
+  jump:      { h:[50,8],  s:[50,16], p:[50,33], a1:[[57,10],[62,3]], a2:[[43,10],[38,3]], l1:[[55,43],[52,55]], l2:[[47,44],[45,55]], air:1, mo:"M80 46 L80 30 M76 34 L80 30 L84 34", eq:"none" },
+  bridge:    { h:[17,56], s:[25,59], p:[46,46], a1:[[34,62],[42,63]], a2:[[33,61],[41,62]], l1:[[60,42],[66,63]], l2:[[59,43],[64,63]], eq:"hips" },
+  slbridge:  { h:[17,56], s:[25,59], p:[46,46], a1:[[34,62],[42,63]], a2:[[33,61],[41,62]], l1:[[60,42],[66,63]], l2:[[62,40],[78,32]], eq:"hips" },
+  hinge:     { h:[27,27], s:[34,31], p:[57,35], a1:[[36,41],[38,51]], a2:[[35,41],[37,51]], l1:[[59,50],[58,64]], l2:[[57,50],[55,64]] },
+  goodmorning:{h:[27,27], s:[34,31], p:[57,35], a1:[[31,23],[27,21]], a2:[[30,24],[26,22]], l1:[[59,50],[58,64]], l2:[[57,50],[55,64]], eq:"none" },
+  slrdl:     { h:[24,33], s:[32,35], p:[54,36], a1:[[33,45],[34,54]], a2:[[32,45],[33,54]], l1:[[55,50],[55,64]], l2:[[67,35],[80,33]], eq:"one" },
+  swing:     { h:[48,13], s:[48,21], p:[47,40], a1:[[57,24],[67,24]], a2:[[57,26],[67,26]], l1:[[51,52],[52,64]], l2:[[48,52],[46,64]], mo:"M70 52 C80 46 82 36 76 28", eq:"chest" },
+  snatch:    { h:[49,13], s:[49,21], p:[49,40], a1:[[53,12],[55,3]], a2:[[48,31],[47,41]], l1:[[52,52],[53,64]], l2:[[48,52],[46,64]], mo:"M66 50 C72 36 70 20 62 10", eq:"one" },
+  clean:     { h:[49,13], s:[49,21], p:[49,40], a1:[[57,27],[55,20]], a2:[[56,28],[54,21]], l1:[[52,52],[53,64]], l2:[[48,52],[46,64]], mo:"M66 50 C70 40 68 30 62 24" },
+  pushup:    { h:[21,43], s:[29,47], p:[56,53], a1:[[29,55],[29,63]], a2:[[30,55],[30,63]], l1:[[70,57],[84,62]], l2:[[70,57],[84,62]], eq:"none" },
+  kneepushup:{ h:[23,43], s:[31,47], p:[52,54], a1:[[31,55],[31,63]], a2:[[32,55],[32,63]], l1:[[64,62],[78,55]], l2:[[64,62],[78,55]], eq:"none" },
+  dbpushup:  { h:[21,43], s:[29,47], p:[56,53], a1:[[29,54],[29,60]], a2:[[30,54],[30,60]], l1:[[70,57],[84,62]], l2:[[70,57],[84,62]], eq:"hands" },
+  renegade:  { h:[21,43], s:[29,47], p:[56,53], a1:[[38,42],[32,50]], a2:[[29,55],[29,61]], l1:[[70,57],[84,62]], l2:[[70,57],[84,62]], eq:"hands" },
+  plank:     { h:[21,50], s:[29,53], p:[56,56], a1:[[29,63],[39,63]], a2:[[30,63],[40,63]], l1:[[70,59],[84,62]], l2:[[70,59],[84,62]], eq:"none" },
+  sideplank: { h:[22,38], s:[30,42], p:[56,52], a1:[[30,32],[30,22]], a2:[[30,55],[40,63]], l1:[[70,57],[84,62]], l2:[[70,57],[84,62]], eq:"none" },
+  climber:   { h:[21,43], s:[29,47], p:[56,53], a1:[[29,55],[29,63]], a2:[[30,55],[30,63]], l1:[[44,50],[50,61]], l2:[[70,57],[84,62]], mo:"M60 40 L46 40 M50 36 L46 40 L50 44", eq:"none" },
+  pike:      { h:[33,52], s:[38,46], p:[55,26], a1:[[35,55],[32,63]], a2:[[36,55],[33,63]], l1:[[64,45],[72,63]], l2:[[63,45],[70,63]], eq:"none" },
+  wallwalk:  { h:[37,52], s:[42,45], p:[62,34], a1:[[40,55],[38,63]], a2:[[41,55],[39,63]], l1:[[72,26],[80,20]], l2:[[71,27],[80,24]], wall:82, eq:"none" },
+  bear:      { h:[23,43], s:[30,46], p:[56,44], a1:[[30,55],[30,63]], a2:[[31,55],[31,63]], l1:[[58,57],[72,63]], l2:[[57,57],[71,63]], eq:"none" },
+  allfours:  { h:[23,43], s:[30,46], p:[56,46], a1:[[30,55],[30,63]], a2:[[31,55],[31,63]], l1:[[56,63],[72,63]], l2:[[60,44],[64,54]], mo:"M70 40 L70 32 M67 35 L70 32 L73 35", eq:"none" },
+  birddog:   { h:[23,43], s:[30,46], p:[56,46], a1:[[19,43],[8,41]], a2:[[30,55],[30,63]], l1:[[56,63],[72,63]], l2:[[70,44],[84,42]], eq:"none" },
+  deadbug:   { h:[15,56], s:[23,59], p:[48,59], a1:[[24,48],[25,37]], a2:[[14,58],[5,57]], l1:[[49,46],[61,45]], l2:[[62,58],[76,58]], eq:"one" },
+  hollow:    { h:[25,47], s:[32,52], p:[54,60], a1:[[22,48],[12,44]], a2:[[22,49],[12,45]], l1:[[68,56],[84,51]], l2:[[68,56],[84,51]], eq:"none" },
+  vsit:      { h:[33,31], s:[36,39], p:[46,60], a1:[[44,42],[54,41]], a2:[[43,43],[53,42]], l1:[[60,46],[73,54]], l2:[[59,47],[72,55]], mo:"M58 30 C64 26 70 28 72 34", eq:"chest" },
+  prone:     { h:[17,51], s:[25,56], p:[52,60], a1:[[15,52],[5,48]], a2:[[15,53],[5,49]], l1:[[68,61],[84,61]], l2:[[68,61],[84,59]], eq:"none" },
+  cobra:     { h:[18,46], s:[26,52], p:[52,60], a1:[[32,52],[40,55]], a2:[[31,53],[39,56]], l1:[[68,61],[84,61]], l2:[[68,61],[84,61]], eq:"none" },
+  row:       { h:[29,26], s:[36,30], p:[58,38], a1:[[46,26],[41,39]], a2:[[45,27],[40,40]], l1:[[62,51],[58,64]], l2:[[60,51],[55,64]], mo:"M30 48 L30 40 M27 43 L30 40 L33 43" },
+  revfly:    { h:[27,27], s:[34,31], p:[57,35], a1:[[30,40],[22,46]], a2:[[40,40],[48,46]], l1:[[60,50],[58,64]], l2:[[57,50],[55,64]] },
+  kickback:  { h:[29,26], s:[36,30], p:[58,38], a1:[[45,32],[57,30]], a2:[[44,33],[56,31]], l1:[[62,51],[58,64]], l2:[[60,51],[55,64]] },
+  seatedrow: { h:[38,31], s:[39,39], p:[40,60], a1:[[32,47],[44,50]], a2:[[31,48],[43,51]], l1:[[58,61],[78,61]], l2:[[58,61],[78,61]] },
+  press:     { h:[50,15], s:[50,23], p:[50,42], a1:[[58,14],[63,5]], a2:[[42,14],[37,5]], l1:[[51,53],[52,64]], l2:[[49,53],[47,64]] },
+  pressone:  { h:[50,15], s:[50,23], p:[50,42], a1:[[57,14],[61,4]], a2:[[49,32],[48,42]], l1:[[51,53],[52,64]], l2:[[49,53],[47,64]], eq:"one" },
+  pulldown:  { h:[50,15], s:[50,23], p:[50,42], a1:[[60,20],[59,8]], a2:[[40,20],[41,8]], l1:[[51,53],[52,64]], l2:[[49,53],[47,64]] },
+  zpress:    { h:[39,30], s:[40,38], p:[40,60], a1:[[44,27],[45,17]], a2:[[37,27],[36,17]], l1:[[58,61],[78,61]], l2:[[58,61],[78,61]] },
+  floorpress:{ h:[15,56], s:[23,59], p:[48,59], a1:[[24,48],[25,38]], a2:[[25,49],[26,39]], l1:[[60,46],[68,63]], l2:[[59,47],[66,63]] },
+  floorfly:  { h:[15,56], s:[23,59], p:[48,59], a1:[[14,50],[8,44]], a2:[[32,50],[38,44]], l1:[[60,46],[68,63]], l2:[[59,47],[66,63]] },
+  skull:     { h:[15,56], s:[23,59], p:[48,59], a1:[[24,44],[14,46]], a2:[[25,45],[15,47]], l1:[[60,46],[68,63]], l2:[[59,47],[66,63]] },
+  pullover:  { h:[22,56], s:[30,59], p:[54,59], a1:[[20,52],[10,48]], a2:[[21,53],[11,49]], l1:[[66,46],[74,63]], l2:[[65,47],[72,63]], mo:"M14 36 C22 28 30 30 34 40", eq:"chest" },
+  curl:      { h:[50,13], s:[50,21], p:[50,40], a1:[[50,31],[59,25]], a2:[[49,32],[58,26]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]] },
+  ohext:     { h:[50,15], s:[50,23], p:[50,42], a1:[[58,10],[52,3]], a2:[[42,10],[48,3]], l1:[[51,53],[52,64]], l2:[[49,53],[47,64]], eq:"chest" },
+  raise:     { h:[50,13], s:[50,21], p:[50,40], a1:[[60,21],[71,21]], a2:[[59,23],[70,23]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]] },
+  latraise:  { h:[50,13], s:[50,21], p:[50,40], a1:[[39,22],[29,22]], a2:[[61,22],[71,22]], l1:[[46,52],[45,64]], l2:[[54,52],[55,64]] },
+  upright:   { h:[50,13], s:[50,21], p:[50,40], a1:[[60,20],[53,27]], a2:[[59,21],[52,28]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]] },
+  wangel:    { h:[50,14], s:[50,22], p:[50,40], a1:[[38,22],[38,10]], a2:[[62,22],[62,10]], l1:[[46,52],[45,64]], l2:[[54,52],[55,64]], eq:"none" },
+  armcircle: { h:[50,14], s:[50,22], p:[50,40], a1:[[39,22],[28,22]], a2:[[61,22],[72,22]], l1:[[46,52],[45,64]], l2:[[54,52],[55,64]], mo:"M22 14 A6 6 0 1 1 22 30 M78 14 A6 6 0 1 0 78 30", eq:"none" },
+  jacks:     { h:[50,12], s:[50,20], p:[50,38], a1:[[42,12],[36,5]], a2:[[58,12],[64,5]], l1:[[44,51],[37,63]], l2:[[56,51],[63,63]], eq:"none" },
+  march:     { h:[50,13], s:[50,21], p:[50,40], a1:[[56,29],[61,22]], a2:[[45,30],[42,39]], l1:[[61,41],[60,53]], l2:[[50,52],[50,64]] },
+  carry:     { h:[50,13], s:[50,21], p:[50,40], a1:[[51,31],[52,42]], a2:[[49,31],[48,42]], l1:[[56,51],[58,63]], l2:[[47,52],[44,64]], eq:"one" },
+  sidebend:  { h:[44,15], s:[46,23], p:[50,41], a1:[[42,33],[40,43]], a2:[[54,18],[50,10]], l1:[[47,52],[46,64]], l2:[[53,52],[55,64]], eq:"one" },
+  windmill:  { h:[40,27], s:[44,32], p:[54,40], a1:[[42,20],[40,8]], a2:[[44,44],[44,55]], l1:[[47,52],[44,64]], l2:[[60,52],[62,64]], eq:"one" },
+  chop:      { h:[48,13], s:[48,21], p:[49,40], a1:[[57,15],[66,8]], a2:[[56,16],[65,9]], l1:[[52,52],[54,64]], l2:[[48,52],[45,64]], mo:"M70 14 C70 36 56 50 40 54" },
+  twistpress:{ h:[48,13], s:[48,21], p:[49,40], a1:[[58,22],[69,22]], a2:[[57,24],[68,24]], l1:[[52,52],[54,64]], l2:[[48,52],[45,64]], mo:"M74 14 L74 30" },
+  calf:      { h:[48,11], s:[48,19], p:[48,38], a1:[[58,24],[70,26]], a2:[[57,26],[69,28]], l1:[[49,50],[50,60]], l2:[[47,50],[47,60]], wall:72, mo:"M60 58 L60 50 M57 53 L60 50 L63 53", eq:"none" },
+  sidelying: { h:[16,54], s:[24,58], p:[50,58], a1:[[20,50],[13,48]], a2:[[34,57],[44,58]], l1:[[66,61],[83,62]], l2:[[66,51],[82,45]], eq:"none" },
+  clam:      { h:[16,54], s:[24,58], p:[50,58], a1:[[20,50],[13,48]], a2:[[34,57],[44,58]], l1:[[62,62],[56,63]], l2:[[60,48],[57,60]], eq:"knees" },
+  dip:       { h:[37,34], s:[37,42], p:[50,47], a1:[[33,52],[30,63]], a2:[[34,52],[31,63]], l1:[[65,45],[72,63]], l2:[[64,46],[70,63]], eq:"none" },
+  skater:    { h:[40,24], s:[45,30], p:[55,42], a1:[[44,40],[40,48]], a2:[[52,36],[60,40]], l1:[[59,53],[56,64]], l2:[[66,52],[73,60]], mo:"M20 50 L32 50 M28 46 L32 50 L28 54", eq:"none" },
+  lateral:   { h:[50,17], s:[50,25], p:[50,43], a1:[[45,32],[50,36]], a2:[[55,32],[50,36]], l1:[[38,50],[36,64]], l2:[[62,50],[64,64]], mo:"M14 40 L4 40 M8 36 L4 40 L8 44 M86 40 L96 40 M92 36 L96 40 L92 44", eq:"knees" },
+  punch:     { h:[50,13], s:[50,21], p:[50,40], a1:[[60,22],[71,22]], a2:[[55,30],[57,23]], l1:[[53,52],[56,64]], l2:[[48,52],[44,64]] },
+  burpee:    { h:[50,9],  s:[50,17], p:[50,35], a1:[[44,9],[39,2]], a2:[[56,9],[61,2]], l1:[[51,47],[52,58]], l2:[[49,47],[47,58]], air:1, mo:"M78 44 L78 30 M74 34 L78 30 L82 34", eq:"none" },
+  thrust:    { h:[29,35], s:[34,42], p:[52,52], a1:[[33,52],[32,63]], a2:[[34,52],[33,63]], l1:[[64,56],[78,62]], l2:[[64,56],[78,62]], mo:"M82 48 L66 48 M70 44 L66 48 L70 52", eq:"none" },
+  pullup:    { h:[50,19], s:[50,27], p:[50,44], a1:[[58,17],[58,7]], a2:[[42,17],[42,7]], l1:[[53,54],[49,61]], l2:[[47,54],[44,61]], bar:7, eq:"none" },
+  wallpress: { h:[58,16], s:[56,24], p:[50,42], a1:[[73,34],[73,20]], a2:[[72,35],[72,21]], l1:[[47,53],[44,64]], l2:[[49,53],[47,64]], wall:76, eq:"none" },
+  donkey:    { h:[23,43], s:[30,46], p:[56,46], a1:[[30,55],[30,63]], a2:[[31,55],[31,63]], l1:[[56,63],[72,63]], l2:[[70,44],[84,40]], mo:"M76 54 L86 54 M82 50 L86 54 L82 58", eq:"none" },
+  ohmarch:   { h:[50,15], s:[50,23], p:[50,42], a1:[[58,14],[63,5]], a2:[[42,14],[37,5]], l1:[[61,43],[60,54]], l2:[[50,53],[50,64]] },
+  hold:      { h:[50,13], s:[50,21], p:[50,40], a1:[[52,31],[51,40]], a2:[[48,31],[49,40]], l1:[[51,52],[52,64]], l2:[[49,52],[47,64]], eq:"none" },
+};
+// draw a pose for a kit: pic 0 dumbbells, 1 band, 2 bodyweight
+function poseSVG(id, color, pic, cls){
+  const P = POSES[id] || POSES.stand;
+  const pt = a=> a[0]+" "+a[1];
+  const limb = (from, j, light)=> '<path class="fig'+(light?' far':'')+'" d="M'+pt(from)+' L'+pt(j[0])+' L'+pt(j[1])+'"/>';
+  let g = '<line class="gnd" x1="8" y1="64" x2="92" y2="64"/>';
+  if(P.bar) g += '<line class="gnd" x1="28" y1="'+P.bar+'" x2="72" y2="'+P.bar+'"/>';
+  if(P.wall) g += '<line class="gnd" x1="'+P.wall+'" y1="6" x2="'+P.wall+'" y2="64"/>';
+  g += limb(P.s, P.a2, 1) + limb(P.p, P.l2, 1);
+  g += '<path class="fig" d="M'+pt(P.s)+' L'+pt(P.p)+'"/>';
+  g += limb(P.p, P.l1) + limb(P.s, P.a1);
+  g += '<circle cx="'+P.h[0]+'" cy="'+P.h[1]+'" r="6" fill="currentColor"/>';
+  // equipment
+  const eq = P.eq || "hands";
+  const db = (x,y)=> '<line class="eq" x1="'+(x-5)+'" y1="'+y+'" x2="'+(x+5)+'" y2="'+y+'"/><circle class="eqf" cx="'+(x-5)+'" cy="'+y+'" r="3.4"/><circle class="eqf" cx="'+(x+5)+'" cy="'+y+'" r="3.4"/>';
+  const h1 = P.a1[1], h2 = P.a2[1], f1 = P.l1[1], f2 = P.l2[1];
+  if(pic===0 && eq!=="none" && eq!=="knees"){
+    if(eq==="hips") g += db(P.p[0], P.p[1]-5);
+    else if(eq==="chest") g += db((h1[0]+h2[0])/2, (h1[1]+h2[1])/2);
+    else { g += db(h1[0], h1[1]); if(eq!=="one") g += db(h2[0], h2[1]); }
+  }
+  if(pic===1 && eq!=="none"){
+    if(eq==="knees"){
+      const k1=P.l1[0], k2=P.l2[0];
+      g += '<path class="eq band" d="M'+pt(k1)+' Q'+((k1[0]+k2[0])/2)+' '+(Math.max(k1[1],k2[1])+4)+' '+pt(k2)+'"/>';
+    } else if(eq==="hips"){
+      g += '<path class="eq band" d="M'+(P.p[0]-8)+' 63 Q'+P.p[0]+' '+(P.p[1]-12)+' '+(P.p[0]+8)+' 63"/>';
+    } else {
+      // band from the foot nearest the floor up to the hand(s)
+      const foot = (f1[1]>=f2[1]) ? f1 : f2;
+      const hands = eq==="one" ? [h1] : (eq==="chest" ? [[(h1[0]+h2[0])/2,(h1[1]+h2[1])/2]] : [h1, h2]);
+      hands.forEach(h=>{ const cx=(foot[0]+h[0])/2+6, cy=(foot[1]+h[1])/2; g += '<path class="eq band" d="M'+pt(foot)+' Q'+cx+' '+cy+' '+pt(h)+'"/>'; });
+    }
+  }
+  if(P.mo) g += '<path class="mo" d="'+P.mo+'"/>';
+  return '<svg class="'+(cls||"pico")+'" viewBox="0 0 100 70" style="--accent:'+color+';color:var(--ink)" aria-hidden="true">'+g+'</svg>';
+}
+const MOVE_POSE = {"Wall Sit": "wallsit",
+  "Bodyweight Squat": "squat",
+  "Reverse Lunge": "lunge",
+  "1.5-Rep Squat": "squat",
+  "Curtsy Lunge": "lunge",
+  "Cossack Squat": "sidelunge",
+  "Squat Jump": "jump",
+  "Glute Bridge": "bridge",
+  "Frog Pump": "bridge",
+  "Glute Bridge March": "slbridge",
+  "Bodyweight Good Morning": "goodmorning",
+  "Single-Leg Glute Bridge": "slbridge",
+  "Single-Leg RDL": "slrdl",
+  "Knee Push-Up": "kneepushup",
+  "Wide Push-Up": "pushup",
+  "Push-Up": "pushup",
+  "Tempo Push-Up": "pushup",
+  "Pike Push-Up": "pike",
+  "Diamond Push-Up": "pushup",
+  "Archer Push-Up": "pushup",
+  "Cobra Hold": "cobra",
+  "Prone Y-T-W": "prone",
+  "Superman Pulls": "prone",
+  "Prone Swimmers": "prone",
+  "Reverse Snow Angel": "prone",
+  "Towel Isometric Row": "seatedrow",
+  "Bird Dog": "birddog",
+  "Slow Dead Bug": "deadbug",
+  "Plank": "plank",
+  "Side Plank": "sideplank",
+  "Bear Hold": "bear",
+  "Mountain Climbers": "climber",
+  "Hollow Hold": "hollow",
+  "Band Split Squat": "lunge",
+  "Banded Squat": "frontsquat",
+  "Band Sumo Squat": "sumo",
+  "Band Reverse Lunge": "lunge",
+  "Band Curtsy Lunge": "lunge",
+  "Band Front Squat": "frontsquat",
+  "Band Glute Bridge": "bridge",
+  "Band Kickback": "donkey",
+  "Band RDL": "hinge",
+  "Band Good Morning": "goodmorning",
+  "Band Sumo Deadlift": "sumo",
+  "Band Single-Leg RDL": "slrdl",
+  "Band Floor Press": "floorpress",
+  "Band Chest Press": "raise",
+  "Band Overhead Press": "press",
+  "Band Single-Arm Press": "pressone",
+  "Band Arnold Press": "press",
+  "Banded Push-Up": "pushup",
+  "Band Pull-Apart": "raise",
+  "Band Reverse Fly": "revfly",
+  "Band Seated Row": "seatedrow",
+  "Band Bent-Over Row": "row",
+  "Band Single-Arm Row": "row",
+  "Overhead Band Pulldown": "pulldown",
+  "Band Bird Dog": "birddog",
+  "Standing Band Crunch": "goodmorning",
+  "Band Dead Bug": "deadbug",
+  "Band Russian Twist": "vsit",
+  "Band Overhead March": "ohmarch",
+  "Low-to-High Band Chop": "chop",
+  "DB Split Squat": "lunge",
+  "Goblet Squat": "goblet",
+  "DB Sumo Squat": "sumo",
+  "DB Reverse Lunge": "lunge",
+  "DB Curtsy Lunge": "lunge",
+  "DB Lateral Lunge": "sidelunge",
+  "DB Front Squat": "frontsquat",
+  "DB Hip Thrust": "bridge",
+  "DB Romanian Deadlift": "hinge",
+  "DB Sumo Deadlift": "sumo",
+  "DB Single-Leg RDL": "slrdl",
+  "DB Swing": "swing",
+  "DB Clean": "clean",
+  "DB Floor Fly": "floorfly",
+  "DB Floor Press": "floorpress",
+  "DB Overhead Press": "press",
+  "DB Arnold Press": "press",
+  "DB Z-Press": "zpress",
+  "DB Push Press": "press",
+  "DB Handle Push-Up": "dbpushup",
+  "DB Reverse Fly": "revfly",
+  "DB Pullover": "pullover",
+  "Bent-Over DB Row": "row",
+  "DB Single-Arm Row": "row",
+  "DB High Pull": "upright",
+  "DB Gorilla Row": "row",
+  "Renegade Row": "renegade",
+  "DB Side Bend": "sidebend",
+  "Suitcase March": "march",
+  "Farmer Hold": "stand",
+  "DB Russian Twist": "vsit",
+  "DB Overhead March": "ohmarch",
+  "Plank DB Drag": "renegade",
+  "DB Windmill": "windmill",
+  "Wall Tricep Extension": "wallpress",
+  "Close-Grip Knee Push-Up": "kneepushup",
+  "Floor Tricep Dip": "dip",
+  "Towel Curl Hold": "curl",
+  "Plank Up-Down": "pushup",
+  "Sphinx Push-Up": "plank",
+  "Arm Circles": "armcircle",
+  "Wall Angels": "wangel",
+  "Plank Shoulder Taps": "renegade",
+  "Pike Hold": "pike",
+  "Bear Crawl": "bear",
+  "Wall Walk": "wallwalk",
+  "Calf Raise": "calf",
+  "Fire Hydrant": "allfours",
+  "Side-Lying Leg Raise": "sidelying",
+  "Single-Leg Calf Raise": "calf",
+  "Lateral Lunge": "sidelunge",
+  "Wall Sit March": "wallsit",
+  "March on the Spot": "march",
+  "Jumping Jacks": "jacks",
+  "High Knees": "march",
+  "Skater Hops": "skater",
+  "Squat Thrust": "thrust",
+  "Burpee": "burpee",
+  "Band Curl": "curl",
+  "Band Hammer Curl": "curl",
+  "Band Reverse Curl": "curl",
+  "Band Tricep Kickback": "kickback",
+  "Overhead Band Tricep Extension": "ohext",
+  "Band 21s": "curl",
+  "Band Front Raise": "raise",
+  "Band Lateral Raise": "latraise",
+  "Band Shoulder Dislocate": "press",
+  "Band Upright Row": "upright",
+  "Band Y-Raise": "press",
+  "Band Calf Raise": "calf",
+  "Band Clamshell": "clam",
+  "Band Fire Hydrant": "allfours",
+  "Band Lateral Walk": "lateral",
+  "Band Monster Walk": "lateral",
+  "Band Squat to Press": "squatpress",
+  "Band Lateral Shuffle": "lateral",
+  "Band Skater": "skater",
+  "Banded Squat Jump": "jump",
+  "DB Curl": "curl",
+  "DB Hammer Curl": "curl",
+  "DB Tricep Kickback": "kickback",
+  "DB Overhead Tricep Extension": "ohext",
+  "DB Floor Skull Crusher": "skull",
+  "DB Zottman Curl": "curl",
+  "DB Front Raise": "raise",
+  "DB Lateral Raise": "latraise",
+  "DB Upright Row": "upright",
+  "DB Bent-Over Y-Raise": "revfly",
+  "DB Cuban Press": "press",
+  "DB Calf Raise": "calf",
+  "DB Glute Bridge": "bridge",
+  "DB Wall Sit": "wallsit",
+  "DB Single-Leg Calf Raise": "calf",
+  "DB Lunge to Knee Drive": "march",
+  "DB Punches": "punch",
+  "DB Thruster": "squatpress",
+  "DB Squat Clean": "frontsquat",
+  "DB Alternating Snatch": "snatch",
+  "DB Burpee Deadlift": "thrust",
+  "DB Devil's Press": "burpee",
+  "Push-Ups": "pushup",
+  "Bodyweight Squats": "squat",
+  "Lunges": "lunge",
+  "Pull-Ups": "pullup",
+  "Sit-Ups": "vsit",
+  "Burpees": "burpee",
+  "Dips": "dip"};
+// your own moves (and anything unmapped) use their category's pose
+const CAT_POSE = ["squat","hinge","pushup","row","plank","curl","press","calf","jacks"];
+function movePose(name, cat){ return MOVE_POSE[name] || CAT_POSE[cat] || "stand"; }
+function movePico(name, cat, colIdx, cls){ const c=COLUMNS[colIdx]||COLUMNS[0]; return poseSVG(movePose(name, cat), c.color, c.pic, cls); }
+
 /* ================================================================= HELPERS */
 function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function pico(rowIdx, colIdx, cls){
-  return '<svg class="'+(cls||"pico")+'" viewBox="0 0 100 70" style="--accent:'+COLUMNS[colIdx].color+';color:var(--ink)"><use href="#p'+rowIdx+COLUMNS[colIdx].pic+'"/></svg>';
-}
 // <option>s for every move in the library, grouped by pattern; value = "l{row}-{col}-{alt}"
 function libraryOptions(){
   let opts = '<option value="" disabled selected>Browse the full library…</option>';
@@ -1019,10 +1317,10 @@ function libraryOptions(){
 function pickFromLibraryValue(v){
   if(v[0]==="x"){
     const cm = customMoves()[+v.slice(1)], c = Math.max(0, COLUMNS.findIndex(x=>x.id===cm.eq));
-    return { name:cm.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[+cm.cat||0], colIdx:c, hold:!!cm.hold, sides:!!cm.sides };
+    return { name:cm.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[+cm.cat||0], cat:+cm.cat||0, colIdx:c, hold:!!cm.hold, sides:!!cm.sides };
   }
   const m=v.slice(1).split("-"); const r=+m[0],c=+m[1],oi=+m[2]; const o=ladder(COLUMNS[c].id, r)[oi];
-  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[r], colIdx:c, hold:!!o.hold, sides:!!o.sides };
+  return { name:o.n, col:COLUMNS[c].id, lt:loadType(COLUMNS[c]), row:CATPIC[r], cat:r, colIdx:c, hold:!!o.hold, sides:!!o.sides };
 }
 function pickFromQuick(i){ const q=QUICK[i]; return { name:q.n, col:COLUMNS[q.pc].id, lt:"bw", row:q.pr, colIdx:q.pc }; }
 function lockScroll(on){ document.body.style.overflow = on ? "hidden" : ""; }
@@ -1083,6 +1381,11 @@ function renderToday(){
   // the workout: an ordered list of any moves — Swap / tap to change one,
   // Edit to reorder or remove, + to add
   const moves = planMoves(colId);
+  const fm = focusMatch(colId);
+  html += '<div class="section-h">Workout type</div><div class="pk-chips" id="focusRow" style="padding-top:0;margin-bottom:2px">';
+  FOCUS.forEach(fc=> html += '<button type="button" data-f="'+fc.id+'" class="'+(fm===fc.id?'on':'')+'">'+esc(fc.name)+'</button>');
+  html += '<button type="button" data-f="" class="'+(fm?'':'on')+'" disabled style="opacity:'+(fm?'.5':'1')+'">'+(fm?'Custom':'✓ Custom')+'</button></div>';
+  html += '<div class="inline-note" style="margin:0 0 2px">A starting point — swap, add or remove any move below, from any category.</div>';
   html += '<div style="display:flex;align-items:center;gap:6px"><div class="section-h">Your moves · '+moves.length+'</div>'+
     '<button type="button" class="chip" id="shuffleBtn" style="margin-left:auto;margin-bottom:8px">🎲 Shuffle</button>'+
     '<button type="button" class="chip'+(planEditing?' solid':'')+'" id="editBtn" style="margin-bottom:8px">'+(planEditing?'✓ Done':'✎ Edit')+'</button></div><div class="card">';
@@ -1141,6 +1444,12 @@ function renderToday(){
     confirmDialog("Reset moves?", "Go back to the default five for "+col.name+". Your own moves stay in the library.", ()=>{ savePlan(colId, kitDefaultPlan(colId)); planEditing=false; renderToday(); }, "Reset");
   });
   document.getElementById("editBtn").addEventListener("click", ()=>{ planEditing=!planEditing; renderToday(); });
+  wrap.querySelectorAll("#focusRow button[data-f]").forEach(b=> b.addEventListener("click", ()=>{
+    const fc = FOCUS.find(x=>x.id===b.getAttribute("data-f")); if(!fc || fm===fc.id) return;
+    const apply = ()=>{ savePlan(colId, buildFocus(colId, fc)); planEditing=false; renderToday(); toast(fc.name+" — "+fc.cats.length+" moves"); };
+    if(fm) apply(); // switching between built-in types loses nothing
+    else confirmDialog("Switch to "+fc.name+"?", "This replaces your "+entries.length+" custom moves. You can still change any move afterwards.", apply, "Switch");
+  }));
   wireSetupCard(colIdx);
   document.getElementById("shuffleBtn").addEventListener("click", ()=>{ shuffleKit(colId); renderToday(); toast("Rerolled — tap again for another set"); });
   document.getElementById("startSession").addEventListener("click", ()=>{ if(planEntries(colId).length) Player.startSession(colId); });
@@ -1192,7 +1501,7 @@ function openExPicker(kitId, idx){
   const kitIdx = COLUMNS.findIndex(c=>c.id===kitId), kit = COLUMNS[kitIdx];
   const entries = planEntries(kitId);
   const cur = idx>=0 ? resolveEntry(entries[idx]) : null;
-  const f = { q:"", cat: cur ? cur.cat : -1, eq: "" }; // -1 = all categories, 99 = mine
+  const f = { q:"", cat:-1, eq:"" }; // -1 = all categories, 99 = mine
   const eqName = ["BW","Band","DB"];
   const back = el('<div class="modal-back picker-back"><div class="modal picker" style="--accent:'+kit.color+'">'+
     '<div class="pk-top"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><h3 style="margin:0;flex:1">'+(cur ? 'Swap '+esc(cur.n) : 'Add a move')+'</h3>'+
@@ -1231,7 +1540,7 @@ function openExPicker(kitId, idx){
     const last = lastLogFor(o.n), sc = COLUMNS[ci];
     const tags = (o.d && ent.k===kitId?'<span class="extag">default</span>':'')+(o.hold?'<span class="extag">hold</span>':'')+(o.sides?'<span class="extag">sides</span>':'')+(inPlan?'<span class="extag">in workout</span>':'');
     return '<div class="pkrow'+(on?' on':'')+'" data-k="'+ent.k+'" data-r="'+(ent.r!=null?ent.r:"")+'" data-n="'+esc(ent.n)+'">'+
-      pico(CATPIC[ent.k==="X"?(+o.cat||0):ent.r]||0, ci)+
+      movePico(o.n, ent.k==="X"?(+o.cat||0):ent.r, ci)+
       '<div class="lr-main"><div class="lr-name">'+esc(o.n)+' '+tags+'</div><div class="lr-sub">'+esc(o.c||"Your own move")+'</div>'+
       (last?'<div class="lr-sub" style="margin-top:1px">last: '+agoText(last.date)+'</div>':'')+'</div>'+
       '<span class="eqtag" style="background:'+sc.color+'">'+eqName[ci]+'</span><span class="tck">'+(on?'✓':'')+'</span></div>';
@@ -1245,7 +1554,11 @@ function openExPicker(kitId, idx){
       if(mine.length){ h += '<div class="pk-h">★ Your moves</div>'; mine.forEach(cm=> h += rowHTML({k:"X", n:cm.n}, cm, Math.max(0,COLUMNS.findIndex(c=>c.id===cm.eq)))); }
     }
     if(f.cat!==99){
-      CATS.forEach((cn, r)=>{
+      // when swapping, the current move's category comes first — but every category is open
+      const order = CATS.map((_,i)=>i);
+      if(cur && !cur.custom){ order.splice(order.indexOf(cur.cat),1); order.unshift(cur.cat); }
+      order.forEach(r=>{
+        const cn = CATS[r];
         if(f.cat!==-1 && f.cat!==r) return;
         // the kit you're on first, then the others
         const kits = [kitIdx].concat(COLUMNS.map((_,i)=>i).filter(i=>i!==kitIdx));
@@ -1264,7 +1577,7 @@ function openExPicker(kitId, idx){
       choose(k==="X" ? {k:"X", n} : {k, r:+row.getAttribute("data-r"), n});
     }));
   };
-  back.querySelector("#pkQ").addEventListener("input", e=>{ f.q=e.target.value; if(f.q && f.cat!==-1 && f.cat!==99){ f.cat=-1; paintChips(); } paintList(); });
+  back.querySelector("#pkQ").addEventListener("input", e=>{ f.q=e.target.value; paintList(); });
   back.querySelector("#pkNew").addEventListener("click", ()=> openCustomMove(kitId, f.q, f.cat>=0&&f.cat<CATS.length ? f.cat : (cur?cur.cat:0), ent=> choose(ent)));
   paintChips(); paintList();
 }
@@ -1336,7 +1649,7 @@ function renderQuick(){
   html += '<p class="small muted" style="margin:-4px 0 12px">One move, straight sets, a rest timer in between. Push-ups by default — or pick anything.</p>';
 
   // the move
-  html += '<div class="card"><div class="lrow" style="border:0;padding:0 0 10px">'+pico(q.ex.row, q.ex.colIdx)+
+  html += '<div class="card"><div class="lrow" style="border:0;padding:0 0 10px">'+movePico(q.ex.name, q.ex.cat!=null?q.ex.cat:q.ex.row, q.ex.colIdx)+
           '<div class="lr-main"><div class="lr-name">'+esc(q.ex.name)+'</div><div class="lr-sub">'+(q.ex.lt==="bw"?"bodyweight":esc(col.equipment))+'</div></div></div>';
   let chips=""; QUICK.forEach((x,i)=> chips += '<button type="button" class="qchip'+(x.n===q.ex.name?' on':'')+'" data-q="'+i+'">'+esc(x.n)+'</button>');
   html += '<div class="qchips" style="margin-bottom:8px">'+chips+'</div>';
@@ -1535,7 +1848,7 @@ function openQuickLog(){
     if(p.chip!=null){ const c=back.querySelector('.qchip[data-q="'+p.chip+'"]'); if(c) c.classList.add("on"); }
     wWrap.style.display = p.lt==="bw" ? "none" : "flex";
     prev.style.display = "flex";
-    prev.innerHTML = pico(p.row, p.colIdx) + '<div class="lr-main"><div class="lr-name">'+esc(p.name)+'</div><div class="lr-sub">'+(p.lt==="bw"?"bodyweight":esc(COLUMNS[p.colIdx].equipment))+'</div></div>';
+    prev.innerHTML = movePico(p.name, p.cat!=null?p.cat:p.row, p.colIdx) + '<div class="lr-main"><div class="lr-name">'+esc(p.name)+'</div><div class="lr-sub">'+(p.lt==="bw"?"bodyweight":esc(COLUMNS[p.colIdx].equipment))+'</div></div>';
   }
   back.querySelectorAll(".qchip").forEach(ch=> ch.addEventListener("click", ()=>{
     const i=+ch.getAttribute("data-q"); sel.value="";
@@ -1837,7 +2150,7 @@ const Player = {
     html += '<div class="center"><div class="time" id="ringTime">'+mmss(step.sec)+'</div><div class="sub">'+esc(phaseLabel)+'</div></div></div></div>';
 
     if(step.type==="exercise" && step.quick){
-      html += '<div class="player-ex">'+pico(q.ex.row, q.ex.colIdx, "pbig");
+      html += '<div class="player-ex">'+movePico(q.ex.name, q.ex.cat!=null?q.ex.cat:q.ex.row, q.ex.colIdx, "pbig");
       html += '<div class="pname">'+esc(q.ex.name)+'</div>';
       html += '<div class="pcue">'+(q.timed ? "Keep going until the timer ends" : "Tap Done when the set is finished")+'</div>';
       html += '<div class="ptarget" style="color:'+col.color+'">'+(q.timed ? (q.work+'s work') : (q.reps+(q.ex.hold?'s hold':' reps')))+' · '+q.sets+' sets</div>';
